@@ -19,3 +19,10 @@ Not yet: campaign missions (Phase 3), per-stage hub painting (only the fully rea
 - Welcome card explains Restoration Parts (rebuild the complex) and Resonance (learn skills), with the amounts just earned. "Show me" or "Skip the guide".
 - Six guided steps, each pointing at the real control and advancing only on the real action: open Moonwell Cisterns → restore stage 1 (opens Water skills) → open Water skills → buy a first skill → Warden Power explained → the Next Step button. A first win always affords both (80 Parts vs 40; ≥40 Resonance vs 25).
 - Each resource in the top bar is a button that explains itself. The ? button replays the guide. Guide progress is stored in the profile, so it travels with save codes.
+
+## Gate-first transition (Oct 22 2026, user direction)
+Tutorial win -> arrive at the Outer Seal -> its gate is sealed -> first restoration is raising the gate (40 Parts, +10 starting Charge, opens the road and the Fire skills) -> first skill with Resonance -> pointed to the first campaign mission at the Moonwell Cisterns.
+- All facilities show "Beyond the gate" until the gate is raised; restorations require it.
+- Guide: Outer Seal -> Raise the gate -> Open Fire skills -> Buy a first skill -> Warden Power -> First campaign mission (Moonwell; arrives in Phase 3, replays earn Parts until then).
+- First win (80 Parts, >=40 Resonance) covers the gate (40), a Fire skill (25) and the first Moonwell stage (40).
+- Warden Power now = total of all percentage bonuses (so any skill shows up), not the average damage.

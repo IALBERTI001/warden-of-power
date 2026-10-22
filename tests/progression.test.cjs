@@ -7,8 +7,8 @@ const plain=new E.Game();assert.equal(plain.charge,165);plain.build('fire',{x:23
 // An old save migrates without losing badges, counters or Parts.
 const old={earned:{first_upgrade:'2026-10-20'},counters:{freeze:7},parts:80};const m=P.migrate(old);assert.equal(m.parts,80);assert.equal(m.counters.freeze,7);assert.equal(m.earned.first_upgrade,'2026-10-20');assert.equal(m.resonance,0);assert.deepEqual(m.skills,{});
 // Skills: branch locked until its facility's first restoration; selecting never spends; prerequisites and costs enforced.
-const p=P.migrate({parts:300,resonance:500});
-assert.equal(P.skillOffer(p,'fire_furnace').ok,false);assert.equal(p.resonance,500,'checking an offer never spends');
+const p=P.migrate({parts:300,resonance:500});assert.equal(P.restore(p,'emberheart').ok,false,'gate first');assert.equal(P.openGate(p).ok,true);assert.equal(p.parts,260);p.gateOpen=false;p.parts=300;
+assert.equal(P.skillOffer(p,'fire_furnace').ok,false);p.gateOpen=true;assert.equal(P.skillOffer(p,'fire_furnace').ok,true,'gate opens Fire skills');assert.equal(P.skillOffer(p,'water_saturation').ok,false);assert.equal(p.resonance,500,'checking an offer never spends');
 assert.equal(P.restore(p,'emberheart').ok,true);assert.equal(p.parts,260);assert.equal(p.restorations.emberheart,1);
 assert.equal(P.skillOffer(p,'fire_pursuit').ok,false,'needs Furnace tuning rank 1 first');
 assert.deepEqual(P.buySkill(p,'fire_furnace'),{ok:true,rank:1,cost:25});assert.equal(p.resonance,475);

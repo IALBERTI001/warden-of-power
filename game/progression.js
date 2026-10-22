@@ -37,6 +37,8 @@ const FACILITIES=[
  {id:'stormcrown',name:'Stormcrown Spire',branch:'lightning',stages:['Raise the rods','Rewire the coils','Reawaken the Stormcrown'],costs:[40,80,140],bonus:['damagePct',.05]},
  {id:'atelier',name:"Cogwright's Atelier",branch:'engineering',stages:['Sweep the workshop','Restore the lathes','Reawaken the Atelier'],costs:[30,60,110],bonus:['startingCharge',15]}
 ];
+// The Outer Seal Gate: the first restoration every Warden makes. Opens the road into the complex.
+const GATE={name:'Outer Seal Gate',stage:'Raise the gate',cost:40,bonus:['startingCharge',10]};
 // Mastery: tiers I-V per branch, 10 ranks each, unlocked by completing endless waves. Bounded and expandable.
 const MASTERY={unlockWaves:[50,100,200,300,400],ranks:10,perRank:{fire:['damagePct',.02],water:['damagePct',.02],ice:['damagePct',.02],lightning:['damagePct',.02],engineering:['allDamagePct',.01]},cost:(tier,rank)=>40*tier+10*rank};
 
@@ -45,13 +47,16 @@ function blankProfile(){return{earned:{},counters:{freeze:0,conduction:0,shatter
 function migrate(profile={}){const p={...blankProfile(),...profile};p.skills={...(profile.skills||{})};p.restorations={...(profile.restorations||{})};p.mastery=JSON.parse(JSON.stringify(profile.mastery||{}));p.progressionVersion=2;return p}
 const skill=id=>SKILLS.find(s=>s.id===id);
 const rank=(p,id)=>Math.max(0,Math.min(skill(id)?.maxRank||0,Math.floor(p.skills?.[id]||0)));
-function branchUnlocked(p,branch){const f=FACILITIES.find(f=>f.branch===branch);return (p.restorations?.[f.id]||0)>=1}
+// Raising the Outer Seal Gate relights its fire wards: the Fire branch opens first (the tutorial's first element).
+function branchUnlocked(p,branch){if(branch==='fire'&&p.gateOpen)return true;const f=FACILITIES.find(f=>f.branch===branch);return (p.restorations?.[f.id]||0)>=1}
 // What buying the next rank needs. Selecting/inspecting never spends; only buySkill does.
-function skillOffer(p,id){const s=skill(id);if(!s)return{ok:false,reason:'Unknown skill.'};const r=rank(p,id);if(r>=s.maxRank)return{ok:false,reason:'Maximum rank.',rank:r};if(!branchUnlocked(p,s.branch))return{ok:false,reason:`Restore the ${FACILITIES.find(f=>f.branch===s.branch).name} first.`,rank:r,cost:s.costs[r]};const prev=SKILLS.find(n=>n.branch===s.branch&&n.order===s.order-1);if(prev&&rank(p,prev.id)<1)return{ok:false,reason:`Needs ${prev.name} rank 1.`,rank:r,cost:s.costs[r]};const cost=s.costs[r];if((p.resonance||0)<cost)return{ok:false,reason:`Needs ${cost-(p.resonance||0)} more Resonance.`,rank:r,cost};return{ok:true,rank:r,cost}}
+function skillOffer(p,id){const s=skill(id);if(!s)return{ok:false,reason:'Unknown skill.'};const r=rank(p,id);if(r>=s.maxRank)return{ok:false,reason:'Maximum rank.',rank:r};if(!branchUnlocked(p,s.branch))return{ok:false,reason:s.branch==='fire'?'Raise the Outer Seal Gate or restore the Emberheart Forge first.':`Restore the ${FACILITIES.find(f=>f.branch===s.branch).name} first.`,rank:r,cost:s.costs[r]};const prev=SKILLS.find(n=>n.branch===s.branch&&n.order===s.order-1);if(prev&&rank(p,prev.id)<1)return{ok:false,reason:`Needs ${prev.name} rank 1.`,rank:r,cost:s.costs[r]};const cost=s.costs[r];if((p.resonance||0)<cost)return{ok:false,reason:`Needs ${cost-(p.resonance||0)} more Resonance.`,rank:r,cost};return{ok:true,rank:r,cost}}
 function buySkill(p,id){const o=skillOffer(p,id);if(!o.ok)return o;p.resonance-=o.cost;p.skills[id]=o.rank+1;return{ok:true,rank:o.rank+1,cost:o.cost}}
 // Free reassignment between attempts: every rank refunded at full price.
 function resetSkills(p){let back=0;for(const s of SKILLS){const r=rank(p,s.id);for(let i=0;i<r;i++)back+=s.costs[i]}p.resonance=(p.resonance||0)+back;p.skills={};return back}
-function restorationOffer(p,id){const f=FACILITIES.find(f=>f.id===id);if(!f)return{ok:false,reason:'Unknown facility.'};const stage=p.restorations?.[id]||0;if(stage>=f.stages.length)return{ok:false,reason:'Fully restored.',stage};const cost=f.costs[stage];if((p.parts||0)<cost)return{ok:false,reason:`Needs ${cost-(p.parts||0)} more Restoration Parts.`,stage,cost};return{ok:true,stage,cost,next:f.stages[stage]}}
+function gateOffer(p){if(p.gateOpen)return{ok:false,reason:'The gate is open.'};if((p.parts||0)<GATE.cost)return{ok:false,reason:`Needs ${GATE.cost-(p.parts||0)} more Restoration Parts.`,cost:GATE.cost};return{ok:true,cost:GATE.cost}}
+function openGate(p){const o=gateOffer(p);if(!o.ok)return o;p.parts-=o.cost;p.gateOpen=true;return{ok:true,cost:o.cost}}
+function restorationOffer(p,id){const f=FACILITIES.find(f=>f.id===id);if(!f)return{ok:false,reason:'Unknown facility.'};if(!p.gateOpen)return{ok:false,reason:'Raise the Outer Seal Gate first.'};const stage=p.restorations?.[id]||0;if(stage>=f.stages.length)return{ok:false,reason:'Fully restored.',stage};const cost=f.costs[stage];if((p.parts||0)<cost)return{ok:false,reason:`Needs ${cost-(p.parts||0)} more Restoration Parts.`,stage,cost};return{ok:true,stage,cost,next:f.stages[stage]}}
 function restore(p,id){const o=restorationOffer(p,id);if(!o.ok)return o;p.parts-=o.cost;p.restorations[id]=o.stage+1;return{ok:true,stage:o.stage+1,cost:o.cost}}
 function masteryTierOpen(p,tier){return (p.bestEndlessWave||0)>=MASTERY.unlockWaves[tier-1]}
 function masteryRanks(p,branch,tier){return Math.max(0,Math.min(MASTERY.ranks,Math.floor(p.mastery?.[branch]?.[tier]||0)))}
@@ -62,6 +67,7 @@ function buyMastery(p,branch,tier){const o=masteryOffer(p,branch,tier);if(!o.ok)
 function bonuses(profile){const p=migrate(profile||{});const b={el:{},eng:{startingCharge:0,upgradeDiscount:0,refundPts:0,fifthWaveCharge:0},allDamagePct:0,sources:[]};for(const e of ELEMENTS)b.el[e]={damagePct:0,impactPct:0,burnPct:0,shatterPct:0,shatterRadiusPct:0,soakPct:0,soakExtra:0,rangePct:0,speedPct:0,slowPts:0,vsFrozenPct:0,vsBossPct:0,conductPct:0,secondaryPct:0,chainExtra:0};
  const add=(branch,key,value,source)=>{if(!value)return;if(branch==='engineering'){if(key==='allDamagePct')b.allDamagePct+=value;else b.eng[key]=(b.eng[key]||0)+value}else b.el[branch][key]=(b.el[branch][key]||0)+value;b.sources.push({branch,key,value,source})};
  for(const s of SKILLS){const r=rank(p,s.id);if(r){let v=s.value*r;add(s.branch,s.key,v,`${s.name} ${r}/${s.maxRank}`)}}
+ if(p.gateOpen)add('engineering',GATE.bonus[0],GATE.bonus[1],GATE.name);
  for(const f of FACILITIES){const st=Math.min(f.stages.length,p.restorations[f.id]||0);if(st)add(f.branch,f.bonus[0],f.bonus[1]*st,`${f.name} ${st}/3`)}
  for(const br of BRANCHES)for(let t=1;t<=MASTERY.unlockWaves.length;t++){const r=masteryRanks(p,br,t);if(r){const [key,per]=MASTERY.perRank[br];add(br,key,per*r,`Mastery ${['I','II','III','IV','V'][t-1]} ${r}/10`)}}
  // caps from the approved tree
@@ -69,6 +75,8 @@ function bonuses(profile){const p=migrate(profile||{});const b={el:{},eng:{start
  return b}
 // Total percentage added to an element's direct damage, used for the "Warden power" line.
 function damageBonus(b,type){const e=b.el[type];return e.damagePct+(type==='fire'?e.impactPct:0)+b.allDamagePct}
-function powerSummary(profile){const b=bonuses(profile);const avg=ELEMENTS.reduce((s,e)=>s+damageBonus(b,e),0)/ELEMENTS.length;return Math.round(avg*100)}
-return{ELEMENTS,BRANCHES,SKILLS,FACILITIES,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
+// Warden Power: the total of every percentage bonus your towers carry (damage, burn, shatter, range, speed, soak, slow...).
+const PCT_KEYS=['damagePct','impactPct','burnPct','shatterPct','shatterRadiusPct','soakPct','rangePct','speedPct','slowPts','vsFrozenPct','vsBossPct','conductPct','secondaryPct'];
+function powerSummary(profile){const b=bonuses(profile);let t=b.allDamagePct*ELEMENTS.length+b.eng.upgradeDiscount+b.eng.refundPts;for(const e of ELEMENTS)for(const k of PCT_KEYS)t+=b.el[e][k]||0;return Math.round(t*100)}
+return{ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
 });
