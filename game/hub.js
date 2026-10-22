@@ -37,7 +37,8 @@ function paint(){if(ready&&!HubFX.isPlaying())HubFX.setState(sceneState())}
 // The restoration moment: pins step aside, the area is rebuilt on screen, a banner names what changed.
 function celebrate(id,from,to,title,line){if(!ready){render();return}document.body.classList.add('moment');const banner=$('momentBanner');banner.innerHTML=`<span class="eyebrow">RESTORED</span><h3></h3><p></p><small>Click or press any key to skip</small>`;banner.querySelector('h3').textContent=title;banner.querySelector('p').textContent=line;banner.hidden=true;
  setTimeout(()=>{if(HubFX.isPlaying())banner.hidden=false},reducedMotion?0:1500);
- HubFX.playMoment(id,from,to,()=>{banner.hidden=true;document.body.classList.remove('moment');render()})}
+ momentAmb=id;syncAmbience();
+ HubFX.playMoment(id,from,to,()=>{momentAmb=null;syncAmbience();banner.hidden=true;document.body.classList.remove('moment');render()})}
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const skip=()=>{if(HubFX.isPlaying())HubFX.skipMoment()};
 addEventListener('keydown',e=>{if(HubFX.isPlaying()){e.preventDefault();e.stopImmediatePropagation();skip()}},true);
@@ -178,18 +179,23 @@ $('openGuide').onclick=()=>{profile.hubGuide=0;profile.hubIntroSeen=false;persis
 setInterval(tickGuide,250);addEventListener('resize',tickGuide);
 if(seals().cleared&&!profile.hubIntroSeen)setTimeout(showIntro,500);
 
-// ---------- ambience: a quiet loop per restored area, louder as it is restored ----------------
+// ---------- ambience: only the selected area is heard ---------------------------------------------
+// User feedback (Oct 22): the always-on mix was too aggressive. Now an area's loop plays softly only while
+// its panel is open (or while its restoration moment plays), fading in and out; the hub is quiet otherwise.
 const AMB={moonwell:'water',emberheart:'fire',rimeglass:'ice',stormcrown:'storm',atelier:'gears'};
-const ambPlayers={};let ambUnlocked=false;
+const ambPlayers={},ambTarget={};let ambUnlocked=false,momentAmb=null;
 function audioSettings(){try{return{master:.65,ambience:.35,masterMute:false,ambienceMute:false,...JSON.parse(localStorage.getItem('warden.settings.v1')||'{}')}}catch{return{master:.65,ambience:.35}}}
-function syncAmbience(){const s=audioSettings(),base=(s.masterMute||s.ambienceMute)?0:s.master*s.ambience;const quiet=document.hidden;
- for(const [id,name] of Object.entries(AMB)){const st=stage(id);let a=ambPlayers[id];if(!st){if(a)a.pause();continue}
-  if(!a){a=ambPlayers[id]=new Audio(`assets/hub/ambience/amb-${name}.wav`);a.loop=true}
-  a.volume=Math.min(1,base*(.35+.22*st));if(ambUnlocked&&!quiet&&base>0)a.play().catch(()=>{});else a.pause()}}
-addEventListener('pointerdown',()=>{if(!ambUnlocked){ambUnlocked=true;syncAmbience()}},{once:false});
+function syncAmbience(){const s=audioSettings(),base=(s.masterMute||s.ambienceMute)?0:s.master*s.ambience;const heard=momentAmb||currentPanel;
+ for(const [id,name] of Object.entries(AMB)){const st=stage(id);
+  ambTarget[id]=(ambUnlocked&&!document.hidden&&id===heard&&st)?Math.min(1,base*(.5+.17*st)):0;
+  if(ambTarget[id]>0&&!ambPlayers[id]){const a=ambPlayers[id]=new Audio(`assets/hub/ambience/amb-${name}.wav`);a.loop=true;a.volume=0}}}
+function ambStep(){for(const [id,a] of Object.entries(ambPlayers)){const t=ambTarget[id]||0,v=a.volume;
+  const nv=t>v?Math.min(t,v+.03):Math.max(t,v-.02);a.volume=nv;   // ~0.8 s in, ~1.2 s out
+  if(nv>0&&a.paused)a.play().catch(()=>{});if(nv===0&&!a.paused)a.pause()}}
+addEventListener('pointerdown',()=>{if(!ambUnlocked){ambUnlocked=true;syncAmbience()}});
 addEventListener('keydown',()=>{if(!ambUnlocked){ambUnlocked=true;syncAmbience()}});
 document.addEventListener('visibilitychange',syncAmbience);
-setInterval(syncAmbience,1500);
+setInterval(()=>{syncAmbience();ambStep()},50);
 function wireAmbienceControls(){const s=audioSettings();$('ambVol').value=s.ambience;$('ambMute').checked=!!s.ambienceMute;
  const write=()=>{const cur=(()=>{try{return JSON.parse(localStorage.getItem('warden.settings.v1')||'{}')}catch{return{}}})();cur.ambience=+$('ambVol').value;cur.ambienceMute=$('ambMute').checked;try{localStorage.setItem('warden.settings.v1',JSON.stringify(cur))}catch{}syncAmbience()};
  $('ambVol').oninput=write;$('ambMute').onchange=write}

@@ -52,7 +52,13 @@ for k in range(0,n-SR,step):
     for j,off in enumerate([0,int(SR*.3)]):
         d=int(SR*.05);s=lp(rng.standard_normal(d),.25)*env(d,.001,.012)*(.6 if j==0 else .35);place(gt,s,k+off+int(rng.uniform(-200,200)))
 gears=norm(loopify(gt+lp(rng.standard_normal(n),.008)*2),.3)
+# v2 (user feedback: "too aggressive"): darker and quieter. Two-pole low-pass near 1 kHz removes the hiss,
+# then every loop is set to the same soft level. Filtered over two copies so the loop stays seamless.
+def soften(x,a=.26,rms=.03,peak=.18):
+    y=lp(lp(np.concatenate([x,x]),a),a)[len(x):]
+    y=y/np.sqrt(np.mean(y**2))*rms
+    return y/max(1,np.max(np.abs(y))/peak)
 out={}
 for name,x in [('water',water),('fire',fire),('ice',ice),('storm',storm),('gears',gears)]:
-    save(f'amb-{name}.wav',x);out[name]={'peak':float(np.max(np.abs(x))),'rms':float(np.sqrt(np.mean(x**2))),'finite':bool(np.isfinite(x).all())}
+    x=soften(x);save(f'amb-{name}.wav',x);out[name]={'peak':float(np.max(np.abs(x))),'rms':float(np.sqrt(np.mean(x**2))),'finite':bool(np.isfinite(x).all())}
 json.dump(out,open('ambience-checks.json','w'),indent=1);print(out)
