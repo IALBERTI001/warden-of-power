@@ -1,0 +1,57 @@
+{
+  "sample_rate": 44100,
+  "duration_seconds": 10.5,
+  "peak_dbfs": -12.81,
+  "clipped_samples": 0,
+  "sound_events": 12,
+  "events": [
+    {
+      "time": 1.0,
+      "sound": "ice_launch"
+    },
+    {
+      "time": 1.45,
+      "sound": "ice_contact"
+    },
+    {
+      "time": 1.45,
+      "sound": "golem_chilled"
+    },
+    {
+      "time": 2.7,
+      "sound": "water_launch"
+    },
+    {
+      "time": 3.15,
+      "sound": "water_contact"
+    },
+    {
+      "time": 3.7,
+      "sound": "ice_launch"
+    },
+    {
+      "time": 4.15,
+      "sound": "freeze_combo"
+    },
+    {
+      "time": 5.8,
+      "sound": "water_launch"
+    },
+    {
+      "time": 6.25,
+      "sound": "water_contact"
+    },
+    {
+      "time": 6.3,
+      "sound": "ice_launch"
+    },
+    {
+      "time": 6.75,
+      "sound": "ice_contact"
+    },
+    {
+      "time": 6.75,
+      "sound": "golem_death"
+    }
+  ]
+}

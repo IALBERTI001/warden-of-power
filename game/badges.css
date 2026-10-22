@@ -1,0 +1,30 @@
+/* Painted badge gallery, profile badge, toasts and results recap. */
+#badges{width:min(980px,94vw)}
+#badges .achievement-list{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;max-height:min(66vh,640px);overflow:auto;padding:2px 4px 2px 2px}
+.achievement{display:flex;gap:12px;align-items:flex-start;border-radius:12px;padding:12px;position:relative}
+.achievement .badge-slot{position:relative;flex:none;width:96px;height:96px}
+.badge-art{display:block;width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 4px 6px #0009)}
+.badge-art.is-locked{filter:grayscale(1) brightness(.42) contrast(1.1);opacity:.8}
+.badge-lock{position:absolute;right:2px;bottom:2px;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#1d1626;border:2px solid #806944;font-size:13px}
+.badge-text{min-width:0;display:flex;flex-direction:column;gap:3px}
+.badge-text strong{font-size:16px}
+.badge-tier{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#cbb994}
+.achievement p{margin:2px 0;font-family:'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;font-size:13px;line-height:1.35}
+.achievement small{color:#b8a98d}
+.tier-silver.earned{border-color:#cfd6dd}.tier-gold.earned{border-color:#f0c766;box-shadow:0 0 14px #f0c76633}
+.tier-prismatic.earned{border-color:#e8d2ff;box-shadow:0 0 18px #b98cff55,0 0 6px #7fe0f555}
+.badge-progress{height:6px;border-radius:3px;background:#ffffff1f;overflow:hidden;margin:3px 0}
+.badge-progress i{display:block;height:100%;background:linear-gradient(90deg,#ff9a3c,#ffd36b)}
+.badge-equip{margin-top:6px;align-self:flex-start;padding:5px 12px;border-radius:8px;font-size:12px}
+.badge-equip[aria-pressed=true]{background:linear-gradient(#ffe39a,#d59a3a);color:#2a1d17;border-color:#2a1d17}
+#profileButton.has-badge{padding:0;overflow:visible;background:none;border:0;box-shadow:none}
+#profileButton .profile-badge{width:44px;height:44px;filter:drop-shadow(0 3px 5px #000a)}
+.badge-toast{display:grid;grid-template-columns:52px 1fr;column-gap:10px;align-items:center}
+.badge-toast .toast-badge{grid-row:1 / span 3;width:52px;height:52px}
+.result-badges h3{margin:10px 0 6px;font-size:14px}
+.result-badges>div{display:flex;flex-wrap:wrap;gap:10px}
+.result-badges figure{margin:0;width:84px;text-align:center}
+.result-badges .badge-art{width:72px;height:72px;margin:0 auto}
+.result-badges figcaption{font-size:11px;line-height:1.2;margin-top:4px}
+@media(prefers-reduced-motion:reduce){.badge-art{transition:none}}
+@media(max-width:560px){#badges .achievement-list{grid-template-columns:1fr}.achievement .badge-slot,.badge-art{width:72px;height:72px}}

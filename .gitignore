@@ -1,0 +1,13 @@
+# Local secrets and machine-specific files
+.env
+*.env
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store
+Thumbs.db
+desktop.ini
+# Large local transfer bundles
+*.tgz
+*.part??

@@ -1,0 +1,122 @@
+[
+  {
+    "file": "broken-conduit.wav",
+    "seconds": 35.69,
+    "peak_dbfs": -11.65,
+    "rms_dbfs": -25.0,
+    "energy_above_4khz_pct": 0.0,
+    "clipped_samples": 0
+  },
+  {
+    "file": "furnace-regulator.wav",
+    "seconds": 31.4,
+    "peak_dbfs": -11.21,
+    "rms_dbfs": -25.0,
+    "energy_above_4khz_pct": 0.0,
+    "clipped_samples": 0
+  },
+  {
+    "file": "crystal-vault.wav",
+    "seconds": 38.32,
+    "peak_dbfs": -11.94,
+    "rms_dbfs": -25.0,
+    "energy_above_4khz_pct": 0.0,
+    "clipped_samples": 0
+  },
+  {
+    "file": "endless-core.wav",
+    "seconds": 30.2,
+    "peak_dbfs": -13.68,
+    "rms_dbfs": -25.0,
+    "energy_above_4khz_pct": 0.0,
+    "clipped_samples": 0
+  },
+  {
+    "file": "water_launch.wav",
+    "seconds": 0.36,
+    "peak_dbfs": -12.45,
+    "rms_dbfs": -27.47,
+    "energy_above_4khz_pct": 0.0002,
+    "clipped_samples": 0
+  },
+  {
+    "file": "water_contact.wav",
+    "seconds": 0.4,
+    "peak_dbfs": -14.03,
+    "rms_dbfs": -28.83,
+    "energy_above_4khz_pct": 0.012,
+    "clipped_samples": 0
+  },
+  {
+    "file": "ice_launch.wav",
+    "seconds": 0.3,
+    "peak_dbfs": -16.16,
+    "rms_dbfs": -34.32,
+    "energy_above_4khz_pct": 0.0014,
+    "clipped_samples": 0
+  },
+  {
+    "file": "ice_contact.wav",
+    "seconds": 0.31,
+    "peak_dbfs": -16.53,
+    "rms_dbfs": -34.26,
+    "energy_above_4khz_pct": 0.0002,
+    "clipped_samples": 0
+  },
+  {
+    "file": "golem_chilled.wav",
+    "seconds": 0.46,
+    "peak_dbfs": -15.29,
+    "rms_dbfs": -31.95,
+    "energy_above_4khz_pct": 0.0004,
+    "clipped_samples": 0
+  },
+  {
+    "file": "freeze_combo.wav",
+    "seconds": 0.64,
+    "peak_dbfs": -18.28,
+    "rms_dbfs": -34.96,
+    "energy_above_4khz_pct": 0.0003,
+    "clipped_samples": 0
+  },
+  {
+    "file": "golem_death.wav",
+    "seconds": 0.95,
+    "peak_dbfs": -11.75,
+    "rms_dbfs": -31.76,
+    "energy_above_4khz_pct": 0.0072,
+    "clipped_samples": 0
+  },
+  {
+    "file": "warmer-combo-effects.wav",
+    "seconds": 10.5,
+    "peak_dbfs": -9.04,
+    "rms_dbfs": -34.79,
+    "energy_above_4khz_pct": 0.0044,
+    "clipped_samples": 0
+  },
+  {
+    "file": "conduit-scene-music.wav",
+    "seconds": 10.5,
+    "peak_dbfs": -20.56,
+    "rms_dbfs": -32.94,
+    "energy_above_4khz_pct": 0.0,
+    "clipped_samples": 0
+  },
+  {
+    "file": "warmer-combo-with-conduit-music.wav",
+    "seconds": 10.5,
+    "peak_dbfs": -8.89,
+    "rms_dbfs": -30.8,
+    "energy_above_4khz_pct": 0.0018,
+    "clipped_samples": 0
+  },
+  {
+    "file": "repeated-fire-comfort-test.wav",
+    "seconds": 18.0,
+    "peak_dbfs": -16.88,
+    "rms_dbfs": -37.83,
+    "energy_above_4khz_pct": 0.0027,
+    "clipped_samples": 0
+  }
+]

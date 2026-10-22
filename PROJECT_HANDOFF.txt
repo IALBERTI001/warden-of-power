@@ -1,0 +1,602 @@
+﻿WARDEN OF POWER - PROJECT HANDOFF AND CONTINUATION INSTRUCTIONS
+Prepared October 22, 2026 (America/Los_Angeles)
+============================================================
+
+READ THIS FIRST
+
+This is a local browser tower-defense game in active development. It is not
+finished, published, integrated with CrazyGames accounts, or release-certified.
+Use this file to continue development on another PC without losing the approved
+direction. Copy the entire project folder, not only this text file.
+
+Current original location:
+C:\Users\Ultim\OneDrive\Documents\ChatGPT\Online Games
+
+The game can live at a different path on the other PC. Runtime assets use relative
+paths. The Codex app's machine-specific runtime paths are NOT game dependencies.
+
+The user's central philosophy:
+"Players are the life-blood of our games. Our focus should be the player and their
+experience."
+
+Quality expectation: no shortcuts. Treat this as game design and production, not
+as a generic website exercise. Polish artwork, animation, audio, teaching,
+feedback, controls, progression, and performance together. Approved designs must
+stay consistent. Do not silently replace, reinterpret, or redesign them.
+
+MOST RECENT APPROVED DIRECTION OVERRIDES OLDER DESIGN NOTES.
+Several older documents retain historical eight-wave, garden, art, audio, or
+font proposals. They are context, not permission to restore those designs.
+This handoff summarizes the current decisions and flags unfinished work.
+
+
+1. GOAL, SETTING, AND PLAYER EXPERIENCE
+--------------------------------------
+
+Goal: create an excellent, polished browser tower-defense game, developed locally,
+ultimately meeting CrazyGames requirements for full publication. Re-check the
+current official CrazyGames developer requirements when doing platform work;
+this project has not completed that audit or submission process.
+
+Working title: Warden of Power.
+Player role: Warden of Power, defending an ancient elemental containment complex.
+Enemies are manifestations of unstable power. Magical towers protect containment
+seals and recapture power. The former garden Keeper framing was superseded.
+
+First map/tutorial: The Broken Conduit, Outer Seal / Sector I.
+The map should tell this world's story, not be a random decorative backdrop.
+
+Desired loop:
+- Enter play with clear objectives and readable threats.
+- Spend run currency (Charge) on elemental towers and upgrades.
+- Start waves, earn Charge from enemies and wave clears.
+- Build, upgrade, retarget, sell, and adapt in real time, including during waves.
+- Combine elements, earn achievements, and learn from visible feedback.
+- Finish runs and progress toward restoration/campaign goals.
+- Eventually unlock endless mode, earn permanent endless progression, and pursue
+  personal records and the player ladder.
+
+Player flexibility is essential. Pause and 1x / 2x / 5x speed remain available.
+Clear resource costs/refunds and responsive hotkeys are required. Avoid needless
+screens or interface clutter that obscure the game.
+
+
+2. CURRENT IMPLEMENTATION: WHAT REALLY EXISTS
+--------------------------------------------
+
+Plain HTML/CSS/JavaScript game with Canvas 2D rendering and browser Audio playback.
+No frontend framework, npm package dependency, bundler, database, or server API.
+Scripts use browser globals/CommonJS-compatible modules rather than a build chain.
+
+Implemented in the playable local tutorial:
+- Exactly FIVE combat waves, ending after the fifth clears.
+- Shared wave total/formatter used by HUD, next-wave preview, and results.
+- Fire, Water, Ice, Lightning towers.
+- Free placement on clear valid ground, not restricted to predefined pads.
+- Placement blocks the road, door approaches, boundaries, and overlapping towers.
+- Tier I, Tier II, and Tier III with two specialization choices at Tier III.
+- Tier-dependent tower artwork; upgraded artwork remains a review candidate
+  unless separately approved. Preserve identities rather than redesigning them.
+- Upgrades during combat, without resetting cooldowns for a free shot.
+- Sell with confirmation. Unused towers refund 100% of actual spending; towers
+  that have fired refund 75%, rounded down.
+- First / Last / Strongest / Nearest targeting.
+- Persistent targeting policy badges ABOVE EVERY tower, including when idle:
+  arrow/1 First, reversed arrow/1 Last, flexed arm Strongest, bullseye Nearest.
+  These indicate policy, not a claim that a particular enemy is currently hit.
+- Animated enemy movement, death sequences, status visuals and combo effects.
+- Pause, speed controls, remappable keyboard controls, audio settings.
+- A closable, paged tutorial handbook with 14 reference pages.
+- Local achievement catalog, counters, banked Restoration Parts, resumable run,
+  settings and hotkeys in browser localStorage.
+- Approved original Warden Quill font, bundled locally.
+- Approved v3 elemental tower sounds.
+
+NOT implemented as production systems:
+Campaign maps/restoration facilities; playable endless mode; actual skill-tree
+purchases applied to endless combat; cloud/account saves; online top-10 ladder;
+validated competitive submissions; CrazyGames SDK integration; finished badge
+art; final approved soundtrack/ambience; complete production animation sets;
+full device/browser/accessibility/performance QA; release packaging/submission.
+
+The engine has a boss type with shorter freeze, but the current five-wave
+course ends with mixed enemies, not the old eight-wave boss finale.
+
+
+3. EXACT CURRENT TUTORIAL AND MECHANICS
+--------------------------------------
+
+Current waves in game/engine.js:
+1. Fire & burning: 6 slimes.
+2. Water + ice: hold the line: 5 golems.
+3. Lightning: connected crowds: 14 swarm enemies.
+4. Fire + ice: shatter: 6 golems.
+5. Your elemental defense: 16 mixed enemies.
+
+Fire is initially available. Water AND Ice unlock after wave 1 clears.
+Lightning unlocks after wave 2 clears.
+Start with 165 Charge and 20 seal integrity.
+Wave 1 clear grants 140 preparation Charge; wave 2 grants 90; later clears grant
+45, plus enemy kill earnings. Teaching golems on waves 2/4 have 1.35x health to
+allow combinations to occur. These values are tutorial tuning, not final campaign
+balance promises.
+
+Every display of combat progress must agree with the actual total. On victory,
+show 5 / 5, never 5 / 8. Use engine WAVES and waveProgress(), not independent
+hardcoded denominators. Handbook page counts are independent REFERENCE pages,
+not combat waves. Achievement counts derive from ACHIEVEMENTS.length.
+
+Handbook behavior:
+- Persistent Warden's Handbook button opens/closes it at any time.
+- Previous/Next freely navigate all 14 pages without completing actions first.
+- Remember reading position, including after closing.
+- Battle continues while the nonmodal book is open; closing frees the view.
+- Escape closes the book. Restart returns to page one.
+- Show me closes the book and highlights the relevant battlefield control/panel.
+- Show me MUST NOT buy, upgrade, sell, or open a transaction confirmation.
+- The sell lesson is informational with an Understood button; selling is optional.
+- Reading position and actual performed actions/combos are separate state.
+- Opening a new wave is not gated on reading the handbook.
+
+Current tier-I tower values (engine is authoritative for numerical changes):
+Fire:      60 Charge; 14 damage; 0.85s interval; 160 range.
+Water:     65 Charge;  5 damage; 0.92s interval; 165 range.
+Ice:       75 Charge;  8 damage; 1.10s interval; 155 range.
+Lightning: 90 Charge; 16 damage; 1.22s interval; 165 range.
+
+Tier II: 1.55x base damage, +12 range, interval x0.82.
+Tier III: 2.15x base damage, +24 range, interval x0.72, plus specialization.
+First upgrade cost: 65 + round(base tower cost x0.3).
+Tier III cost: 130 + round(base tower cost x0.5).
+
+Specializations:
+Fire: Wildfire / Fracture furnace.
+Water: Deluge / Pressure Lance.
+Ice: Cold front / Crystal focus.
+Lightning: Chain reaction / Focused current.
+Read stats() for exact effects; do not infer upgrades from art alone.
+
+Element/status contract:
+- Fire deals direct damage and burning for 3 seconds.
+- Water deals light damage and applies Soaked (4 seconds at Tier I; longer when
+  upgraded). SOAKED BY ITSELF DOES NOT SLOW. It is a combo primer.
+- Ice applies Chilled for 2.7 seconds, slowing 24% at Tier I.
+- Ice hitting a Soaked, eligible enemy consumes Soaked and freezes it for 1.5s.
+- Extra hits cannot refresh/extend an existing freeze or bypass freeze resistance.
+- Natural thaw grants 4 seconds freeze resistance.
+- Fire hitting frozen enemies shatters them, dealing area burst damage and ending
+  the freeze. Resistance after shatter is 2 seconds, HALF natural thaw recovery.
+  The user's quarter-time idea was discussed; the accepted current rule is 2s.
+- Boss freeze duration is currently 0.75s in the engine.
+- Lightning hitting a Soaked target can conduct to nearby enemies (up to 3 total
+  chain targets at Tier I; certain upgrades increase this).
+- Badges require real resolved combo events, not merely building towers together.
+- First real status/combo occurrences give explanatory notices; tower inspector
+  and field manual also explain the mechanics.
+
+Default keys:
+1 Fire; 2 Water; 3 Ice; 4 Lightning.
+U focuses/reviews upgrades; X opens sell confirmation; T cycles target policy.
+Space pause; N next/early wave; Z 1x; C 2x; V 5x.
+Escape/right click cancel placement/selection (Escape first closes the book).
+Settings support remapping. Do not break text-field/select keyboard interaction.
+
+
+4. VISUAL DIRECTION AND APPROVAL RULES
+-------------------------------------
+
+Canonical approved reference:
+art-reference/approved-elemental-sprites-v1.png
+
+Preserve the painted cartoon fantasy identity: dark colored outlines, recognizable
+silhouettes, elemental palettes, three-quarter depth, materials and proportions.
+The user approved base sprites, fireball animation direction, enemy walking/death
+and status-effect treatments. Approval of treatment does not mean every missing
+production frame or later candidate is complete.
+
+LATEST MAP REQUEST, IMPORTANT AND NOT YET IMPLEMENTED:
+The current map layout/design is good, but the environment looks too realistic
+beside the cartoon towers. Restyle the map to be AS CARTOONY AS THE TOWERS.
+Preserve approved layout while matching sprite style: bold readable forms,
+strong defined edges, larger simplified stones, less fine texture, richer colors,
+soft painted shading, consistent perspective and lighting. Terrain, road, gates
+and actors must look like one illustrated fantasy world. This applies to every
+future map. This is the obvious next art task, not a completed change.
+
+Earlier visual feedback that must remain respected:
+- The game is the focus. Controls belong inside the game; avoid a generic website
+  shell surrounding a tiny game.
+- Towers must sit on the ground, not hover. The explicit rendered tower shadow
+  was removed at the user's request; do not reintroduce it.
+- Ground, road, entrances and exits must share one perspective and material style.
+- Enemies should visibly emerge from/go into doorway openings using foreground
+  and background layering/occlusion; no pasted disconnected doors.
+- Do not reintroduce a flat procedural tiled road over a detailed 3D-looking map.
+- Tier upgrades should add readable visual changes while preserving tower identity.
+- Targeting indicators belong above towers, not primarily as lines/reticles on foes.
+
+Current map asset:
+game/assets/broken-conduit-weathered-road-v2.png
+Portal masks sample that SAME painted map. Repainting/repositioning gate openings
+may require synchronized portal masks, path/placement geometry, actor occlusion,
+and targeting exposure updates. Merely swapping the bitmap can break alignment.
+
+game/ground.js project/unproject are currently identity functions: the painted
+scene carries the camera perspective. Do not double-project sprites/route.
+
+Upgraded Water atlas bug fixed:
+The Water sheet is NOT evenly spaced in three equal columns. Equal-third crops
+leaked part of the neighboring tower into Tier II. Individual crop bounds and
+base anchors now live in game/tower-layout.js waterFrame(). Preserve/revalidate
+these whenever modifying the asset or renderer.
+
+Typography:
+Warden Quill was created here from original authored outlines and APPROVED by the
+user. Use it throughout game text, handbook, dialogs, counters and canvas labels.
+It is NOT Quite Magical; that image was the initial style inspiration and was
+superseded by an original font request. No external Quite Magical file/license is
+needed for the current implementation. Keep small labels and numbers readable.
+Font: game/assets/fonts/warden-quill.ttf
+Generator: previews/build_warden_font.py
+Notes: game/assets/fonts/README.md
+Specimen: previews/warden-quill-specimen.png
+Symbol/emoji fallback is intentional for glyphs outside the font.
+
+Version new art candidates; preserve approved originals and clearly identify
+what is awaiting review. AI image-generation capability was used for raster art;
+it is a production tool, not a runtime game dependency. With an AI assistant that
+has an image-generation skill, use that skill for raster asset generation/edits
+and provide canonical references. Do not assume another PC has the same tools.
+
+
+5. AUDIO DIRECTION (APPROVED CURRENT VERSION)
+--------------------------------------------
+
+User rejected single-note background irritation, high-pitched attacks and later
+attack sounds that resembled an obnoxious drum band.
+
+Current APPROVED effects: previews/audio-v3/*.wav.
+Original generated material sounds:
+Fire = warm flame rush; Water = flowing splash/liquid ripples;
+Ice = soft granular frost/friction; Lightning = filtered electrical crackle.
+Three variants each for launch/contact. Matching restrained freeze, shatter,
+conduction and golem effects. Preserve this direction and do not restore rejected
+short bass glides/drum-like attacks.
+
+Real-time sound throttling, 6 simultaneous voices maximum, overlap attenuation,
+normal sample pitch at every speed, independent volume/mute controls. Settings
+changes apply to active voices. User gesture unlocks browser audio.
+
+Generator: previews/build_elemental_audio_v3.py (NumPy + standard library).
+Preview: previews/audio-v3/elemental-preview.wav.
+Measured WAV reports: previews/audio-v3/technical-checks.json.
+Preview order: Fire, Water, Ice, Lightning, then overlapping combat, without music.
+
+Optional map-music study still lives in previews/audio-v2/broken-conduit.wav and
+starts muted. Do not treat sound-effect approval as final approval of music.
+Separate authored ambience track is not implemented even though a settings
+channel exists. Map-specific pleasing ambience/music is still a production goal.
+
+
+6. PROGRESSION, ACHIEVEMENTS, ENDGAME (APPROVED DESIGN; MOSTLY FUTURE WORK)
+------------------------------------------------------------------------
+
+Campaign wins collect Restoration Parts for facilities. Clear campaign and
+complete required restorations before unlocking the central engine/endless.
+The current tutorial grants Parts but has no playable restoration interface.
+
+Endless introduces a new resource, Resonance. Earn and bank rewards at milestones,
+keep banked rewards on defeat, and spend between attempts on tower strength to
+reach harder waves. Endless bonuses do not alter campaign balance.
+
+Five skill branches: Fire, Water, Ice, Lightning, Engineering.
+Affordable foundation -> specialization -> bounded, expandable mastery tiers.
+Players may eventually obtain all foundational upgrades. Free reassignment is
+between attempts only, not during combat. Show current/next benefits, exact costs,
+prerequisites, caps, and a clear separate purchase action. Selection alone must
+never spend currency. Reveal understandable next goals instead of overwhelming
+players. Costs/intervals/node values in mockups are illustrative, not final balance.
+
+Endgame motivation: rewarding progress now, exciting next goals, and a record to
+beat. Strategy supports fun and replayability. Add meaningful formations, enemy
+roles and bosses, not only endlessly inflated HP.
+
+Ladder goal: account-based all-time Top 10 by highest COMPLETED endless wave.
+Also show personal best, own rank, nearby competitors and next record to beat.
+Account power growth is intended. Validate submissions and keep incomparable major
+balance versions separate. Tie-break details require final implementation/spec.
+No backend, ranking validation or online account system currently exists.
+
+Results should show completed-wave record, personal best, Resonance earned/total,
+achievements/milestones, ladder change, selected upgrade goal and remaining cost,
+with clear upgrade/retry actions.
+
+Authoritative endgame notes:
+design/ENDGAME_PLAN_APPROVED.md
+design/ENDGAME_SKILL_TREE.md
+
+Skill-tree HTML was originally stored outside the project in a Codex visualization
+folder. A portable reference copy is now included at:
+design/prototypes/warden-skill-tree.html
+It is a presentation/interaction mockup, not integrated combat or real purchases.
+It uses optional Codex host state hooks; those do not transfer an actual account.
+Layout approval and exact node numbers/icons must not be inferred from loop approval.
+
+20 achievement definitions exist in engine ACHIEVEMENTS:
+Permit to Defend; A Little More Oomph; Class Dismissed; Just Chilling;
+Current Affairs; Ice to Meet You; Chemistry Set; Watt a Crowd; Breaking the Ice;
+Freeze Frame; Making Connections; Some Like It Thawed; Four Real;
+Not on My Watch; Structurally Questionable; Express Delivery; Less Is More;
+Change of Scenery; Shift Supervisor; Overtime Optional.
+Some require future campaign/endless features and cannot currently be earned.
+Profile/account badges are the long-term goal; current saves are browser-local.
+Historical thresholds must be reviewed against the shortened tutorial. In
+particular, do not assume every "available" achievement is feasible in five waves.
+
+
+7. FILE/FOLDER MAP
+------------------
+
+game/index.html         In-game HUD, book, inspector, settings/results dialogs.
+game/style.css          Styling; later overrides currently win. Preserve layout
+                        responsiveness and test actual rendering after edits.
+game/engine.js          Deterministic gameplay, waves, economy, effects, awards.
+game/game.js            Canvas rendering, input, audio, persistence, UI wiring.
+game/tutorial.js        Handbook lesson catalog + action/achievement teaching state.
+game/ground.js          Ground projection/range/legacy geometry helpers.
+game/portals.js         Entry/exit geometry, foreground masks, clipping/exposure.
+game/tower-layout.js    Sprite ground anchors and individual Water atlas cropping.
+game/assets/           Current map, tier sheets, UI panel, original font.
+art-reference/         Canonical approved sprites and animation reference sheets.
+previews/              Review HTML, sample media, asset-generator Python scripts.
+previews/audio-v3/     Current approved elemental SFX.
+previews/audio-v2/     Earlier SFX/research and current optional music study.
+previews/audio/        Historical original audio experiments; not current SFX.
+tests/                 Eight Node .cjs suites.
+design/                Decision records, historical proposals, approval notes.
+ART_DIRECTION.md       Canonical art preservation rules; read with latest map note.
+
+Useful current design notes:
+TUTORIAL_FIVE_WAVES_AND_TARGET_BADGES.md
+UX_COUNTS_AND_TYPOGRAPHY.md
+ELEMENTAL_AUDIO_V3.md
+FREE_TOWER_PLACEMENT.md
+SETTINGS_AND_GAME_SPEED.md
+INTEGRATED_SCENE_REVISION.md
+LAYERED_PORTALS.md
+ROAD_MATERIAL_REVIEW_02.md
+ANIMATION_REVIEW.md / DEATH_ANIMATION_REVIEW.md / STATUS_EFFECT_REVIEW.md
+
+Some README/history claims still describe earlier implementations. Examples:
+old eight-wave completion figures, separate road rendering, fire/lightning audio
+missing, gold currency wording, foundation-only placement, and boss-freeze values
+"to be specified." Use current code and the superseding decisions above.
+
+
+8. DEPENDENCIES AND SETUP ON THE OTHER PC
+----------------------------------------
+
+PLAYING THE EXISTING GAME:
+- A current browser supporting Canvas 2D, HTML dialog, Audio, localStorage,
+  modern JavaScript, CSS container queries, and local TrueType fonts.
+- All project asset folders at their existing relative paths.
+- No Node/Python/npm/framework/account/network required merely to open the game.
+- Sound begins after a player interaction; browser autoplay rules apply.
+
+RECOMMENDED DEVELOPMENT:
+- Code editor (Codex, VS Code, or another editor).
+- Node.js. The tests have run with Node 24.19.0 on the original PC. No npm install.
+- Python 3.11+ if regenerating media or running an optional local HTTP server.
+  The original bundled Python environment checked for this handoff is 3.12.14.
+- Python packages: numpy for audio generators; Pillow for image/animation previews.
+  Checked installed versions: NumPy 2.3.5; Pillow 12.3.0.
+- Font generation uses Python STANDARD LIBRARY ONLY. No fontTools dependency.
+- Git is useful for version control; not needed to run the game.
+- AI image-generation access is optional production tooling for new raster art.
+
+The exact Node/Python versions above identify the development environment, not
+claims that other modern versions have passed QA. There is no dependency lockfile.
+Do not copy machine-specific Codex caches as a prerequisite.
+
+On Windows PowerShell, from your copied project root:
+
+  node --version
+  py --version
+  py -m venv .venv
+  .\.venv\Scripts\python.exe -m pip install numpy Pillow
+
+Python venv/packages are only necessary for regeneration, not game play/tests.
+Use python instead of py if your installation provides that executable instead.
+Old image-preview scripts use C:/Windows/Fonts/segoeui.ttf and segoeuib.ttf.
+On another Windows PC these usually exist; on another OS, change those review
+script font paths to available fonts before regenerating. The game's actual
+Warden Quill font is bundled and does NOT depend on Segoe UI installation.
+
+LAUNCH OPTIONS:
+A. Double-click game/index.html, or open it in a browser.
+B. Recommended for consistent development origin: serve the ENTIRE project root:
+
+  py -m http.server 8124 --bind 127.0.0.1
+
+Then open:
+  http://127.0.0.1:8124/game/
+
+Keep that terminal open. Stop with Ctrl+C. Serving only the game subfolder will
+break ../art-reference and ../previews asset paths.
+Use a consistent host, port and browser profile for save continuity.
+
+REGENERATE ASSETS ONLY WHEN INTENDED:
+  py previews/build_elemental_audio_v3.py
+  py previews/build_warden_font.py
+
+Other historical generators:
+  previews/build_audio_sample.py
+  previews/build_audio_research_v2.py
+  previews/build_enemy_preview.py
+  previews/build_death_preview.py
+  previews/build_status_preview.py
+  previews/build_all_status_previews.py
+
+Generators overwrite their respective outputs. Back up approved assets or use
+version control before regenerating. Do not regenerate approved effects/font
+just to launch the game. No raster image-generation service is needed to use
+already generated assets.
+
+
+9. TRANSFERRING FILES, SAVES, AND VERSION CONTROL
+------------------------------------------------
+
+Copy ALL of Online Games (including game, art-reference, previews, tests, design,
+ART_DIRECTION.md and this handoff). Include .git if you want repository metadata,
+but do not rely on it as the only copy of files.
+
+IMPORTANT: git status currently lists the main project directories as UNTRACKED.
+A fresh clone or git bundle alone would NOT carry those files. Copy the full
+working directory or deliberately review/add/commit them before using Git to
+transfer. No commit/push has been done by this handoff task.
+
+OneDrive: ensure assets are downloaded/available offline before copying. After
+transfer compare sizes/checksums if files appear incomplete. Avoid editing the
+same files on both PCs concurrently. Choose one active editing PC or coordinate
+reviewed Git changes, and back up before synchronizing. Do not overwrite a newer
+approved asset with a stale copy.
+
+Browser localStorage DOES NOT travel with copied source files, Git, or OneDrive.
+The project currently has no in-game save export/import or cloud sync.
+Storage keys:
+  warden.profile.v1   achievements, counters, banked Parts
+  warden.settings.v1  volumes/mutes, guidance/book settings, reading position
+  warden.keys.v1      hotkeys
+  warden.run.v1       current resumable attempt
+
+file:// storage behavior is browser-dependent. Switching between file://,
+http://localhost, http://127.0.0.1 or different ports/browser profiles can expose
+different saves. Do not mistake an empty save at a new origin for lost code/assets.
+
+OPTIONAL MANUAL SAVE TRANSFER (your own local data only):
+On the old PC, in the browser where your game/save exists, open developer tools
+and run this in its Console. It downloads a JSON backup:
+
+  (() => {
+    const keys = ['warden.profile.v1','warden.settings.v1',
+                  'warden.keys.v1','warden.run.v1'];
+    const data = Object.fromEntries(keys.map(k => [k, localStorage.getItem(k)]));
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)],
+                                            {type:'application/json'}));
+    const a = document.createElement('a');
+    a.href = url; a.download = 'warden-save-transfer.json'; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  })();
+
+Copy that JSON separately to the new PC. Open the game at your chosen consistent
+origin, then run this Console snippet to choose and import the backup:
+
+  (() => {
+    const keys = ['warden.profile.v1','warden.settings.v1',
+                  'warden.keys.v1','warden.run.v1'];
+    const input = document.createElement('input'); input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = async () => {
+      const data = JSON.parse(await input.files[0].text());
+      for (const k of keys) {
+        if (!Object.hasOwn(data, k) ||
+            (data[k] !== null && typeof data[k] !== 'string')) {
+          throw new Error('Not a compatible Warden save backup');
+        }
+        if (data[k] !== null) JSON.parse(data[k]);
+      }
+      for (const k of keys) {
+        if (data[k] === null) localStorage.removeItem(k);
+        else localStorage.setItem(k, data[k]);
+      }
+      location.reload();
+    };
+    input.click();
+  })();
+
+Back up any save already on the new PC first: import replaces these four keys.
+These optional snippets are instructions, not a built-in game feature or an
+end-to-end browser-tested transfer. Current run restore expects version 1,
+tutorialVersion 3 and a valid <=5-wave run. Old incompatible practice runs reset
+while separately banked profile badges/Parts remain.
+
+
+10. VALIDATION AND KNOWN LIMITATIONS
+------------------------------------
+
+From project root, run all tests in PowerShell:
+
+  Get-ChildItem tests -Filter '*.cjs' | ForEach-Object {
+    node $_.FullName
+    if ($LASTEXITCODE -ne 0) { throw "Test failed: $($_.Name)" }
+  }
+
+Individual suites:
+  node tests/engine.test.cjs
+  node tests/ground.test.cjs
+  node tests/portals.test.cjs
+  node tests/targeting.test.cjs
+  node tests/tower-layout.test.cjs
+  node tests/tutorial-guide.test.cjs
+  node tests/tutorial-five-waves.test.cjs
+  node tests/tutorial-smoke.cjs
+
+All eight suites passed at the last implementation checks and again during
+handoff preparation on October 22, 2026.
+They check engine/economy/status behavior, deterministic 1x/2x/5x outcomes,
+projection, gate exposure, targeting, tower anchors, guide logic, a complete real
+five-wave simulation with all three combos, and mocked UI/audio integration.
+
+UI smoke tests use a mocked DOM/Canvas/Audio. They do NOT establish live browser
+layout, asset decoding, pleasant audio, responsive behavior or performance.
+Font was loaded/rendered with FreeType/Pillow for visual specimen inspection.
+Audio files were technically checked for finite values/clipping; subjective audio
+approval came from the user, not from those metrics.
+
+Prior automated in-app browser attempts were unable to complete local browser
+verification. Actual user playthroughs supplied screenshots/feedback. Do not claim
+that full automated browser QA, device QA or release QA has passed.
+
+Manual checks on the new PC:
+- Assets, original font and all four tower sounds load.
+- Build/select/upgrade/sell/retarget; correct tier art and no Water sliver.
+- Tower bases touch the ground; no reintroduced tower shadow.
+- Target badges stay above each tower and reflect policy.
+- Doors reveal/hide enemies cleanly and route aligns with openings.
+- Book freely pages, closes/reopens, retains page, and Show me does not transact.
+- All status/combination rules and achievement events actually trigger.
+- Pause/settings interactions; audio mute/volume immediately affect sound.
+- 1x/2x/5x do not change pitch or create an overwhelming audio pileup.
+- Complete tutorial and confirm every combat total reports 5 / 5.
+- Reload/resume/restart retain intended local profile progress.
+- Test narrower windows, legibility, mouse and keyboard interaction.
+
+
+11. NEXT DEVELOPMENT PRIORITIES / RESUME PROMPT
+------------------------------------------------
+
+Immediate next art priority: restyle the existing map into the towers' cartoon
+fantasy style while preserving the layout and coherent ground/road/gate geometry.
+Show a review candidate before treating the new artwork as approved.
+
+Then continue tutorial/UI polish, visual/playtesting QA, production animation and
+art cleanup, soundtrack/ambience, and platform budget/performance measurements.
+After a reliable foundation, build campaign/restoration, the approved endgame
+progression loop, and eventually validated account/ladder/platform services.
+No promise has been made that those future systems already work.
+
+Suggested instruction to paste into the coding assistant on your other PC:
+
+"Continue Warden of Power from the copied project. Read PROJECT_HANDOFF.txt,
+ART_DIRECTION.md, the current files in game/, and the relevant design notes.
+Preserve all approved assets, original Warden Quill typography, approved v3
+sounds, five-wave tutorial, above-tower targeting badges, and player-first
+philosophy. The latest pending request is to make the map as cartoony as the
+towers without changing its approved layout or breaking route/doorway alignment.
+Inspect the implementation before editing. Distinguish approved direction from
+unfinished candidates and historical notes. Use reviewable versioned artwork,
+run appropriate tests, and report actual verification honestly. Work locally;
+publication and online systems are future tasks. Do not silently change approved
+mechanics or take shortcuts."
+
+End of handoff.

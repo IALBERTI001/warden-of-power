@@ -1,0 +1,76 @@
+/* Warden coach layer + restyled handbook/toasts (review candidate: ?tutorial=v2). Scoped to body.tut-v2. */
+.tut-v2{--body-font:'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;--plum-hi:#45344f;--plum-lo:#1d1626;--brass:#d5b369;--brass-hi:#ffd98a;--ink-dark:#2a1d17}
+
+/* G. Typography: Warden Quill for titles, labels and numbers; a readable serif for sentences. */
+.tut-v2 .coach-callout p,.tut-v2 .coach-intro p,.tut-v2 .coach-tracker li,.tut-v2 .coach-foes span,.tut-v2 .toast>div,.tut-v2 .toast p,
+.tut-v2 .inspector p,.tut-v2 .enemy-detail,.tut-v2 .tutorial-book p,.tut-v2 #feedback,.tut-v2 dialog p,.tut-v2 .achievement p{font-family:var(--body-font)!important;letter-spacing:0}
+
+/* A. Objective tracker */
+.coach-tracker{position:absolute;z-index:6;left:24px;top:118px;width:250px;padding:10px 14px 12px;border-radius:12px;background:linear-gradient(#45344fee,#1d1626ee);border:2px solid var(--brass);box-shadow:0 6px 18px #0009,inset 0 0 0 2px #0006;color:#fff0d1;font-family:var(--game-font)}
+.coach-tracker h3{margin:2px 0 6px;font:normal 20px var(--game-font);color:#fff0d1}
+.coach-eyebrow{display:block;font:11px var(--game-font);letter-spacing:.16em;color:var(--brass)}
+.coach-tracker ul{list-style:none;margin:0;padding:0}
+.coach-tracker li{display:flex;gap:8px;align-items:center;font-size:14px;line-height:1.25;margin:5px 0;color:#e9dcc0}
+.coach-tracker li i{flex:none;width:14px;height:14px;border-radius:50%;border:2px solid var(--brass)}
+.coach-tracker li.now{color:#fff;font-weight:bold}.coach-tracker li.now i{box-shadow:0 0 0 3px #ffb24a55;animation:coachPulse 1.4s ease-in-out infinite}
+.coach-tracker li.done{color:#a99a80;text-decoration:line-through}.coach-tracker li.done i{background:var(--brass)}
+.coach-pips{display:flex;gap:5px;margin-top:9px}.coach-pips b{flex:1;height:6px;border-radius:3px;background:#ffffff22}
+.coach-pips b.on{background:linear-gradient(90deg,#ff9a3c,#ffd36b)}.coach-pips b.cur{background:#ffd36b66}
+.coach-collapse{position:absolute;right:6px;top:4px;border:0!important;background:none!important;box-shadow:none!important;color:var(--brass);font-size:14px;padding:2px 6px;cursor:pointer}
+.tut-v2 .tutorial-book-button{top:auto;bottom:132px;left:24px}
+
+/* tracker yields to the battlefield when something important is under it */
+.coach-tracker{transition:opacity .25s}.coach-tracker.faded{opacity:.28;pointer-events:none}
+
+/* B. Anchored Warden callout */
+.coach-callout{position:absolute;z-index:7;width:300px;padding:12px 16px 13px 68px;border-radius:16px;background:linear-gradient(#41314f,#211a2c);border:3px solid var(--ink-dark);outline:2px solid var(--brass);box-shadow:0 10px 26px #000a;color:#f3e6c9;animation:coachIn .25s ease-out}
+.coach-callout[hidden]{display:none}
+.coach-callout h4{margin:0 0 4px;font:normal 20px var(--game-font);color:var(--brass-hi)}
+.coach-callout p{margin:0;font-size:15px;line-height:1.4}
+.coach-face{position:absolute;left:10px;top:11px;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ffe9a8,#d5953a 60%,#6b3b1a);border:3px solid var(--ink-dark);display:grid;place-items:center;font-size:22px;color:#3a2210}
+.coach-x{position:absolute;right:4px;top:2px;border:0!important;background:none!important;box-shadow:none!important;color:#cbb994;font-size:18px;padding:2px 7px;cursor:pointer}
+.coach-ack{margin-top:10px;padding:6px 16px;border-radius:9px;background:linear-gradient(#ffe39a,#d59a3a)!important;color:var(--ink-dark)!important;border:2px solid var(--ink-dark)!important;font:16px var(--game-font);cursor:pointer}
+.coach-key{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;background:#f3e2b8;color:var(--ink-dark);font:bold 13px Georgia,serif;border-bottom:3px solid #9c7a3c;text-align:center;line-height:1.35}
+.coach-need{display:block;margin-top:5px;color:#ffcf8a;font-size:13px}
+.el-fire{color:#ffb066}.el-water{color:#7fe0f5}.el-ice{color:#c4efff}.el-lightning{color:#d9b8ff}
+.coach-callout::after{content:'';position:absolute;border:11px solid transparent}
+.coach-callout[data-arrow=left]::after{left:-24px;top:calc(var(--arrow-y,40px) - 11px);border-right:13px solid var(--brass)}
+.coach-callout[data-arrow=right]::after{right:-24px;top:calc(var(--arrow-y,40px) - 11px);border-left:13px solid var(--brass)}
+.coach-callout[data-arrow=down]::after{bottom:-24px;left:calc(var(--arrow-x,40px) - 11px);border-top:13px solid var(--brass)}
+
+/* D. Wave intro card */
+.coach-intro{position:absolute;inset:0;z-index:9;display:grid;place-items:center;background:radial-gradient(#0000 30%,#0b081066);pointer-events:none}
+.coach-intro[hidden]{display:none}
+.coach-intro-card{pointer-events:auto;width:min(620px,86%);text-align:center;padding:18px 26px 20px;border-radius:18px;background:linear-gradient(#3e2f4cf4,#1c1525f4);border:3px solid var(--ink-dark);outline:2px solid var(--brass);box-shadow:0 14px 40px #000c;color:#e7d9bb;animation:coachIn .35s cubic-bezier(.2,1.4,.4,1)}
+.coach-intro-card h2{margin:6px 0 4px;font:normal 34px var(--game-font);color:#ffe2a2}
+.coach-intro-card p{margin:0 auto;max-width:480px;font-size:16px;line-height:1.4}
+.coach-recipe{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 6px;flex-wrap:wrap}
+.coach-tower{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px}.coach-tower figcaption{font:13px var(--game-font);color:#e7d9bb}
+.coach-tower canvas{filter:drop-shadow(0 6px 4px #0008)}
+.coach-op{font:34px var(--game-font);color:var(--brass-hi)}
+.coach-result{padding:8px 16px;border-radius:12px;font:24px var(--game-font);border:3px solid var(--ink-dark);color:var(--ink-dark);box-shadow:0 4px 10px #0007}
+.el-bg-fire{background:linear-gradient(#ffd38a,#ff8c3a)}.el-bg-ice{background:linear-gradient(#e2f7ff,#7cc5ee)}.el-bg-lightning{background:linear-gradient(#ead6ff,#a776f0)}
+.coach-foes{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:8px;font-size:14px;color:#cbb994}
+.coach-go{margin-top:14px;padding:10px 30px;border-radius:12px;background:linear-gradient(#ffe39a,#d59a3a)!important;color:var(--ink-dark)!important;font:20px var(--game-font);border:3px solid var(--ink-dark)!important;cursor:pointer;box-shadow:0 4px 0 #6b4a1d,0 8px 16px #0008}
+.coach-go:hover{filter:brightness(1.08)}.coach-go:focus-visible,.coach-ack:focus-visible{outline:3px solid #fff3c4;outline-offset:3px}
+
+/* E. Toasts in the game's painted panel style */
+.tut-v2 .toast{padding:10px 14px 11px;border-radius:12px;background:linear-gradient(#45344ff2,#1d1626f2);border:2px solid var(--brass);box-shadow:0 6px 18px #0009;color:#fff0d1;animation:coachIn .3s ease-out}
+.tut-v2 .toast small{color:var(--brass);letter-spacing:.14em;font-size:9px}
+.tut-v2 .toast>div{font-size:15px;color:#ffe2a2}
+.tut-v2 .toast p{margin:4px 0 0;font-size:12px;line-height:1.35;color:#e7d9bb}
+.tut-v2 .toast.combo{outline:2px solid #ffd36b;box-shadow:0 0 22px #ffb24a88,0 6px 18px #0009}
+.tut-v2 #toasts{max-width:260px}
+
+/* F. Handbook as an optional painted tome (behaviour unchanged) */
+.tut-v2 .briefing.tutorial-book{left:auto;right:24px;top:96px;transform:none;width:min(400px,40%);max-height:calc(100% - 240px);padding:18px 22px 16px 40px;border:10px solid #5a3a2a;border-radius:10px 16px 16px 10px;background:radial-gradient(120% 90% at 30% 20%,#fbefcf,#ecd6a4 70%,#d9bb82);box-shadow:inset 9px 0 14px #6b462966,inset 0 0 0 2px #c9a0603d,0 0 0 2px var(--brass),10px 14px 28px #08050cb3}
+.tut-v2 .tutorial-book h2{font-size:22px;margin:10px 0}
+.tut-v2 .tutorial-book p{font-size:15px;line-height:1.5}
+.tut-v2 .tutorial-book .lesson-actions button,.tut-v2 .tutorial-book .book-navigation button{border-radius:8px}
+
+@keyframes coachIn{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes coachPulse{50%{box-shadow:0 0 0 6px #ffb24a22}}
+@media(prefers-reduced-motion:reduce){.coach-callout,.coach-intro-card,.tut-v2 .toast{animation:none}.coach-tracker li.now i{animation:none}}
+@container(max-width:1350px){.coach-tracker{width:220px}.coach-tracker li:not(.now){display:none}.coach-tracker h3{font-size:17px}}
+@container(max-width:900px){.coach-tracker{width:200px;top:96px;padding:7px 10px}.coach-tracker h3{font-size:16px}.coach-tracker li{font-size:12px}.coach-callout{width:240px;padding:9px 12px 10px 54px}.coach-face{width:36px;height:36px;font-size:17px}.coach-callout p{font-size:13px}.coach-intro-card h2{font-size:26px}}
+@container(max-width:600px){.coach-tracker{display:none}.coach-callout{width:200px}.coach-intro-card{padding:12px 14px}.coach-intro-card p{font-size:13px}.coach-tower canvas{height:60px!important;width:auto!important}}

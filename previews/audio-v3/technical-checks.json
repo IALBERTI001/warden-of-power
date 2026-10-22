@@ -1,0 +1,212 @@
+[
+  {
+    "file": "fire_launch_0",
+    "seconds": 0.4,
+    "peak_dbfs": -11.42,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "fire_launch_1",
+    "seconds": 0.4,
+    "peak_dbfs": -11.06,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "fire_launch_2",
+    "seconds": 0.4,
+    "peak_dbfs": -13.85,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "fire_contact_0",
+    "seconds": 0.48,
+    "peak_dbfs": -14.48,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "fire_contact_1",
+    "seconds": 0.48,
+    "peak_dbfs": -14.76,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "fire_contact_2",
+    "seconds": 0.48,
+    "peak_dbfs": -14.75,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "water_launch_0",
+    "seconds": 0.4,
+    "peak_dbfs": -12.36,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "water_launch_1",
+    "seconds": 0.4,
+    "peak_dbfs": -12.93,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "water_launch_2",
+    "seconds": 0.4,
+    "peak_dbfs": -12.22,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "water_contact_0",
+    "seconds": 0.48,
+    "peak_dbfs": -13.49,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "water_contact_1",
+    "seconds": 0.48,
+    "peak_dbfs": -14.95,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "water_contact_2",
+    "seconds": 0.48,
+    "peak_dbfs": -16.31,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "ice_launch_0",
+    "seconds": 0.4,
+    "peak_dbfs": -11.79,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "ice_launch_1",
+    "seconds": 0.4,
+    "peak_dbfs": -13.16,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "ice_launch_2",
+    "seconds": 0.4,
+    "peak_dbfs": -12.59,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "ice_contact_0",
+    "seconds": 0.48,
+    "peak_dbfs": -14.03,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "ice_contact_1",
+    "seconds": 0.48,
+    "peak_dbfs": -14.4,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "ice_contact_2",
+    "seconds": 0.48,
+    "peak_dbfs": -13.24,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "lightning_launch_0",
+    "seconds": 0.4,
+    "peak_dbfs": -9.41,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "lightning_launch_1",
+    "seconds": 0.4,
+    "peak_dbfs": -12.15,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "lightning_launch_2",
+    "seconds": 0.4,
+    "peak_dbfs": -11.88,
+    "rms_dbfs": -26.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "lightning_contact_0",
+    "seconds": 0.48,
+    "peak_dbfs": -14.61,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "lightning_contact_1",
+    "seconds": 0.48,
+    "peak_dbfs": -14.63,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "lightning_contact_2",
+    "seconds": 0.48,
+    "peak_dbfs": -13.36,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "freeze_combo",
+    "seconds": 0.48,
+    "peak_dbfs": -15.44,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "golem_chilled",
+    "seconds": 0.48,
+    "peak_dbfs": -14.27,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "golem_death",
+    "seconds": 0.48,
+    "peak_dbfs": -14.54,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "shatter_combo",
+    "seconds": 0.48,
+    "peak_dbfs": -14.12,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "conduction_combo",
+    "seconds": 0.48,
+    "peak_dbfs": -12.83,
+    "rms_dbfs": -28.17,
+    "clipped_samples": 0
+  },
+  {
+    "file": "elemental-preview",
+    "seconds": 18.0,
+    "peak_dbfs": -10.33,
+    "rms_dbfs": -29.89,
+    "clipped_samples": 0
+  }
+]

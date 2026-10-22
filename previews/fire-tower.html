@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fire tower · animation study</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#101719;color:#eee9da;font:16px system-ui;display:grid;place-items:center;padding:24px}.wrap{width:min(100%,1000px)}header{display:flex;align-items:center;justify-content:space-between;gap:20px}h1{font-size:25px;font-weight:600;margin:0}p{color:#a7b4ae;line-height:1.6}canvas{display:block;width:100%;background:radial-gradient(ellipse at 25% 60%,#29382f,#172321 65%);border:1px solid #35443c;border-radius:18px;margin:24px 0}button{background:#eeb560;color:#241a0e;border:0;border-radius:8px;padding:11px 20px;font:600 14px system-ui;cursor:pointer}small{color:#99aaa0}footer{display:flex;justify-content:space-between;gap:20px;align-items:center}
+</style>
+<main class="wrap"><header><div><small>APPROVED ART · MOTION STUDY 01</small><h1>Fire tower</h1></div><button id="toggle">Pause</button></header><p>Charge → launch → recoil → recover. Original approved tower and fireball sprites.</p><canvas id="stage" width="1000" height="500" aria-label="Looping animation of the approved fire tower launching a fireball to the right"></canvas><footer><small>One shot every 2.4 seconds · proposed firing motion</small><button id="replay">Replay shot</button></footer><p id="status" role="status"></p></main>
+<script>
+const c=document.querySelector('canvas'),ctx=c.getContext('2d'),sheet=new Image();
+let paused=false,elapsed=0,last=0,ready=false;
+sheet.src='../art-reference/approved-elemental-sprites-v1.png';
+sheet.onload=()=>{ready=true;document.querySelector('#status').textContent='';requestAnimationFrame(frame)};
+sheet.onerror=()=>document.querySelector('#status').textContent='The approved sprite reference could not be loaded.';
+document.querySelector('#toggle').onclick=()=>{paused=!paused;document.querySelector('#toggle').textContent=paused?'Play':'Pause'};
+document.querySelector('#replay').onclick=()=>{elapsed=0;paused=false;document.querySelector('#toggle').textContent='Pause'};
+function glow(x,y,r,a){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(255,159,48,${a})`);g.addColorStop(1,'rgba(255,95,12,0)');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2)}
+function frame(now){const dt=last?Math.min((now-last)/1000,.05):0;last=now;if(!paused)elapsed+=dt;const t=elapsed%2.4;ctx.clearRect(0,0,1000,500);
+// Quiet placement grid, kept separate from the approved sprite artwork.
+ctx.strokeStyle='#ffffff06';ctx.lineWidth=1;for(let x=0;x<1000;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,500);ctx.stroke()}for(let y=0;y<500;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(1000,y);ctx.stroke()}
+const charge=t<.55?Math.pow(t/.55,2):0;const kick=t>=.55?Math.exp(-(t-.55)*14)*Math.sin(Math.min((t-.55)*20,Math.PI)):0;
+glow(257,337,112,.12+charge*.25);ctx.save();ctx.translate(250-kick*7,285+kick*2);ctx.drawImage(sheet,20,0,340,457,-119,-160,238,320);ctx.restore();
+// Warm charge and short muzzle flash overlay; source artwork stays unchanged.
+glow(260,300,35,charge*.35);if(t>=.55&&t<.72)glow(300,300,65,(1-(t-.55)/.17)*.7);
+if(t>=.55&&t<1.55){const u=(t-.55);const x=306+u*650,y=300;glow(x,y,60,.22);ctx.save();ctx.translate(x,y);ctx.rotate(-.48);const fade=Math.min(1,u/.07,(1.55-t)/.12);ctx.globalAlpha=Math.max(0,fade);ctx.drawImage(sheet,25,795,340,265,-53,-39,106,83);ctx.restore()}
+ctx.fillStyle='#b6c2b7';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(t<.55?'CHARGING':t<.78?'FIRING':t<1.55?'PROJECTILE IN FLIGHT':'READY',500,450);requestAnimationFrame(frame)}
+</script>
+</html>
