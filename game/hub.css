@@ -151,3 +151,11 @@ hr{border:0;border-top:1px solid #ffffff22;margin:14px 0}
 @keyframes guidePulse{50%{box-shadow:0 0 0 5px #ffd36baa,0 0 34px 10px #ffb24a88}}
 @media(prefers-reduced-motion:reduce){.guide-pulse{animation:none}}
 @media(max-width:600px){.intro-res{grid-template-columns:1fr}.guide-callout{width:260px}}
+
+/* restoration moment */
+body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;pointer-events:none;transition:opacity .3s}
+#pins,.play-next{transition:opacity .3s}
+.moment-banner{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);z-index:25;min-width:min(520px,90%);text-align:center;padding:14px 24px 12px;border-radius:16px;background:linear-gradient(#41314ff2,#211a2cf2);border:3px solid var(--dark);outline:2px solid var(--brass);box-shadow:0 12px 30px #000c;animation:toastIn .4s ease-out}
+.moment-banner h3{font-size:26px;color:var(--brass-hi);margin:4px 0}
+.moment-banner p{margin:0;font-size:15px}
+.moment-banner small{display:block;margin-top:6px;color:var(--muted);font-size:12px}

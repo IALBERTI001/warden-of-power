@@ -28,15 +28,20 @@ let profile=load();
 function persist(){try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile))}catch{toast('Progress not saved','This browser is blocking storage.')}}
 addEventListener('storage',e=>{if(e.key===PROFILE_KEY){profile=load();render()}});
 
-// ---------- map painting ------------------------------------------------------------------------
-const canvas=$('hubMap'),ctx=canvas.getContext('2d');
-const img={};let ready=false;const fades={};
-Promise.all([['ruined','assets/hub/hub-ruined.jpg'],['restored','assets/hub/hub-restored.jpg']].map(([k,src])=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>{img[k]=i;ok()};i.onerror=()=>bad(src);i.src=src}))).then(()=>{ready=true;paint()}).catch(src=>{toast('Could not load the hub painting',String(src))});
-const maskCache={};
-function restoredLayer(place){if(maskCache[place.id])return maskCache[place.id];const c=document.createElement('canvas');c.width=1536;c.height=1024;const x=c.getContext('2d');x.drawImage(img.restored,0,0);const [cx,cy,rx,ry]=place.mask;x.globalCompositeOperation='destination-in';x.save();x.translate(cx,cy);x.scale(rx/ry,1);const g=x.createRadialGradient(0,0,ry*.55,0,0,ry);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.beginPath();x.arc(0,0,ry,0,Math.PI*2);x.fill();x.restore();return maskCache[place.id]=c}
-function paint(){if(!ready)return;ctx.clearRect(0,0,1536,1024);ctx.drawImage(img.ruined,0,0);let animating=false;const now=performance.now();
- for(const p of PLACES){if(p.kind!=='facility')continue;if(stage(p.id)<3)continue;const f=fades[p.id];let a=1;if(f){a=Math.min(1,(now-f)/1400);if(a<1)animating=true;else delete fades[p.id]}ctx.globalAlpha=a;ctx.drawImage(restoredLayer(p),0,0);ctx.globalAlpha=1}
- if(animating)requestAnimationFrame(paint)}
+// ---------- map painting (HubFX draws stages, living effects and restoration moments) ------------
+const canvas=$('hubMap');
+const img={};let ready=false;
+Promise.all([['ruined','assets/hub/hub-ruined.jpg'],['restored','assets/hub/hub-restored.jpg']].map(([k,src])=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>{img[k]=i;ok()};i.onerror=()=>bad(src);i.src=src}))).then(()=>HubFX.init(canvas,img.ruined,img.restored)).then(()=>{ready=true;paint()}).catch(src=>{toast('Could not load the hub painting',String(src))});
+function sceneState(){const s={gate:profile.gateOpen?1:0};for(const id of ['moonwell','emberheart','rimeglass','stormcrown','atelier'])s[id]=stage(id);return s}
+function paint(){if(ready&&!HubFX.isPlaying())HubFX.setState(sceneState())}
+// The restoration moment: pins step aside, the area is rebuilt on screen, a banner names what changed.
+function celebrate(id,from,to,title,line){if(!ready){render();return}document.body.classList.add('moment');const banner=$('momentBanner');banner.innerHTML=`<span class="eyebrow">RESTORED</span><h3></h3><p></p><small>Click or press any key to skip</small>`;banner.querySelector('h3').textContent=title;banner.querySelector('p').textContent=line;banner.hidden=true;
+ setTimeout(()=>{if(HubFX.isPlaying())banner.hidden=false},reducedMotion?0:1500);
+ HubFX.playMoment(id,from,to,()=>{banner.hidden=true;document.body.classList.remove('moment');render()})}
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const skip=()=>{if(HubFX.isPlaying())HubFX.skipMoment()};
+addEventListener('keydown',e=>{if(HubFX.isPlaying()){e.preventDefault();e.stopImmediatePropagation();skip()}},true);
+addEventListener('pointerdown',e=>{if(HubFX.isPlaying()){e.preventDefault();e.stopPropagation();skip()}},true);
 
 // ---------- helpers -----------------------------------------------------------------------------
 const stage=id=>Math.min(3,profile.restorations?.[id]||0);
@@ -78,15 +83,16 @@ function openPanel(id,opener,keep){const p=PLACES.find(p=>p.id===id);currentPane
   html+=s>=3?`<p class="reawakened">Fully reawakened. Its bonus strengthens every tower, in every mode.</p>`:`<button class="primary-btn" id="restoreBtn" ${o.ok?'':'disabled'}>Restore: ${escape(f.stages[s])} · ${f.costs[s]} Parts</button>${o.ok?'':`<p class="why">${escape(o.reason)}</p>`}`;
   const unlocked=P.branchUnlocked(profile,f.branch);html+=`<h3>${ELEMENT[f.branch].name} skills</h3>${unlocked?`<p>The ${ELEMENT[f.branch].name} branch of the skill tree is open.</p><button class="hub-btn" id="panelSkills">Open ${ELEMENT[f.branch].name} skills</button>`:`<p class="muted">Restore the first stage to open the ${ELEMENT[f.branch].name} branch of the skill tree.</p>`}`}
  body.innerHTML=html;$('panel').hidden=false;
- $('panelPlay')&&($('panelPlay').onclick=play);$('panelSkills')&&($('panelSkills').onclick=()=>openSkills(p.kind==='tutorial'?'fire':facility(id).branch));$('gateBtn')&&($('gateBtn').onclick=()=>{const r=P.openGate(profile);if(r.ok){persist();toast('The Outer Seal Gate rises','ROAD OPENED · FIRE SKILLS UNLOCKED');render()}});
+ $('panelPlay')&&($('panelPlay').onclick=play);$('panelSkills')&&($('panelSkills').onclick=()=>openSkills(p.kind==='tutorial'?'fire':facility(id).branch));$('gateBtn')&&($('gateBtn').onclick=()=>{const r=P.openGate(profile);if(r.ok){persist();closePanelQuiet();celebrate('gate',0,1,'The Outer Seal Gate rises',`The road into the complex is open · Fire skills unlocked · +${P.GATE.bonus[1]} starting Charge in every defense`)}});
  $('restoreBtn')&&($('restoreBtn').onclick=()=>restore(id));
  document.querySelectorAll('.pin').forEach(b=>b.classList.toggle('active',b.dataset.place===id));
  if(!keep)setTimeout(()=>$('panel').querySelector('button:not([disabled]):not(.panel-close)')?.focus(),30)}
 function closePanel(){$('panel').hidden=true;currentPanel=null;document.querySelectorAll('.pin').forEach(b=>b.classList.remove('active'));lastOpener?.focus?.()}
 function restore(id){const r=P.restore(profile,id);if(!r.ok){toast('Not yet',r.reason);return}const f=facility(id),p=PLACES.find(p=>p.id===id);
  if(r.stage===1&&f.branch)toast(`${ELEMENT[f.branch].name} skills unlocked`,f.name);
- if(r.stage===3){fades[id]=performance.now();if(reduced)delete fades[id];toast(`${f.name} reawakened`,'RESTORATION COMPLETE');if(p.badge)award(p.badge)}else toast(f.stages[r.stage-1],`${f.name} · stage ${r.stage}/3`);
- persist();render()}
+ if(r.stage===3){toast(`${f.name} reawakened`,'RESTORATION COMPLETE');if(p.badge)award(p.badge)}
+ persist();closePanelQuiet();celebrate(id,r.stage-1,r.stage,`${f.stages[r.stage-1]}`,`${f.name} · stage ${r.stage} of 3 · ${bonusText(f)}`)}
+function closePanelQuiet(){$('panel').hidden=true;currentPanel=null}
 document.querySelector('[data-close-panel]').onclick=closePanel;
 
 // ---------- skill tree ------------------------------------------------------------------------
@@ -116,7 +122,7 @@ $('openBadges').onclick=()=>{renderBadges();openOverlay('badges')};
 
 // ---------- settings: saves + test tools --------------------------------------------------------
 function saveCode(){const data={};for(const k of KEYS){try{data[k]=localStorage.getItem(k)}catch{data[k]=null}}data[PROFILE_KEY]=JSON.stringify(profile);return'WARDEN1:'+btoa(unescape(encodeURIComponent(JSON.stringify(data))))}
-$('openSettings').onclick=()=>{$('saveCode').value=saveCode();$('testMode').checked=testMode();$('testTools').hidden=!testMode();openOverlay('settings')};
+$('openSettings').onclick=()=>{wireAmbienceControls();$('saveCode').value=saveCode();$('testMode').checked=testMode();$('testTools').hidden=!testMode();openOverlay('settings')};
 $('copySave').onclick=async()=>{const code=saveCode();$('saveCode').value=code;try{await navigator.clipboard.writeText(code);$('copyStatus').textContent='Copied. Paste it somewhere safe.'}catch{$('saveCode').select();$('copyStatus').textContent='Selected: press Ctrl+C to copy.'}};
 $('importSave').onclick=()=>{const raw=$('saveCode').value.trim();try{if(!raw.startsWith('WARDEN1:'))throw new Error('This is not a Warden save code.');const data=JSON.parse(decodeURIComponent(escape_(atob(raw.slice(8)))));for(const k of KEYS){if(!(k in data))throw new Error('The save code is incomplete.');if(data[k]!==null)JSON.parse(data[k])}for(const k of KEYS){if(data[k]===null)localStorage.removeItem(k);else localStorage.setItem(k,data[k])}profile=load();render();$('importStatus').textContent='Save loaded.';toast('Save loaded','PROGRESS RESTORED')}catch(e){$('importStatus').textContent=e.message||'That save code could not be read.'}};
 function escape_(s){return Array.from(s,c=>'%'+c.charCodeAt(0).toString(16).padStart(2,'0')).join('')}
@@ -171,3 +177,19 @@ function tickGuide(){const box=$('guideCallout');const step=guideStep();document
 $('openGuide').onclick=()=>{profile.hubGuide=0;profile.hubIntroSeen=false;persist();showIntro()};
 setInterval(tickGuide,250);addEventListener('resize',tickGuide);
 if(seals().cleared&&!profile.hubIntroSeen)setTimeout(showIntro,500);
+
+// ---------- ambience: a quiet loop per restored area, louder as it is restored ----------------
+const AMB={moonwell:'water',emberheart:'fire',rimeglass:'ice',stormcrown:'storm',atelier:'gears'};
+const ambPlayers={};let ambUnlocked=false;
+function audioSettings(){try{return{master:.65,ambience:.35,masterMute:false,ambienceMute:false,...JSON.parse(localStorage.getItem('warden.settings.v1')||'{}')}}catch{return{master:.65,ambience:.35}}}
+function syncAmbience(){const s=audioSettings(),base=(s.masterMute||s.ambienceMute)?0:s.master*s.ambience;const quiet=document.hidden;
+ for(const [id,name] of Object.entries(AMB)){const st=stage(id);let a=ambPlayers[id];if(!st){if(a)a.pause();continue}
+  if(!a){a=ambPlayers[id]=new Audio(`assets/hub/ambience/amb-${name}.wav`);a.loop=true}
+  a.volume=Math.min(1,base*(.35+.22*st));if(ambUnlocked&&!quiet&&base>0)a.play().catch(()=>{});else a.pause()}}
+addEventListener('pointerdown',()=>{if(!ambUnlocked){ambUnlocked=true;syncAmbience()}},{once:false});
+addEventListener('keydown',()=>{if(!ambUnlocked){ambUnlocked=true;syncAmbience()}});
+document.addEventListener('visibilitychange',syncAmbience);
+setInterval(syncAmbience,1500);
+function wireAmbienceControls(){const s=audioSettings();$('ambVol').value=s.ambience;$('ambMute').checked=!!s.ambienceMute;
+ const write=()=>{const cur=(()=>{try{return JSON.parse(localStorage.getItem('warden.settings.v1')||'{}')}catch{return{}}})();cur.ambience=+$('ambVol').value;cur.ambienceMute=$('ambMute').checked;try{localStorage.setItem('warden.settings.v1',JSON.stringify(cur))}catch{}syncAmbience()};
+ $('ambVol').oninput=write;$('ambMute').onchange=write}

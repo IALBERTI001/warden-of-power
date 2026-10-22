@@ -1,0 +1,27 @@
+{
+ "water": {
+  "peak": 0.35,
+  "rms": 0.05376608764552577,
+  "finite": true
+ },
+ "fire": {
+  "peak": 0.35,
+  "rms": 0.08189145024184762,
+  "finite": true
+ },
+ "ice": {
+  "peak": 0.3,
+  "rms": 0.047688927837353935,
+  "finite": true
+ },
+ "storm": {
+  "peak": 0.3,
+  "rms": 0.04393718358964663,
+  "finite": true
+ },
+ "gears": {
+  "peak": 0.3,
+  "rms": 0.054208349430263675,
+  "finite": true
+ }
+}
