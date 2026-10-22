@@ -21,13 +21,14 @@
       <h1>The Containment Complex</h1>
     </div>
     <div class="hub-wallet" aria-live="polite">
-      <span title="Restoration Parts: spent on restoring facilities"><i aria-hidden="true">⚙</i><small>PARTS</small><b id="parts">0</b></span>
-      <span title="Resonance: spent on skills"><i aria-hidden="true">✦</i><small>RESONANCE</small><b id="resonance">0</b></span>
-      <span title="Average damage bonus your towers get from skills and restorations"><i aria-hidden="true">⬢</i><small>WARDEN POWER</small><b id="power">+0%</b></span>
+      <button class="wallet-item" data-explain="parts" aria-label="Restoration Parts: what are these?"><i aria-hidden="true">⚙</i><small>PARTS</small><b id="parts">0</b></button>
+      <button class="wallet-item" data-explain="resonance" aria-label="Resonance: what is this?"><i aria-hidden="true">✦</i><small>RESONANCE</small><b id="resonance">0</b></button>
+      <button class="wallet-item" data-explain="power" aria-label="Warden Power: what is this?"><i aria-hidden="true">⬢</i><small>WARDEN POWER</small><b id="power">+0%</b></button>
     </div>
     <nav class="hub-actions" aria-label="Hub menu">
       <button id="openSkills" class="hub-btn">✦ Skills</button>
       <button id="openBadges" class="hub-btn">◆ Badges</button>
+      <button id="openGuide" class="hub-btn" aria-label="Replay the hub guide" title="How the hub works">?</button>
       <button id="openSettings" class="hub-btn" aria-label="Settings and saves">⚙</button>
     </nav>
   </header>
@@ -79,11 +80,15 @@
     </div>
   </section>
 
+  <div id="explain" class="explain" hidden role="dialog" aria-live="polite"></div>
+  <div id="guideCallout" class="guide-callout" hidden role="status"></div>
+  <div id="guideIntro" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="guideTitle"></div>
   <div id="toasts" aria-live="polite"></div>
 </main>
 <script src="progression.js"></script>
 <script src="engine.js"></script>
 <script src="badges.js"></script>
+<script>try{var _p=JSON.parse(localStorage.getItem("warden.profile.v1")||"{}");if(!(_p.seals&&_p.seals.tutorial&&_p.seals.tutorial.cleared)&&!/[?&]stay(&|$)/.test(location.search))location.replace("index.html")}catch(e){}</script>
 <script src="hub.js"></script>
 </body>
 </html>

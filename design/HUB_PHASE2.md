@@ -12,3 +12,10 @@ Open `game/hub.html` (local: http://127.0.0.1:8124/game/hub.html). The tutorial'
 
 Gate (per plan): your approval of the hub + keyboard-only run-through (verified headless: Tab to a pin, Enter opens, Esc closes).
 Not yet: campaign missions (Phase 3), per-stage hub painting (only the fully reawakened state is painted), Atelier art for intermediate stages.
+
+## First-visit guide (Oct 22 2026, per user direction)
+- A brand-new player opening the hub is sent straight to the tutorial; the in-game ⌂ hub button and "Return to the hub" stay hidden until the first tutorial win.
+- First win: the results button reads "Enter the Containment Complex".
+- Welcome card explains Restoration Parts (rebuild the complex) and Resonance (learn skills), with the amounts just earned. "Show me" or "Skip the guide".
+- Six guided steps, each pointing at the real control and advancing only on the real action: open Moonwell Cisterns → restore stage 1 (opens Water skills) → open Water skills → buy a first skill → Warden Power explained → the Next Step button. A first win always affords both (80 Parts vs 40; ≥40 Resonance vs 25).
+- Each resource in the top bar is a button that explains itself. The ? button replays the guide. Guide progress is stored in the profile, so it travels with save codes.

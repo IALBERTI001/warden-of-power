@@ -134,4 +134,40 @@ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(!closeOverlays()&&!$('panel').hidden)closePanel()}});
 
 render();
-let seen=true;try{seen=!!localStorage.getItem('warden.hub.seen');localStorage.setItem('warden.hub.seen','1')}catch{}if(!seals().cleared&&!seen){setTimeout(()=>toast('Welcome, Warden','Start at the Outer Seal: the tutorial earns your first Parts and Resonance.'),600)}
+
+// ---------- first-visit guide ----------------------------------------------------------------
+// One step at a time, pointing at the real control; advances only on the real action. Stored in the profile
+// (travels with save codes). Never spends anything for the player.
+const EXPLAIN={
+ parts:['Restoration Parts','Earned by winning missions (80 for a first win, 20 for replays). Spend them to rebuild the ruined facilities. Each restored stage gives every tower a permanent bonus and the first stage opens that element\'s skills.'],
+ resonance:['Resonance','Earned once for each Seal you win on a mission (Cleared, Held, Challenge) and later in endless mode. Spend it in Skills to make your towers stronger. You can reassign skills for free at any time.'],
+ power:['Warden Power','The average damage bonus your towers carry from restorations and skills. It applies everywhere: the tutorial, the campaign and endless. Select a tower in battle to see its exact bonus.']};
+function explain(key,anchor){const [t,d]=EXPLAIN[key];const box=$('explain');box.innerHTML=`<button class="panel-close" aria-label="Close">×</button><h3>${t}</h3><p>${d}</p>`;box.hidden=false;const r=anchor.getBoundingClientRect();box.style.left=Math.max(12,Math.min(innerWidth-332,r.left))+'px';box.style.top=(r.bottom+10)+'px';box.querySelector('button').onclick=()=>{box.hidden=true;anchor.focus()};box.querySelector('button').focus()}
+document.querySelectorAll('[data-explain]').forEach(b=>b.onclick=()=>explain(b.dataset.explain,b));
+
+const GUIDE=[
+ {id:'moonwell',target:()=>document.querySelector('[data-place="moonwell"]'),title:'Rebuild the Moonwell',text:'Click <b>Moonwell Cisterns</b>. Every ruin here can be restored with Parts.',done:()=>currentPanel==='moonwell'||stage('moonwell')>0},
+ {id:'restore',target:()=>$('restoreBtn'),title:'Spend your Parts',text:'Each stage costs Parts and gives <b>every tower</b> a lasting bonus. The first stage also opens the <b>Water skills</b>.',done:()=>stage('moonwell')>0,fallback:()=>openPanel('moonwell')},
+ {id:'skills',target:()=>$('panelSkills'),title:'Skills are open',text:'Restoring the Moonwell opened the Water skills. Open them to spend your <b>Resonance</b>.',done:()=>!$('skills').hidden||P.SKILLS.some(s=>P.rank(profile,s.id)),fallback:()=>openPanel('moonwell')},
+ {id:'buy',target:()=>$('buySkill'),title:'Learn your first skill',text:'Choosing a skill never spends. When you are ready, press <b>Buy</b>. You can reassign skills for free later.',done:()=>P.SKILLS.some(s=>P.rank(profile,s.id)),fallback:()=>openSkills('water')},
+ {id:'power',target:()=>document.querySelector('[data-explain="power"]'),title:'Your towers are stronger',text:'<b>Warden Power</b> shows the bonus your towers now carry, in every battle. Click any resource up here to see what it does.',ack:'Got it'},
+ {id:'next',target:()=>$('playNext'),title:'What next',text:'This button always shows your most useful next step: restore more, learn skills, or play again for more Parts. New missions arrive with the campaign.',ack:'Start playing'}
+];
+let guideAnchor=null;
+function guideStep(){const g=profile.hubGuide||0;return g<GUIDE.length?GUIDE[g]:null}
+function advanceGuide(){profile.hubGuide=(profile.hubGuide||0)+1;persist();guideAnchor=null;tickGuide()}
+function showIntro(){const s=seals(),earnedRes=(profile.resonance||0);const el=$('guideIntro');el.innerHTML=`<div class="overlay-card intro-card"><span class="eyebrow">THE OUTER SEAL HOLDS</span><h2 id="guideTitle">Welcome to the Containment Complex</h2><p>This is your home. Between battles you rebuild the ruined complex and grow your towers. Everything you earn here makes <b>every tower stronger in every battle</b>.</p><div class="intro-res"><div><i aria-hidden="true">⚙</i><b>Restoration Parts · ${profile.parts||0}</b><span>Rebuild the ruined facilities. Earned by winning missions.</span></div><div><i aria-hidden="true">✦</i><b>Resonance · ${earnedRes}</b><span>Learn skills that strengthen your towers. Earned from Seals.</span></div></div><p class="muted">You won ${['cleared','held','challenge'].filter(k=>s[k]).length} of 3 Seals on the tutorial. Let's spend your first rewards.</p><div class="intro-actions"><button class="primary-btn" id="guideGo">Show me</button><button class="ghost" id="guideSkip">Skip the guide</button></div></div>`;el.hidden=false;$('guideGo').onclick=()=>{el.hidden=true;profile.hubGuide=0;profile.hubIntroSeen=true;persist();tickGuide()};$('guideSkip').onclick=()=>{el.hidden=true;profile.hubIntroSeen=true;profile.hubGuide=GUIDE.length;persist();tickGuide()};setTimeout(()=>$('guideGo').focus(),30)}
+function tickGuide(){const box=$('guideCallout');const step=guideStep();document.querySelectorAll('.guide-pulse').forEach(e=>e.classList.remove('guide-pulse'));
+ if(!profile.hubIntroSeen||!step||!$('guideIntro').hidden){box.hidden=true;return}
+ if(step.done&&step.done()){advanceGuide();return}
+ let t=step.target();if(!t&&step.fallback){step.fallback();t=step.target()}
+ if(!t||t.offsetParent===null&&getComputedStyle(t).position!=='fixed'){box.hidden=true;return}
+ const overlayOpen=['badges','settings'].some(id=>!$(id).hidden);if(overlayOpen){box.hidden=true;return}
+ t.classList.add('guide-pulse');
+ const key=step.id;if(box.dataset.step!==key){box.dataset.step=key;box.innerHTML=`<div class="coach-face" aria-hidden="true">✦</div><span class="eyebrow">HUB GUIDE · ${(profile.hubGuide||0)+1} OF ${GUIDE.length}</span><h4>${step.title}</h4><p>${step.text}</p><div class="guide-actions">${step.ack?`<button class="primary-btn small" id="guideAck">${step.ack}</button>`:''}<button class="ghost" id="guideSkipAll">Skip guide</button></div>`;if($('guideAck'))$('guideAck').onclick=advanceGuide;$('guideSkipAll').onclick=()=>{profile.hubGuide=GUIDE.length;persist();tickGuide()}}
+ box.hidden=false;const r=t.getBoundingClientRect(),W=box.offsetWidth,H=box.offsetHeight;let x=r.right+16,y=r.top+r.height/2-H/2,side='left';
+ if(x+W>innerWidth-12){x=r.left-W-16;side='right'}if(x<12){x=Math.max(12,r.left+r.width/2-W/2);y=r.top-H-16;side='down';if(y<12){y=r.bottom+16;side='up'}}
+ y=Math.max(12,Math.min(innerHeight-H-12,y));box.style.left=x+'px';box.style.top=y+'px';box.dataset.arrow=side}
+$('openGuide').onclick=()=>{profile.hubGuide=0;profile.hubIntroSeen=false;persist();showIntro()};
+setInterval(tickGuide,250);addEventListener('resize',tickGuide);
+if(seals().cleared&&!profile.hubIntroSeen)setTimeout(showIntro,500);
