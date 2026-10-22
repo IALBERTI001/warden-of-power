@@ -104,4 +104,4 @@ function install(){
 return{LESSONS,INTROS,plan,introDue,lessonIndex,install};
 });
 // Approved Oct 22 2026: the in-world tutorial is the default. ?tutorial=v1 shows the earlier handbook-only flow.
-if(typeof location!=='undefined'&&!/[?&]tutorial=v1(&|$)/.test(location.search||'')&&typeof game!=='undefined')globalThis.WardenCoachHook=WardenCoach.install();
+if(typeof location!=='undefined'&&!/[?&]tutorial=v1(&|$)/.test(location.search||'')&&typeof game!=='undefined'&&game.mission==='tutorial')globalThis.WardenCoachHook=WardenCoach.install();

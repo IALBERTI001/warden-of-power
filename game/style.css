@@ -31,3 +31,6 @@ button{min-height:32px;line-height:1.25}button:focus-visible,select:focus-visibl
 @container(max-width:600px){.resources small{font-size:5px}.speedbar button{min-height:27px}.tower-card{min-height:0}.tutorial-book p{line-height:1.5}}
 
 .primary{text-transform:none;letter-spacing:0}.eyebrow,small{letter-spacing:.35px}.tutorial-book p{font-size:16px}.tutorial-book .book-note{font-size:12px}.inspector p{font-size:13px}.tower-card b{font-weight:400}.resources b{font-size:29px}button{font-weight:400}
+
+/* Hold the Outer Seal (defense levels): the tutorial handbook belongs to the tutorial only. */
+body.mission-outer #tutorialBookButton,body.mission-outer #tutorialBook,body.mission-outer label:has(#guide){display:none!important}

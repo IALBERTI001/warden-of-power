@@ -159,3 +159,14 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .moment-banner h3{font-size:26px;color:var(--brass-hi);margin:4px 0}
 .moment-banner p{margin:0;font-size:15px}
 .moment-banner small{display:block;margin-top:6px;color:var(--muted);font-size:12px}
+
+/* Hold the Outer Seal: level list in the Outer Seal panel */
+.levels{list-style:none;margin:.4rem 0 .6rem;padding:0;display:grid;gap:.45rem}
+.levels li{display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.55rem .7rem;border-radius:10px;background:rgba(255,240,200,.05);border:1px solid rgba(231,202,131,.18)}
+.levels li.next{border-color:rgba(231,202,131,.6);background:rgba(231,202,131,.1)}
+.levels li div{display:flex;flex-direction:column;gap:.15rem;min-width:0;flex:1}
+.levels b{font-family:"Warden Quill",Georgia,serif;letter-spacing:.02em}
+.levels small{font-size:14px;opacity:.85}
+.levels .held-tag{font-size:13px;color:#9fd6a3}
+.levels .ready.tone-ok{color:#9fd6a3}.levels .ready.tone-warn{color:#f0c97a}.levels .ready.tone-hard{color:#f08f7a}
+.levels button,.levels .primary-btn{flex:none;width:auto;min-width:112px;min-height:44px;margin:0;padding:0 16px}
