@@ -1,6 +1,7 @@
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.WardenEngine=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
 const PROG=(typeof module==='object'&&module.exports)?(()=>{try{return require('./progression.js')}catch{return null}})():(globalThis.WardenProgression||null);
+const SEAL_RESONANCE=40;
 const PATH=[[125,70],[125,222],[310,222],[310,346],[525,346],[525,188],[758,188],[758,388],[925,388],[925,277]];
 const LENGTHS=PATH.slice(1).map((p,i)=>Math.hypot(p[0]-PATH[i][0],p[1]-PATH[i][1]));
 const TOTAL=LENGTHS.reduce((a,b)=>a+b,0);
@@ -44,7 +45,7 @@ class Game{
  this.enemies=this.enemies.filter(e=>e.alive);for(const c of this.corpses)c.age+=dt;this.corpses=this.corpses.filter(c=>c.age<1.35);
  if(this.health<=0){this.status='lost';this.finish(false);return}if(this.wave>this.completed&&!this.spawnQueue.length&&!this.enemies.length){const number=this.wave-this.completed;this.completed=this.wave;const preparation=this.completed===1?140:this.completed===2?90:45;this.charge+=number*preparation;const stable=(this.bonus?.eng?.fifthWaveCharge||0)*(Math.floor(this.completed/5)-Math.floor((this.completed-number)/5));this.charge+=stable;this.emit('waveClear',{wave:this.completed,charge:number*preparation+stable});if(this.completed===WAVES.length){this.status='won';this.award('tutorial_clear');this.finish(true)}}
  }
- finish(won){if(this.rewarded)return;this.rewarded=true;const parts=won?80:Math.floor(this.completed*4);this.profile.parts+=parts;this.emit('result',{won,parts})}
+ finish(won){if(this.rewarded)return;this.rewarded=true;const pr=this.profile;pr.seals=pr.seals||{};const had=pr.seals.tutorial||{};const firstClear=won&&!had.cleared;const parts=won?(firstClear?80:20):Math.floor(this.completed*4);pr.parts=(pr.parts||0)+parts;const earned={cleared:won,held:won&&this.health>=15,challenge:won&&this.combos.freeze>0&&this.combos.conduction>0&&this.combos.shatter>0};const newSeals=Object.keys(earned).filter(k=>earned[k]&&!had[k]);const resonance=newSeals.length*SEAL_RESONANCE;pr.seals.tutorial={...had,...Object.fromEntries(newSeals.map(k=>[k,true]))};pr.resonance=(pr.resonance||0)+resonance;this.emit('result',{won,parts,seals:newSeals,resonance,firstClear})}
 }
-return{Game,PATH,PADS,PLAY,DOORS,TOTAL,TYPES,ENEMIES,WAVES,ACHIEVEMENTS,position,waveProgress};
+return{Game,SEAL_RESONANCE,PATH,PADS,PLAY,DOORS,TOTAL,TYPES,ENEMIES,WAVES,ACHIEVEMENTS,position,waveProgress};
 });

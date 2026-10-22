@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warden of Power · The Containment Complex</title>
+<link rel="preload" href="assets/fonts/warden-quill.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="badges.css">
+<link rel="stylesheet" href="hub.css">
+</head>
+<body>
+<main id="hub" aria-label="The Containment Complex, your home hub">
+  <div id="mapFrame">
+    <canvas id="hubMap" width="1536" height="1024" role="img" aria-label="Painted map of the Containment Complex"></canvas>
+    <div id="pins"></div>
+  </div>
+
+  <header class="hub-top">
+    <div class="hub-title">
+      <span class="eyebrow">WARDEN OF POWER</span>
+      <h1>The Containment Complex</h1>
+    </div>
+    <div class="hub-wallet" aria-live="polite">
+      <span title="Restoration Parts: spent on restoring facilities"><i aria-hidden="true">⚙</i><small>PARTS</small><b id="parts">0</b></span>
+      <span title="Resonance: spent on skills"><i aria-hidden="true">✦</i><small>RESONANCE</small><b id="resonance">0</b></span>
+      <span title="Average damage bonus your towers get from skills and restorations"><i aria-hidden="true">⬢</i><small>WARDEN POWER</small><b id="power">+0%</b></span>
+    </div>
+    <nav class="hub-actions" aria-label="Hub menu">
+      <button id="openSkills" class="hub-btn">✦ Skills</button>
+      <button id="openBadges" class="hub-btn">◆ Badges</button>
+      <button id="openSettings" class="hub-btn" aria-label="Settings and saves">⚙</button>
+    </nav>
+  </header>
+
+  <button id="playNext" class="play-next"></button>
+
+  <aside id="panel" class="side-panel" hidden aria-live="polite">
+    <button class="panel-close" data-close-panel aria-label="Close panel">×</button>
+    <div id="panelBody"></div>
+  </aside>
+
+  <section id="skills" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="skillsTitle">
+    <div class="overlay-card skills-card">
+      <header class="overlay-head">
+        <div><span class="eyebrow">THE WARDEN'S CONDUITS</span><h2 id="skillsTitle">Skill tree</h2></div>
+        <div class="overlay-wallet"><span>✦ <b id="skillsResonance">0</b> Resonance</span><button id="resetSkills" class="ghost">Reassign all (free)</button></div>
+        <button class="overlay-close" data-close-overlay aria-label="Close skill tree">×</button>
+      </header>
+      <div class="skills-body">
+        <div id="board" class="board"></div>
+        <div id="skillDetail" class="skill-detail"></div>
+      </div>
+      <p class="overlay-foot">Choosing a skill never spends. Buy with the button. Every bonus strengthens every tower, everywhere.</p>
+    </div>
+  </section>
+
+  <section id="badges" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="badgesTitle">
+    <div class="overlay-card">
+      <header class="overlay-head"><div><span class="eyebrow">WARDEN'S RECORD</span><h2 id="badgesTitle">Badges</h2></div><p id="badgeSummary" class="muted"></p><button class="overlay-close" data-close-overlay aria-label="Close badges">×</button></header>
+      <div id="achievementList" class="achievement-list"></div>
+    </div>
+  </section>
+
+  <section id="settings" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="overlay-card settings-card">
+      <header class="overlay-head"><div><span class="eyebrow">SETTINGS</span><h2 id="settingsTitle">Your progress</h2></div><button class="overlay-close" data-close-overlay aria-label="Close settings">×</button></header>
+      <p>Progress saves automatically in this browser. To back it up or move it to another computer, copy your save code and paste it there.</p>
+      <div class="save-row"><button id="copySave" class="hub-btn">Copy save code</button><span id="copyStatus" class="muted" role="status"></span></div>
+      <label for="saveCode" class="muted">Save code</label>
+      <textarea id="saveCode" rows="4" spellcheck="false" aria-describedby="importStatus"></textarea>
+      <div class="save-row"><button id="importSave" class="hub-btn">Load this save code</button><span id="importStatus" class="muted" role="status"></span></div>
+      <hr>
+      <label class="check"><input id="testMode" type="checkbox"> Test tools (for trying the hub quickly)</label>
+      <div id="testTools" class="test-tools" hidden>
+        <p class="muted">Test tools change your saved progress. Use Copy save code first if you want to keep your real progress.</p>
+        <div class="save-row"><button data-test="parts" class="hub-btn">+100 Parts</button><button data-test="resonance" class="hub-btn">+100 Resonance</button><button data-test="wave" class="hub-btn">Pretend endless wave 100</button></div>
+        <div class="save-row"><button id="resetAll" class="danger">Reset all progress…</button><span id="resetStatus" class="muted" role="status"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="toasts" aria-live="polite"></div>
+</main>
+<script src="progression.js"></script>
+<script src="engine.js"></script>
+<script src="badges.js"></script>
+<script src="hub.js"></script>
+</body>
+</html>

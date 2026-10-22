@@ -10,7 +10,7 @@ const TIERS={
 };
 const TIER_LABEL={bronze:'Bronze',silver:'Silver',gold:'Gold',prismatic:'Prismatic'};
 // Achievements that need campaign maps, restorations or endless mode, which are not playable yet.
-const LATER=new Set(['perfect_campaign_mission','close_call','two_elements_only','three_maps_clear','ten_mission_wins','first_endless_twenty','restore_water','restore_fire','restore_ice','restore_lightning','engine_reborn','endless_fifty','endless_hundred','endless_500']);
+const LATER=new Set(['perfect_campaign_mission','close_call','two_elements_only','three_maps_clear','ten_mission_wins','first_endless_twenty','engine_reborn','endless_fifty','endless_hundred','endless_500']);
 // Cumulative counters shown as progress while locked.
 const PROGRESS={freeze_twenty_five:['freeze',25],conduction_twenty_five:['conduction',25],shatter_twenty_five:['shatter',25],early_wave_five:['early',5]};
 function tier(id){return TIERS[id]||'bronze'}
