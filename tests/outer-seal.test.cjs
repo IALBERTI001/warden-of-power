@@ -18,3 +18,7 @@ const l=new E.Game({},{mission:'outer',level:2});l.completed=4;l.finish(false);a
 // a full level plays to the gate: an undefended run loses health at the gate
 const u=new E.Game({},{mission:'outer',level:1});u.towers.push({id:999,type:'fire',x:-500,y:-500,tier:1,cooldown:9e9});u.startWave();for(let i=0;i<60*120&&u.status==='playing';i++)u.step(1/60);assert(u.health<20,'enemies reach the gate');
 console.log('PASS: Outer Seal map and levels, +15%/level, attuned from 3, armour from 4, elites from 6, boss every 5th, Parts 40/25 +10 per level, no Resonance.');
+// A boss that reaches the seal breaks it outright (Oct 22 2026); other enemies only chip it.
+{const g=new E.Game({},{mission:'outer',level:5});g.wave=8;const b=g.spawn('boss',8);b.distance=g.routeOf(b).total-.1;g.step(1/30);assert.equal(g.health,0);assert.equal(g.status,'lost','boss at the seal = instant loss');
+ const h=new E.Game({},{mission:'outer',level:5});h.wave=1;const s=h.spawn('golem',1);s.distance=h.routeOf(s).total-.1;h.step(1/30);assert.equal(h.health,18,'a golem only chips the seal');}
+console.log('PASS: boss at the seal is an instant loss.');

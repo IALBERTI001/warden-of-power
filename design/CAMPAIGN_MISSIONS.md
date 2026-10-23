@@ -37,5 +37,16 @@ From the approved Campaign & Progression Plan: four sectors of three missions pl
 Roles reuse the approved sprites with a tint and a moving mark (diver fin + ripple and a ripple-only look while submerged,
 bronze shield plate, runner speed lines, splitter crack; splinters are small). Painted role sprites can replace these later.
 
+## Clarity: where enemies come from and what you defend (Oct 22 2026, after playtest)
+- Every route ends at the **seal**: a glowing, pulsing rune circle with rising motes in the sector's colour, plus a
+  **seal health bar** ("SEAL 18 / 20") right above it that flashes and shakes when something breaks through. Ends that sit
+  close together (the finale's heart core) share one seal. Reduced motion: static glow, no particles or shake.
+- Every route starts at a violet **breach swirl** with arrows pointing down the road.
+- Furnace Heart (Emberheart 3): repainted so the right-hand monsters walk out of the furnace door down a new walkway; the old
+  road end at the bare wall is closed. Moonwell 1 (Silted Overflow): monsters now come out of the painted tunnel.
+- **A boss that reaches the seal breaks it: the run is lost.** Bosses now grow more slowly than other enemies
+  (health ~ level strength^0.6) and the finale guardian lost its extra +50%, so a prepared defense can always stop them.
+  Simulator: all campaign missions still win on every seed at expected power; Outer Seal level 11 now needs skills.
+
 ## Known
-- Bellows Walk's painted entrance is in the top-left corner, so enemies appear beside the map title for a moment.
+- Bellows Walk's painted entrance is in the top-left corner, beside the map title; the breach swirl marks it.

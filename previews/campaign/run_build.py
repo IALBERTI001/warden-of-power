@@ -1,8 +1,10 @@
 import sys,json,numpy as np,cv2
 from trace import final,buildable
+# Entrances that the painting shows as tunnels/doors (game units): enemies come out of them, not out of a bare edge.
+STARTS={'moonwell-1':[(128,72)],'emberheart-3':[None,(940,190)]}
 out={}
 for k in sys.argv[1:]:
-    img,prob,road,raw,res=final(k)
+    img,prob,road,raw,res=final(k,STARTS.get(k))
     grid,fp=buildable(k,img,[p for p in res])
     vis=img.copy()
     ov=vis.copy()
