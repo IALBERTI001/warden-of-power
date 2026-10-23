@@ -34,3 +34,9 @@ removes the limit, the ladder counts Engine runs.
 ## Not yet
 - Random routes for the Unbound Gate (approved direction: random generation is for the unlimited mode).
 - Online ladder (needs accounts); Fractures every 50 waves; Mastery purchase UI; Engine contracts.
+
+## Decisions 2026-10-23 (approved in Review & Approvals)
+- **Overcharge unlocks after the wave 25 Guardian** (first time `bestEndlessWave` reaches 25; unlocks mid-run). Before that the tower panel shows a lock note. Overcharge spends in-run Charge, never Resonance, and resets each run.
+- **Resonance milestones retuned to 30 + 14·m** (m = wave/5): wave 5 pays 44, wave 50 pays 170, wave 100 pays 310. Total through wave 100 = 3,540 ≥ full skill tree 3,525, so "reach wave 100 = full tree".
+- Simulated ceilings (22-tower bot): no Overcharge ~45–55 for every profile; with Overcharge fresh 55–69, restored 79–87, full tree ~100, full tree + full Mastery ~155. Mastery (43,750 Resonance total) needs its own retune before it is built.
+- Enemy HP compounds (≈17× at wave 100, ≈1,900× at wave 500), so every build has a wall; the climb to 500 needs Mastery plus future systems.

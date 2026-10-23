@@ -60,7 +60,7 @@ function shortOnParts(o){return o&&!o.ok&&/more Restoration Parts/.test(o.reason
 const EN=E.ENGINE;
 function engineSection(){if(!EN.available(profile))return`<h3>Engine Trials</h3><p>Resonance, which buys skills, is earned only here. Restore the <b>Moonwell Cisterns</b> to its first stage to wake the Engine.</p>`;
  const best=profile.engineBest||0,lim=EN.limit(profile),nextM=Math.floor(best/5)+1,next=nextM*5;
- return`<h3>Engine Trials</h3><p>A rising-wave defense with no fixed end. <b>Every 5 waves past your best banks Resonance at once</b>, and you keep it even if the seal breaks.</p><ul class="levels"><li class="next stack"><div><b>Best depth: wave ${best}</b><small>Run limit: ${Number.isFinite(lim)?`wave ${lim} (+10 for every restoration stage; the finale removes it)`:'none: the Unbound Gate is open'}</small><small class="ready tone-ok">Next: wave ${next} banks ${EN.resonance(nextM)} Resonance</small></div><button class="primary-btn" id="engineBtn" data-engine ${Number.isFinite(lim)&&best>=lim?'':''}>▶ Enter the Engine</button></li></ul><p class="muted">In the Engine, Tier III towers can be <b>Overcharged</b> with spare Charge: +15% damage per level.</p>`}
+ return`<h3>Engine Trials</h3><p>A rising-wave defense with no fixed end. <b>Every 5 waves past your best banks Resonance at once</b>, and you keep it even if the seal breaks.</p><ul class="levels"><li class="next stack"><div><b>Best depth: wave ${best}</b><small>Run limit: ${Number.isFinite(lim)?`wave ${lim} (+10 for every restoration stage; the finale removes it)`:'none: the Unbound Gate is open'}</small><small class="ready tone-ok">Next: wave ${next} banks ${EN.resonance(nextM)} Resonance</small></div><button class="primary-btn" id="engineBtn" data-engine ${Number.isFinite(lim)&&best>=lim?'':''}>▶ Enter the Engine</button></li></ul><p class="muted">${best>=25?'<b>Overcharge unlocked:</b> in the Engine, Tier III towers can spend spare Charge for +15% damage per level.':'🔒 Defeat the <b>wave 25 Guardian</b> to unlock <b>Overcharge</b>: Tier III towers spend spare Charge for +15% damage per level.'}</p>`}
 function playEngine(){persist();location.href='index.html?mission=engine'}
 function playOuter(L){persist();location.href=`index.html?mission=outer&level=${L}`}
 const sealCount=()=>['cleared','held','challenge'].filter(k=>seals()[k]).length;
@@ -113,7 +113,7 @@ function openPanel(id,opener,keep){const p=PLACES.find(p=>p.id===id);if(!keep&&c
  $('restoreBtn')&&($('restoreBtn').onclick=()=>restore(id));
  document.querySelectorAll('.pin').forEach(b=>b.classList.toggle('active',b.dataset.place===id));
  if(!keep)setTimeout(()=>$('panel').querySelector('button:not([disabled]):not(.panel-close)')?.focus(),30)}
-function closePanel(){stopCue();$('panel').hidden=true;currentPanel=null;document.querySelectorAll('.pin').forEach(b=>b.classList.remove('active'));lastOpener?.focus?.()}
+function closePanel(){$('panel').hidden=true;currentPanel=null;document.querySelectorAll('.pin').forEach(b=>b.classList.remove('active'));lastOpener?.focus?.()}
 function restore(id){const r=P.restore(profile,id);if(!r.ok){toast('Not yet',r.reason);return}const f=facility(id),p=PLACES.find(p=>p.id===id);
  if(r.stage===1&&f.branch)toast(`${ELEMENT[f.branch].name} skills unlocked`,f.name);
  if(r.stage===3){toast(`${f.name} reawakened`,'RESTORATION COMPLETE');if(p.badge)award(p.badge)}
@@ -211,7 +211,7 @@ if(seals().cleared&&!profile.hubIntroSeen)setTimeout(showIntro,500);
 // its own sound once for about 3 seconds (soft fade in, fade out) and stops. Nothing loops. A restoration moment
 // plays the same cue. Settings -> Sound -> Area sound volume / mute.
 const AMB={moonwell:'water',emberheart:'fire',rimeglass:'ice',stormcrown:'storm',atelier:'gears'};
-const CUE_LEN=3,CUE_IN=.3,CUE_OUT=.9;let cue=null;
+const CUE_LEN=3.5,CUE_IN=.3,CUE_OUT=.9;let cue=null;
 function audioSettings(){try{return{master:.65,ambience:.35,masterMute:false,ambienceMute:false,...JSON.parse(localStorage.getItem('warden.settings.v1')||'{}')}}catch{return{master:.65,ambience:.35}}}
 function stopCue(fast){if(!cue)return;const c=cue;cue=null;if(fast){c.a.pause();clearInterval(c.t);return}c.stopAt=Math.min(c.stopAt,performance.now()/1000+.25)}
 function playAreaCue(id){const name=AMB[id];stopCue(true);if(!name||document.hidden)return;const s=audioSettings(),base=(s.masterMute||s.ambienceMute)?0:s.master*s.ambience;if(base<=0)return;

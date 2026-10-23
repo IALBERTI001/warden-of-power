@@ -53,14 +53,14 @@ const MISSIONS={tutorial:{id:'tutorial',map:'conduit'},outer:{id:'outer',map:'ou
 // kept even if the seal breaks. The only source of Resonance.
 // Overcharge (Engine Trials only, candidate): a Tier III tower can be overcharged with Charge again and again,
 // +15% damage per level, each level costing 35% more than the last. Turns deep-run Charge into power.
-const OVERCHARGE={per:.15,base:220,cost:oc=>Math.round(220*Math.pow(1.35,oc))};
+const OVERCHARGE={per:.15,base:220,unlockWave:25,cost:oc=>Math.round(220*Math.pow(1.35,oc)),unlocked:p=>(p&&(p.bestEndlessWave||0))>=25};
 // Tuned Oct 23 2026 (simulator, 22-tower bot): the approved starting curve (0.10, 1.012) walled every player near wave 40;
 // HP(w) = (1 + 0.07 w) x 1.008^w with elites x2.0 and Overcharge lets power matter: fresh ~55-69, fully restored ~80-87,
 // full skill tree ~100 (the approved table's targets for those stages).
 const ENGINE={hp:w=>(1+.07*(w-1))*Math.pow(1.008,w-1),eliteHp:2.0,startCharge:300,waveCharge:w=>60+2*w,rewardScale:w=>1+.03*(w-1),
  stages:p=>['moonwell','emberheart','rimeglass','stormcrown','atelier'].reduce((a,f)=>a+Math.min(3,p?.restorations?.[f]||0),0),
  limit:p=>p?.unboundOpen?Infinity:20+10*ENGINE.stages(p),available:p=>(p?.restorations?.moonwell||0)>=1,
- resonance:m=>30+10*m,armor:w=>w<20?0:Math.min(10,2+Math.floor((w-20)/15)),bossCurve:.6};
+ resonance:m=>30+14*m,armor:w=>w<20?0:Math.min(10,2+Math.floor((w-20)/15)),bossCurve:.6};
 function engineWave(w,r,routes){const roles=['diver','shield','runner','splitter'],att=['tide','ember','rime','storm'];const boss=w%25===0;
  const count=Math.min(26,Math.round(7+w*.4+(r()<.5?0:1))),shape=['mixed','swarm','heavy','role','mixed','swarm'][(w-1)%6];const spawns=[];
  const a1=w>=8?att[Math.floor(r()*4)]:null,a2=w>=18?att[Math.floor(r()*4)]:null;
@@ -108,7 +108,7 @@ class Game{
  upgradeCost(t){const base=t.tier===1?65+Math.round(TYPES[t.type].cost*.3):130+Math.round(TYPES[t.type].cost*.5);const d=this.bonus?.eng?.upgradeDiscount||0;return d?Math.max(1,Math.round(base*(1-d))):base}
  upgrade(id,spec){const t=this.towers.find(t=>t.id===id);if(!t||this.status!=='playing')return{ok:false,reason:'Select a tower.'};if(t.tier>=3)return{ok:false,reason:'Already Tier III.'};if(t.tier===2&&![0,1].includes(spec))return{ok:false,reason:'Choose a specialization.'};const cost=this.upgradeCost(t);if(this.charge<cost)return{ok:false,reason:'Not enough Charge.'};this.charge-=cost;t.spent+=cost;t.tier++;if(t.tier===3)t.spec=spec;this.award('first_upgrade');this.emit('upgrade',{tower:t});return{ok:true}}
  overchargeCost(t){return OVERCHARGE.cost(t.oc||0)}
- overcharge(id){const t=this.towers.find(t=>t.id===id);if(!t||this.status!=='playing')return{ok:false,reason:'Select a tower.'};if(!this.endless)return{ok:false,reason:'Overcharge works only in Engine Trials.'};if(t.tier<3)return{ok:false,reason:'Reach Tier III first.'};const cost=this.overchargeCost(t);if(this.charge<cost)return{ok:false,reason:'Not enough Charge.'};this.charge-=cost;t.spent+=cost;t.oc=(t.oc||0)+1;this.emit('overcharge',{tower:t});return{ok:true,level:t.oc}}
+ overcharge(id){const t=this.towers.find(t=>t.id===id);if(!t||this.status!=='playing')return{ok:false,reason:'Select a tower.'};if(!this.endless)return{ok:false,reason:'Overcharge works only in Engine Trials.'};if(!OVERCHARGE.unlocked(this.profile))return{ok:false,reason:'Overcharge unlocks when you defeat the wave 25 Guardian in Engine Trials.'};if(t.tier<3)return{ok:false,reason:'Reach Tier III first.'};const cost=this.overchargeCost(t);if(this.charge<cost)return{ok:false,reason:'Not enough Charge.'};this.charge-=cost;t.spent+=cost;t.oc=(t.oc||0)+1;this.emit('overcharge',{tower:t});return{ok:true,level:t.oc}}
  refund(t){return!t.acted? t.spent:Math.floor(t.spent*Math.min(.9,.75+(this.bonus?.eng?.refundPts||0)))}
  sell(id){const t=this.towers.find(t=>t.id===id);if(!t||this.status!=='playing')return{ok:false,reason:'Select a tower.'};const refund=this.refund(t);this.charge+=refund;this.towers=this.towers.filter(v=>v.id!==id);this.emit('sell',{tower:t,refund});return{ok:true,refund}}
  startWave(early=false){if(this.status!=='playing'||!this.waveAt(this.wave))return{ok:false,reason:'No more waves.'};if(!this.towers.length)return{ok:false,reason:'Build a tower first.'};if(this.spawnQueue.length)return{ok:false,reason:'This wave is still entering.'};const live=this.enemies.some(e=>e.alive);if(live&&!early)return{ok:false,reason:'Confirm sending early.'};if(live){this.profile.counters.early++;if(this.profile.counters.early>=5)this.award('early_wave_five')}const w=this.waves[this.wave++];if(w.spawns)w.spawns.forEach((s,i)=>this.spawnQueue.push({at:this.time+i*w.gap,kind:s.kind,wave:this.wave,attune:s.attune||null,elite:!!s.elite,route:s.route||0}));else for(let i=0;i<w.count;i++){const kind=pick(w.kind,i,w.count);this.spawnQueue.push({at:this.time+i*(w.kind==='swarm'?.56:1.25),kind,wave:this.wave})}this.emit('wave',{wave:this.wave,name:w.name});return{ok:true}}
@@ -129,7 +129,7 @@ class Game{
  this.enemies=this.enemies.filter(e=>e.alive);for(const c of this.corpses)c.age+=dt;this.corpses=this.corpses.filter(c=>c.age<1.35);
  if(this.health<=0){this.status='lost';this.finish(false);return}if(this.wave>this.completed&&!this.spawnQueue.length&&!this.enemies.length){const number=this.wave-this.completed;this.completed=this.wave;const preparation=this.endless?ENGINE.waveCharge(this.completed):this.mission==='outer'?OUTER.waveCharge(this.level):this.completed===1?140:this.completed===2?90:45;this.charge+=number*preparation;const stable=(this.bonus?.eng?.fifthWaveCharge||0)*(Math.floor(this.completed/5)-Math.floor((this.completed-number)/5));this.charge+=stable;this.emit('waveClear',{wave:this.completed,charge:number*preparation+stable});if(this.endless)this.engineMilestone();if(this.endless?this.completed>=this.limit:this.completed===this.waves.length){this.status='won';if(this.mission==='tutorial')this.award('tutorial_clear');this.finish(true)}}
  }
- engineMilestone(){const pr=this.profile,w=this.completed;pr.bestEndlessWave=Math.max(pr.bestEndlessWave||0,w);pr.engineBest=Math.max(pr.engineBest||0,w);
+ engineMilestone(){const pr=this.profile,w=this.completed;const ocBefore=OVERCHARGE.unlocked(pr);pr.bestEndlessWave=Math.max(pr.bestEndlessWave||0,w);if(!ocBefore&&OVERCHARGE.unlocked(pr))this.emit('overchargeUnlocked',{wave:w});pr.engineBest=Math.max(pr.engineBest||0,w);
   for(const [id,n] of [['first_endless_twenty',20],['endless_fifty',50],['endless_hundred',100],['endless_500',500]])if(w>=n)this.award(id);
   if(w%5===0&&w>this.bestBefore){const amount=ENGINE.resonance(w/5);pr.resonance=(pr.resonance||0)+amount;this.banked+=amount;this.emit('resonance',{amount,wave:w})}}
  finish(won){if(this.rewarded)return;this.rewarded=true;const pr=this.profile;pr.counters=pr.counters||{};

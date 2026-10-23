@@ -11,6 +11,15 @@ const a=new E.Game({},{mission:'engine',seed:1});a.completed=20;a.engineMileston
 // the run ends at the limit; the seal breaking keeps what was banked
 const k=new E.Game({restorations:{moonwell:1}},{mission:'engine',seed:6,limit:1});k.towers.push({id:900,type:'fire',x:-500,y:-500,tier:1,cooldown:9e9});k.startWave();for(const e of k.spawnQueue)e.at=0;k.step(1/60);k.enemies.forEach(e=>e.alive=false);k.enemies=[];k.spawnQueue=[];k.step(1/60);assert.equal(k.status,'won','limit reached');
 // overcharge
-const o=new E.Game({},{mission:'engine',seed:1});o.charge=5000;const t=o.build('fire',{x:120,y:420});assert(t.ok||true);const tw=o.towers[0]||(o.towers.push({id:77,type:'fire',x:0,y:0,tier:3,spec:0,spent:0,target:'first'}),o.towers[0]);tw.tier=3;tw.spec=0;const d0=o.stats(tw).damage;assert(o.overcharge(tw.id).ok);assert(Math.abs(o.stats(tw).damage/d0-1.15)<1e-9,'+15% per level');assert(o.overchargeCost(tw)>E.OVERCHARGE.cost(0),'each level costs more');
+const o=new E.Game({bestEndlessWave:25},{mission:'engine',seed:1});o.charge=5000;const t=o.build('fire',{x:120,y:420});assert(t.ok||true);const tw=o.towers[0]||(o.towers.push({id:77,type:'fire',x:0,y:0,tier:3,spec:0,spent:0,target:'first'}),o.towers[0]);tw.tier=3;tw.spec=0;const d0=o.stats(tw).damage;assert(o.overcharge(tw.id).ok);assert(Math.abs(o.stats(tw).damage/d0-1.15)<1e-9,'+15% per level');assert(o.overchargeCost(tw)>E.OVERCHARGE.cost(0),'each level costs more');
 const q=new E.Game({},{mission:'outer',level:1});q.towers.push({id:5,type:'fire',x:0,y:0,tier:3,spec:0,spent:0});q.charge=9999;assert(!q.overcharge(5).ok,'Overcharge is Engine-only');
 console.log('PASS: Engine Trials wake, limit, Resonance past best (kept), endless badges, bosses every 25, Overcharge.');
+
+// Overcharge is locked until the wave 25 Guardian falls, and unlocks mid-run when it does
+{const z=new E.Game({},{mission:'engine',seed:2});z.towers.push({id:9,type:'fire',x:0,y:0,tier:3,spec:0,spent:0,target:'first'});z.charge=9999;
+ const r=z.overcharge(9);assert(!r.ok&&/wave 25 Guardian/.test(r.reason),'locked before wave 25');
+ const seen=[];z.on?z.on('overchargeUnlocked',e=>seen.push(e)):0;z.completed=24;z.engineMilestone();assert(!E.OVERCHARGE.unlocked(z.profile));
+ z.completed=25;z.engineMilestone();assert(E.OVERCHARGE.unlocked(z.profile),'unlocked at 25');assert(z.overcharge(9).ok,'usable right away');}
+// Resonance retune: reaching wave 100 pays for the whole skill tree
+{const P=require('../game/progression.js');let tree=0;for(const s of P.SKILLS)for(let i=0;i<s.maxRank;i++)tree+=s.costs[i];let pay=0;for(let m=1;m<=20;m++)pay+=E.ENGINE.resonance(m);
+ assert(pay>=tree,`wave 100 pays ${pay} ≥ tree ${tree}`);assert.equal(E.ENGINE.resonance(1),44);}
