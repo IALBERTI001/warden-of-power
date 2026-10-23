@@ -34,3 +34,13 @@ button{min-height:32px;line-height:1.25}button:focus-visible,select:focus-visibl
 
 /* Hold the Outer Seal (defense levels): the tutorial handbook belongs to the tutorial only. */
 body.mission-outer #tutorialBookButton,body.mission-outer #tutorialBook,body.mission-outer label:has(#guide){display:none!important}
+
+/* Tower panel: facts behind a "?" so upgrades sit right under the stats (Oct 22 2026) */
+.tower-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tower-head h2{margin:0}
+.inspector .info-toggle{flex:0 0 28px!important;width:28px!important;min-width:28px!important;max-width:28px!important;height:28px!important;min-height:28px!important;margin:0!important;padding:0!important;border-radius:50%!important;font:bold 15px Georgia,serif!important;line-height:1!important;display:grid!important;place-items:center}
+.inspector .tower-head h2{flex:1;min-width:0}
+.info-toggle[aria-expanded="true"]{background:#e7ca83;color:#261c37}
+.tower-info{margin:6px 0;padding:6px 8px;border-radius:8px;background:#0006}
+.tower-info p{margin:4px 0}
+.spec-button.spec-pick{outline:3px solid #ffd66b;outline-offset:2px;box-shadow:0 0 12px #ffd66b88}
