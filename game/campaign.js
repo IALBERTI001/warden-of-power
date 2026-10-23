@@ -20,7 +20,7 @@ const MISSIONS=[
  ['rimeglass-1',5,10],['rimeglass-2',6,12],['rimeglass-3',7,15],
  ['stormcrown-1',5,10],['stormcrown-2',6,12],['stormcrown-3',6,15],
  ['aetherheart-1',5,15]].map(([id,level,waves])=>{const [sector,n]=id.split('-');const i=+n;const finale=sector==='aetherheart';return{id,sector,index:i,name:MAPS[id].name,level,waves,finale,
-  firstParts:finale?150:[70,90,110][i-1],replayParts:finale?40:[20,25,30][i-1],
+  firstParts:finale?150:[70,90,110][i-1],replayParts:0,/* Oct 23 2026: replays pay only Seals not yet earned */
   challenge:finale?['four','Build all four elements and win']:[['combos','Trigger freeze, chain and shatter in one attempt'],['two','Win using at most two elements'],['perfect','Win without losing any seal']][i-1]}});
 const SEAL_PARTS=15;
 function mission(id){return MISSIONS.find(m=>m.id===id)||null}

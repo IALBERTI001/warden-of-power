@@ -103,7 +103,7 @@ const CHAPTERS=[
   <div class="g-row g-side">${fig('hub-facility.jpg','The Moonwell Cisterns panel listing missions.','Campaign missions live in each facility panel.')}<div>
   <h3>The campaign</h3><ul><li><b>Moonwell Cisterns</b> first, then Emberheart, Rimeglass and Stormcrown in any order, then the <b>Aetherheart finale</b>.</li>
   <li>Three missions per facility, each a new map with its own enemy role. Clearing a mission opens that facility's next restoration stage.</li>
-  <li>First clears pay 70, 90 and 110 Parts (finale 150). Replays pay less.</li><li><b>Seals</b>, 15 Parts each, once: <i>Cleared</i>, <i>Held</i> (seal at 75% or more) and a <i>Challenge</i> written on the mission.</li>
+  <li>First clears pay 70, 90 and 110 Parts (finale 150). <b>Replays pay only Seals you haven't earned yet</b>, so replay for Seals and badges, not for Parts.</li><li><b>Seals</b>, 15 Parts each, once: <i>Cleared</i>, <i>Held</i> (seal at 75% or more) and a <i>Challenge</i> written on the mission.</li>
   <li>Each attempt varies a little: enemy order, which attuned foes appear, and which entrance a wave uses.</li></ul></div></div>
   ${fig('results.jpg','A results report: waves held, Parts earned, combos and new Seals.','After every battle: what you earned and what to do next.')}
   <h3>The Aetherheart Engine and the Unbound Gate</h3><p>Winning the finale opens the <b>Unbound Gate</b>: endless waves, the ladder and the climb to wave 500. <b>Engine Trials</b>, the only source of Resonance, are coming next.</p>`},
@@ -115,7 +115,7 @@ const CHAPTERS=[
   <li><b>Watch the seal bar</b>, not just the enemies. If it drops, add slow (Ice) or damage near the end of the road.</li>
   <li><b>Bosses end runs.</b> Keep Fire near the end of the road, and save Charge for upgrades before boss waves.</li>
   <li><b>Read the next wave.</b> The bottom-right card names it: roles, attuned foes, elites and which entrance.</li>
-  <li><b>Lost? Restore and come back.</b> Every restoration makes every tower stronger, and replays get easier as you grow.</li></ol>`},
+  <li><b>Short on Parts?</b> Hold the Outer Seal: every level pays Parts, and your restorations make every tower stronger.</li></ol>`},
  {id:'controls',title:'Controls',short:'Controls',html:`
   <table class="g-table g-keys"><tbody>
   <tr><td>${key('1')} ${key('2')} ${key('3')} ${key('4')}</td><td>Pick Fire, Water, Ice, Lightning to build</td></tr>

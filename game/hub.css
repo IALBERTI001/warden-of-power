@@ -172,3 +172,5 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .levels button,.levels .primary-btn{flex:none;width:auto;min-width:112px;min-height:44px;margin:0;padding:0 16px}
 .levels li.locked{opacity:.75}
 .levels li.locked b{opacity:.85}
+.short-parts{margin:8px 0 4px;padding:10px 12px;border-radius:10px;border:1px dashed #d5b36988;background:#d5b36912}
+.short-parts p{margin:0 0 8px;font-size:15px}
