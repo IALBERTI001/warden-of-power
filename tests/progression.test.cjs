@@ -9,7 +9,7 @@ const old={earned:{first_upgrade:'2026-10-20'},counters:{freeze:7},parts:80};con
 // Skills: branch locked until its facility's first restoration; selecting never spends; prerequisites and costs enforced.
 const p=P.migrate({parts:300,resonance:500});assert.equal(P.restore(p,'emberheart').ok,false,'gate first');assert.equal(P.openGate(p).ok,true);assert.equal(p.parts,260);p.gateOpen=false;p.parts=300;
 assert.equal(P.skillOffer(p,'fire_furnace').ok,false);p.gateOpen=true;assert.equal(P.skillOffer(p,'fire_furnace').ok,true,'gate opens Fire skills');assert.equal(P.skillOffer(p,'water_saturation').ok,false);assert.equal(p.resonance,500,'checking an offer never spends');
-assert.equal(P.restore(p,'emberheart').ok,true);assert.equal(p.parts,260);assert.equal(p.restorations.emberheart,1);
+assert.equal(P.restore(p,'emberheart').ok,false,'restoration stage 1 needs the Emberheart mission 1');p.missions={'emberheart-1':{cleared:true}};assert.equal(P.restore(p,'emberheart').ok,true);assert.equal(p.parts,260);assert.equal(p.restorations.emberheart,1);
 assert.equal(P.skillOffer(p,'fire_pursuit').ok,false,'needs Furnace tuning rank 1 first');
 assert.deepEqual(P.buySkill(p,'fire_furnace'),{ok:true,rank:1,cost:25});assert.equal(p.resonance,475);
 assert.equal(P.buySkill(p,'fire_furnace').cost,50);assert.equal(P.buySkill(p,'fire_furnace').cost,75);assert.equal(P.buySkill(p,'fire_furnace').ok,false,'max rank 3');

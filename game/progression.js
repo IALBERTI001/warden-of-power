@@ -4,6 +4,7 @@
 // values are STARTING TARGETS for the balance simulator, not final balance.
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.WardenProgression=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
+const CAMP=(typeof module==='object'&&module.exports)?(()=>{try{return require('./campaign.js')}catch{return null}})():(globalThis.WardenCampaign||null);
 const ELEMENTS=['fire','water','ice','lightning'];
 const BRANCHES=['fire','water','ice','lightning','engineering'];
 // node: [id, branch, order, name, maxRank, costs[], effect key, per-rank value, cap?]
@@ -56,7 +57,7 @@ function buySkill(p,id){const o=skillOffer(p,id);if(!o.ok)return o;p.resonance-=
 function resetSkills(p){let back=0;for(const s of SKILLS){const r=rank(p,s.id);for(let i=0;i<r;i++)back+=s.costs[i]}p.resonance=(p.resonance||0)+back;p.skills={};return back}
 function gateOffer(p){if(p.gateOpen)return{ok:false,reason:'The gate is open.'};if((p.parts||0)<GATE.cost)return{ok:false,reason:`Needs ${GATE.cost-(p.parts||0)} more Restoration Parts.`,cost:GATE.cost};return{ok:true,cost:GATE.cost}}
 function openGate(p){const o=gateOffer(p);if(!o.ok)return o;p.parts-=o.cost;p.gateOpen=true;return{ok:true,cost:o.cost}}
-function restorationOffer(p,id){const f=FACILITIES.find(f=>f.id===id);if(!f)return{ok:false,reason:'Unknown facility.'};if(!p.gateOpen)return{ok:false,reason:'Raise the Outer Seal Gate first.'};const stage=p.restorations?.[id]||0;if(stage>=f.stages.length)return{ok:false,reason:'Fully restored.',stage};const cost=f.costs[stage];if((p.parts||0)<cost)return{ok:false,reason:`Needs ${cost-(p.parts||0)} more Restoration Parts.`,stage,cost};return{ok:true,stage,cost,next:f.stages[stage]}}
+function restorationOffer(p,id){const f=FACILITIES.find(f=>f.id===id);if(!f)return{ok:false,reason:'Unknown facility.'};if(!p.gateOpen)return{ok:false,reason:'Raise the Outer Seal Gate first.'};const stage=p.restorations?.[id]||0;if(stage>=f.stages.length)return{ok:false,reason:'Fully restored.',stage};const cost=f.costs[stage];const need=CAMP?.restorationNeeds?.(p,id,stage+1);if(need)return{ok:false,reason:need.reason,stage,cost,needMission:need.mission};if((p.parts||0)<cost)return{ok:false,reason:`Needs ${cost-(p.parts||0)} more Restoration Parts.`,stage,cost};return{ok:true,stage,cost,next:f.stages[stage]}}
 function restore(p,id){const o=restorationOffer(p,id);if(!o.ok)return o;p.parts-=o.cost;p.restorations[id]=o.stage+1;return{ok:true,stage:o.stage+1,cost:o.cost}}
 function masteryTierOpen(p,tier){return (p.bestEndlessWave||0)>=MASTERY.unlockWaves[tier-1]}
 function masteryRanks(p,branch,tier){return Math.max(0,Math.min(MASTERY.ranks,Math.floor(p.mastery?.[branch]?.[tier]||0)))}

@@ -170,3 +170,5 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .levels .held-tag{font-size:13px;color:#9fd6a3}
 .levels .ready.tone-ok{color:#9fd6a3}.levels .ready.tone-warn{color:#f0c97a}.levels .ready.tone-hard{color:#f08f7a}
 .levels button,.levels .primary-btn{flex:none;width:auto;min-width:112px;min-height:44px;margin:0;padding:0 16px}
+.levels li.locked{opacity:.75}
+.levels li.locked b{opacity:.85}
