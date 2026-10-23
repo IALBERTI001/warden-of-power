@@ -66,3 +66,7 @@ dialog.ascension-card::backdrop{background:radial-gradient(ellipse,#f2c75c33,#00
 .round-button.skills-round.can-buy{box-shadow:0 0 0 2px #ffd98a,0 0 14px #ffd36b99;animation:skillGlow 2s ease-in-out infinite}
 @keyframes skillGlow{50%{box-shadow:0 0 0 2px #ffd98a,0 0 22px #ffd36bcc}}
 @media (prefers-reduced-motion:reduce){.round-button.skills-round.can-buy{animation:none}}
+.auto-wave{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px;font-size:11px;letter-spacing:.5px;color:#e4cb8f;cursor:pointer;user-select:none}
+.auto-wave input{accent-color:#d5b369;width:14px;height:14px;margin:0}
+.auto-wave kbd{font-size:9px}
+@container(max-width:600px){.auto-wave{font-size:8px;margin-top:2px}.auto-wave kbd{display:none}}
