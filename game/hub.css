@@ -174,3 +174,5 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .levels li.locked b{opacity:.85}
 .short-parts{margin:8px 0 4px;padding:10px 12px;border-radius:10px;border:1px dashed #d5b36988;background:#d5b36912}
 .short-parts p{margin:0 0 8px;font-size:15px}
+.levels li.stack{flex-direction:column;align-items:stretch}
+.levels li.stack .primary-btn{width:100%;min-width:0}

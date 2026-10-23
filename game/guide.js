@@ -61,7 +61,8 @@ const CHAPTERS=[
   <ul><li><b>Tier II</b>: +55% damage, longer range, faster attacks. Press ${key('U')} and it upgrades at once.</li>
   <li><b>Tier III</b>: choose one of two paths. Press ${key('U')}: both are outlined, ${key('←')} ${key('→')} picks, ${key('Enter')} (or ${key('U')} again) buys, ${key('Esc')} cancels.</li>
   <li><b>Target</b>: <i>First</i> (furthest along the road), <i>Last</i> (newest arrival), <i>Strongest</i> (most health) or <i>Nearest</i>. The badge above the tower shows its choice. ${key('T')} cycles it.</li>
-  <li><b>Sell</b> (${key('X')}): a tower that hasn't fired yet refunds everything; otherwise you get 75% back.</li></ul>
+  <li><b>Sell</b> (${key('X')}): a tower that hasn't fired yet refunds everything; otherwise you get 75% back.</li>
+  <li><b>Overcharge</b> (Engine Trials only): a Tier III tower can be overcharged again and again with Charge, +15% damage per level. ${key('U')} does it.</li></ul>
   <p class="g-tip">Upgrading a well-placed tower is often better than building a new one.</p></div></div>
   <h3>Pace</h3><p>Start each wave when you are ready (${key('N')}). You can send the next wave early while enemies remain. Speed: ${key('Z')} 1×, ${key('C')} 2×, ${key('V')} 5×. ${key('Space')} pauses, and you can still build and upgrade while paused.</p>`},
  {id:'enemies',title:'Know your enemies',short:'Enemies',html:`
@@ -89,7 +90,7 @@ const CHAPTERS=[
   ${fig('hub-wallet.jpg','The top bar showing Parts, Resonance and Warden Power.','Click any of these for a short explanation.','g-wide')}
   <table class="g-table"><tbody>
   <tr><td><b>⚙ Restoration Parts</b></td><td>Rebuild the complex. Earned by holding the Outer Seal, winning missions and earning Seals.</td></tr>
-  <tr><td><b>✦ Resonance</b></td><td>Buys skills. Earned <b>only in the Aetherheart Engine</b>: the deeper you hold there, the more you earn.</td></tr>
+  <tr><td><b>✦ Resonance</b></td><td>Buys skills. Earned <b>only in Engine Trials</b> at the Aetherheart Engine: every 5 waves past your best banks some.</td></tr>
   <tr><td><b>⬢ Warden Power</b></td><td>The total of every bonus your towers carry. It applies in every battle.</td></tr></tbody></table>
   <h3>Restoring the complex</h3>
   <p>Raise the <b>Outer Seal Gate</b> first (40 Parts). Each facility then has three restoration stages. <b>Every stage makes every tower stronger, everywhere</b> (+5% damage for that element), and its first stage opens that element's skills. In the campaign, each stage needs its mission cleared first. <b>Cogwright's Atelier</b> has no missions: rebuild it with Parts from anywhere for more starting Charge.</p>
@@ -106,7 +107,7 @@ const CHAPTERS=[
   <li>First clears pay 70, 90 and 110 Parts (finale 150). <b>Replays pay only Seals you haven't earned yet</b>, so replay for Seals and badges, not for Parts.</li><li><b>Seals</b>, 15 Parts each, once: <i>Cleared</i>, <i>Held</i> (seal at 75% or more) and a <i>Challenge</i> written on the mission.</li>
   <li>Each attempt varies a little: enemy order, which attuned foes appear, and which entrance a wave uses.</li></ul></div></div>
   ${fig('results.jpg','A results report: waves held, Parts earned, combos and new Seals.','After every battle: what you earned and what to do next.')}
-  <h3>The Aetherheart Engine and the Unbound Gate</h3><p>Winning the finale opens the <b>Unbound Gate</b>: endless waves, the ladder and the climb to wave 500. <b>Engine Trials</b>, the only source of Resonance, are coming next.</p>`},
+  <h3>Engine Trials: where Resonance comes from</h3><p>Once the Moonwell's first stage is restored, the <b>Aetherheart Engine</b> wakes. Engine Trials is one long defense that keeps getting harder, with no fixed end.</p><ul><li><b>Every 5 waves past your best</b> banks Resonance at once, and you keep it even if the seal breaks. Resonance buys skills.</li><li>A run can go up to <b>wave 20, +10 for every restoration stage</b> you have completed. Winning the Aetherheart finale removes the limit: that's the <b>Unbound Gate</b>, the climb to wave 500.</li><li>Your best wave is your record for badges and Mastery.</li><li>Spare Charge piles up in long runs: <b>Overcharge</b> your Tier III towers (+15% damage per level, press ${key('U')}).</li></ul>`},
  {id:'tips',title:'Tips from veteran Wardens',short:'Tips',html:`
   <ol class="g-tips"><li><b>Water first, always near Ice or Lightning.</b> Water alone is weak; Water with partners wins waves.</li>
   <li><b>Build where the road bends or doubles back.</b> One tower there covers two stretches.</li>
