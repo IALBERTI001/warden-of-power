@@ -62,3 +62,7 @@ dialog.ascension-card::backdrop{background:radial-gradient(ellipse,#f2c75c33,#00
 @keyframes ascSpin{to{transform:rotate(360deg)}}
 @keyframes ascPulse{50%{transform:scale(1.06)}}
 @media (prefers-reduced-motion:reduce){dialog.ascension-card,.asc-rays,.asc-medal{animation:none}}
+.round-button.skills-round{color:#ffd98a}
+.round-button.skills-round.can-buy{box-shadow:0 0 0 2px #ffd98a,0 0 14px #ffd36b99;animation:skillGlow 2s ease-in-out infinite}
+@keyframes skillGlow{50%{box-shadow:0 0 0 2px #ffd98a,0 0 22px #ffd36bcc}}
+@media (prefers-reduced-motion:reduce){.round-button.skills-round.can-buy{animation:none}}
