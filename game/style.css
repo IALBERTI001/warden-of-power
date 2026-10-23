@@ -44,3 +44,21 @@ body.mission-outer #tutorialBookButton,body.mission-outer #tutorialBook,body.mis
 .tower-info{margin:6px 0;padding:6px 8px;border-radius:8px;background:#0006}
 .tower-info p{margin:4px 0}
 .spec-button.spec-pick{outline:3px solid #ffd66b;outline-offset:2px;box-shadow:0 0 12px #ffd66b88}
+/* Ascension moment (endgame, v1 candidate) */
+dialog.ascension-card{width:min(440px,92vw);text-align:center;overflow:hidden;position:relative;border:2px solid #e9c46a;background:radial-gradient(ellipse at 50% 30%,#3a2c12f8,#160f0af8 70%);box-shadow:0 0 60px #f2c75c66,0 20px 60px #000c;animation:ascIn .7s cubic-bezier(.2,1.4,.4,1) both}
+dialog.ascension-card::backdrop{background:radial-gradient(ellipse,#f2c75c33,#000c 70%)}
+.ascension-card>*{position:relative}
+.asc-rays{position:absolute!important;inset:-50%;background:repeating-conic-gradient(from 0deg,#ffe08a22 0 8deg,transparent 8deg 22deg);animation:ascSpin 18s linear infinite;pointer-events:none}
+.ascension-card .eyebrow{color:#f2c75c;letter-spacing:3px}
+.asc-medal{position:relative;width:128px;height:128px;margin:10px auto 16px;filter:drop-shadow(0 0 18px #ffd36baa);animation:ascPulse 2.4s ease-in-out infinite}
+.asc-medal img{width:128px;height:128px}
+.asc-medal b{position:absolute;right:-10px;bottom:-4px;font:700 22px "Warden Quill",Georgia,serif;color:#1b1206;background:linear-gradient(#ffe9a8,#d9a83e);border-radius:50%;min-width:40px;height:40px;line-height:40px;box-shadow:0 2px 8px #000a}
+.ascension-card h2{font-size:30px;margin:6px 0 2px;color:#ffe9b0;text-shadow:0 0 18px #f2c75c88}
+.asc-banner{color:#e7d3a1;font-style:italic;margin:0 0 10px}
+.asc-power{display:grid;gap:4px;background:#00000040;border:1px solid #e9c46a55;border-radius:10px;padding:10px 12px;margin:0 0 14px;text-align:left}
+.asc-power b{color:#ffd36b}.asc-power small{color:#cdbb91}
+.ascension-card[data-rank="5"]{border-color:#c79bff;box-shadow:0 0 70px #c79bff77,0 0 40px #5fd2ef55,0 20px 60px #000c}
+@keyframes ascIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes ascSpin{to{transform:rotate(360deg)}}
+@keyframes ascPulse{50%{transform:scale(1.06)}}
+@media (prefers-reduced-motion:reduce){dialog.ascension-card,.asc-rays,.asc-medal{animation:none}}

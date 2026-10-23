@@ -3,8 +3,8 @@
 // Painting coordinates are 1536 x 1024. Stage art: assets/hub/stages/<facility>-stage<1|2|3>.png (crop of the box),
 // gate: gate-sealed.png. Missing stage art falls back to the next painted stage, so the hub always draws.
 (function(root){'use strict';
-const BOXES={moonwell:[0,0,576,416],emberheart:[640,0,1136,352],rimeglass:[0,400,512,896],stormcrown:[864,192,1280,640],atelier:[704,544,1152,864],gate:[448,640,832,1024]};
-const COLORS={moonwell:'#5fd2ef',emberheart:'#ff9a3c',rimeglass:'#bfeeff',stormcrown:'#c79bff',atelier:'#ffd36b',gate:'#ffd36b'};
+const BOXES={moonwell:[0,0,576,416],emberheart:[640,0,1136,352],rimeglass:[0,400,512,896],stormcrown:[864,192,1280,640],atelier:[704,544,1152,864],gate:[448,640,832,1024],aetherheart:[416,224,832,608]};
+const COLORS={moonwell:'#5fd2ef',emberheart:'#ff9a3c',rimeglass:'#bfeeff',stormcrown:'#c79bff',atelier:'#ffd36b',gate:'#ffd36b',aetherheart:'#ffe08a'};
 // Looping effects per facility and stage: [type, x, y, extra]
 const LOOPS={
  gate:{1:[['flame',545,722],['flame',695,722]]},
@@ -12,6 +12,7 @@ const LOOPS={
  emberheart:{2:[['smoke',945,20],['ember',880,195,.5]],3:[['smoke',945,20],['smoke',1045,72],['flame',945,30],['flame',1045,82],['ember',880,195,1],['ember',860,215,1]]},
  rimeglass:{2:[['glint',190,490],['glint',260,600]],3:[['glint',190,490],['glint',260,600],['glint',210,650],['glint',285,720],['glint',380,660],['snow',250,560]]},
  stormcrown:{2:[['spark',1060,330]],3:[['spark',1060,330],['spark',1045,380],['bolt',1065,248],['glint',1065,250]]},
+ aetherheart:{4:[['glint',560,330],['glint',650,330]],5:[['glint',600,300],['glint',570,330],['glint',640,330],['shimmer',600,290]]},
  atelier:{2:[['window',890,700],['glint',945,722]],3:[['window',890,700],['window',840,690],['glint',945,722],['steam',1000,640],['steam',960,600]]}
 };
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -24,11 +25,11 @@ function feather(img,box,edge=36){const w=box[2]-box[0],h=box[3]-box[1],c=docume
  x.globalCompositeOperation='destination-in';x.drawImage(m,0,0);return c}
 function cropOf(img,box){const w=box[2]-box[0],h=box[3]-box[1],c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,box[0],box[1],w,h,0,0,w,h);return c}
 async function init(canvas,base,restored){FX.canvas=canvas;FX.ctx=canvas.getContext('2d');FX.base=base;FX.restored=restored;
- const jobs=[];for(const id of Object.keys(BOXES)){if(id==='gate'){jobs.push(load('assets/hub/stages/gate-sealed.png').then(i=>{FX.art.gate={sealed:i?feather(i,BOXES.gate):null,open:null}}));continue}
+ const jobs=[];for(const id of Object.keys(BOXES)){if(id==='aetherheart'){jobs.push(Promise.all([1,2,3,4,5].map(n=>load(`assets/hub/stages/aetherheart-asc${n}.png`))).then(list=>{FX.art.aetherheart={};list.forEach((im,i)=>{if(im)FX.art.aetherheart[i+1]=feather(im,BOXES.aetherheart,48)})}));continue}if(id==='gate'){jobs.push(load('assets/hub/stages/gate-sealed.png').then(i=>{FX.art.gate={sealed:i?feather(i,BOXES.gate):null,open:null}}));continue}
   jobs.push(Promise.all([load(`assets/hub/stages/${id}-stage1.png`),load(`assets/hub/stages/${id}-stage2.png`)]).then(([a,b])=>{FX.art[id]={1:a&&feather(a,BOXES[id]),2:b&&feather(b,BOXES[id]),3:feather(cropOf(restored,BOXES[id]),BOXES[id])}}))}
  await Promise.all(jobs)}
 // The best available picture for a facility stage (0 = ruined base, nothing drawn).
-function layerFor(id,s){if(id==='gate')return s>=1?null:FX.art.gate?.sealed;if(!s)return null;const a=FX.art[id]||{};for(let k=s;k<=3;k++)if(a[k])return a[k];return null}
+function layerFor(id,s){if(id==='aetherheart'){const a=FX.art.aetherheart||{};for(let k=s;k>=1;k--)if(a[k])return a[k];return null}if(id==='gate')return s>=1?null:FX.art.gate?.sealed;if(!s)return null;const a=FX.art[id]||{};for(let k=s;k<=3;k++)if(a[k])return a[k];return null}
 function setState(state){FX.state={...state};compose();ensureLoop()}
 let composed=null;
 function compose(skip){const c=composed||(composed=document.createElement('canvas'));c.width=1536;c.height=1024;const x=c.getContext('2d');x.drawImage(FX.base,0,0);
@@ -52,7 +53,7 @@ function spawn(type,x,y,k=1){const P=FX.particles;switch(type){
  case'dust':P.push({t:'puff',x:x+rnd(-60,60),y:y+rnd(-30,40),vx:rnd(-20,20),vy:rnd(-30,-8),life:rnd(.8,1.4),c:'rgba(170,150,120,',r:rnd(6,12),grow:14});break;
  case'sweep':P.push({t:'spark',x:x+rnd(-20,20),y:y+rnd(-20,20),vx:rnd(-30,30),vy:rnd(-60,-20),life:rnd(.5,.9),c:k,r:rnd(1.5,3)});break}}
 const RATES={fall:14,fountain:10,shimmer:3,smoke:2.2,steam:2.5,ember:6,flame:14,glint:1.6,snow:3,spark:3,bolt:.5,window:2.4};
-function emit(dt){if(reduced)return;for(const [id,byStage] of Object.entries(LOOPS)){const s=FX.state[id]||0;if(FX.moment&&FX.moment.id===id&&FX.moment.p<.75)continue;const set=byStage[s>=3?3:s]||(id==='gate'&&s>=1?byStage[1]:null);if(!set)continue;
+function emit(dt){if(reduced)return;for(const [id,byStage] of Object.entries(LOOPS)){const s=FX.state[id]||0;if(FX.moment&&FX.moment.id===id&&FX.moment.p<.75)continue;const set=id==='aetherheart'?byStage[s]:byStage[s>=3?3:s]||(id==='gate'&&s>=1?byStage[1]:null);if(!set)continue;
  for(const [type,x,y,k] of set){let n=RATES[type]*dt;while(n>0){if(Math.random()<n)spawn(type,x,y,k);n--}}}}
 function drawParticles(x,dt){const P=FX.particles;for(let i=P.length-1;i>=0;i--){const p=P[i];p.age=(p.age||0)+dt;if(p.age>=p.life){P.splice(i,1);continue}const a=1-p.age/p.life;p.vy+=(p.g||0)*dt;p.x+=(p.vx||0)*dt;p.y+=(p.vy||0)*dt;
  if(p.t==='puff'){const r=p.r+(p.grow||0)*p.age;x.fillStyle=p.c+(.35*a)+')';x.beginPath();x.arc(p.x,p.y,r,0,7);x.fill()}
