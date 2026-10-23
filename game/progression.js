@@ -74,10 +74,48 @@ function bonuses(profile){const p=migrate(profile||{});const b={el:{},eng:{start
  // caps from the approved tree
  for(const e of ELEMENTS){b.el[e].slowPts=Math.min(b.el[e].slowPts,.50)}b.eng.upgradeDiscount=Math.min(b.eng.upgradeDiscount,.06);b.eng.refundPts=Math.min(b.eng.refundPts,.15);
  return b}
+// ---------- Warden Power v2 (approved Oct 23 2026) ----------
+// One honest number for the account's strength: 100 = a fresh Warden; 400 = handles enemies 4x as tough.
+// Every source is weighted by what it was MEASURED to be worth in the balance simulator (standard play, 22 towers,
+// 12 seeds): depth reached -> enemy health at that depth -> multiplier over a fresh Warden. Values: design/WARDEN_POWER.md.
+const POWER=/*MEASURED*/{d0:68.2,fac:{moonwell:1.052,emberheart:1.051,rimeglass:1.021,stormcrown:1.049,atelier:1.038},branch:{fire:1.063,water:1.048,ice:1.036,lightning:1.076,engineering:1.026},mastery:2.591,asc:[1,3.67,9.13,21.49,60.76,60.76]}/*END*/;
+const ETERNAL={per:.03,cap:94,cost:n=>1500+100*n,unlocked:p=>Math.floor(p?.ascension||0)>=5};
+function hpAt(w){return(1+.07*(w-1))*Math.pow(1.008,w-1)}
+function depthForHp(h){let lo=1,hi=20000;for(let i=0;i<60;i++){const m=(lo+hi)/2;if(hpAt(m)<h)lo=m;else hi=m}return lo}
+const BRANCH_COST={};for(const s of SKILLS)BRANCH_COST[s.branch]=(BRANCH_COST[s.branch]||0)+s.costs.reduce((a,c)=>a+c,0);
+function eternalRanks(p){return Math.max(0,Math.min(ETERNAL.cap,Math.floor(p?.eternal||0)))}
+function eternalFactor(p){return Math.pow(1+ETERNAL.per,eternalRanks(p))}
+function powerMultiplier(profile){const p=migrate(profile||{});let m=1;
+ for(const f of FACILITIES)m*=Math.pow(POWER.fac[f.id]||1,Math.min(3,p.restorations[f.id]||0)/3);
+ const spent={};for(const s of SKILLS){const r=rank(p,s.id);for(let i=0;i<r;i++)spent[s.branch]=(spent[s.branch]||0)+s.costs[i]}
+ for(const b of BRANCHES)m*=Math.pow(POWER.branch[b]||1,(spent[b]||0)/BRANCH_COST[b]);
+ let mr=0;for(const b of BRANCHES)for(let t=1;t<=MASTERY.unlockWaves.length;t++)mr+=masteryRanks(p,b,t);m*=Math.pow(POWER.mastery,mr/(BRANCHES.length*MASTERY.unlockWaves.length*MASTERY.ranks));
+ m*=POWER.asc[Math.max(0,Math.min(5,Math.floor(p.ascension||0)))]||1;m*=eternalFactor(p);return m}
+function powerRating(profile){return Math.round(100*powerMultiplier(profile))}
+// Engine depth a Warden of this power reaches with standard play (the simulator's level of placement and timing).
+function projectedDepth(profile){return Math.floor(depthForHp(hpAt(POWER.d0)*powerMultiplier(profile)))}
+function powerForDepth(w){return Math.round(100*hpAt(w)/hpAt(POWER.d0))}
+// Tactician: how far beyond standard play a run went, as a multiple of enemy toughness handled.
+const POWER_BADGES=[['power_rising',1000],['power_towering',10000],['power_overwhelming',100000]];
+const TACTICIAN=[[0,'Apprentice'],[1,'Adept'],[1.5,'Expert'],[2,'Master'],[3,'Grandmaster'],[4,'Legend']];
+function tacticianFactor(depth,profile){return hpAt(Math.max(1,depth))/hpAt(Math.max(1,projectedDepth(profile)))}
+function tacticianRank(f){let r=TACTICIAN[0][1];for(const [min,name] of TACTICIAN)if(f>=min)r=name;return r}
+// The Outer Seal's recommendations were written on the old scale (sum of bonus percentages). Convert them by walking a
+// typical progression path (restorations, then skills cheapest-first, then Mastery) and reading both scales at each step.
+let LEGACY=null;
+function legacyPath(){if(LEGACY)return LEGACY;const p=blankProfile();p.gateOpen=true;const pts=[[powerSummary(p),powerRating(p)]];
+ for(const f of FACILITIES)for(let st=1;st<=3;st++){p.restorations[f.id]=st;pts.push([powerSummary(p),powerRating(p)])}
+ const steps=[];for(const s of SKILLS)for(let r=0;r<s.maxRank;r++)steps.push([s.costs[r],s.id,r+1]);steps.sort((a,b)=>a[0]-b[0]);
+ for(const [,id,r] of steps){p.skills[id]=Math.max(p.skills[id]||0,r);pts.push([powerSummary(p),powerRating(p)])}
+ for(let t=1;t<=5;t++)for(let k=1;k<=10;k++){for(const b of BRANCHES){p.mastery[b]=p.mastery[b]||{};p.mastery[b][t]=k}pts.push([powerSummary(p),powerRating(p)])}
+ pts.sort((a,b)=>a[0]-b[0]);for(let i=1;i<pts.length;i++)pts[i][1]=Math.max(pts[i][1],pts[i-1][1]);return LEGACY=pts}
+function legacyToRating(old){const pts=legacyPath();if(old<=pts[0][0])return pts[0][1];for(let i=1;i<pts.length;i++)if(old<=pts[i][0]){const [a,ra]=pts[i-1],[b,rb]=pts[i];return Math.round(b===a?rb:ra+(rb-ra)*(old-a)/(b-a))}const [a,ra]=pts[pts.length-1];return Math.round(ra*Math.pow(1.02,old-a))}
+function eternalOffer(p){if(!ETERNAL.unlocked(p))return{ok:false,reason:'Claim the Crown at wave 500 first.'};const n=eternalRanks(p);if(n>=ETERNAL.cap)return{ok:false,reason:'Eternal Mastery is complete.',rank:n};const cost=ETERNAL.cost(n+1);if((p.resonance||0)<cost)return{ok:false,reason:`Needs ${cost-(p.resonance||0)} more Resonance.`,cost,rank:n};return{ok:true,cost,rank:n}}
+function buyEternal(p){const o=eternalOffer(p);if(!o.ok)return o;p.resonance-=o.cost;p.eternal=o.rank+1;return{ok:true,cost:o.cost,rank:o.rank+1}}
 // Total percentage added to an element's direct damage, used for the "Warden power" line.
 function damageBonus(b,type){const e=b.el[type];return e.damagePct+(type==='fire'?e.impactPct:0)+b.allDamagePct}
 // Warden Power: the total of every percentage bonus your towers carry (damage, burn, shatter, range, speed, soak, slow...).
 const PCT_KEYS=['damagePct','impactPct','burnPct','shatterPct','shatterRadiusPct','soakPct','rangePct','speedPct','slowPts','vsFrozenPct','vsBossPct','conductPct','secondaryPct'];
 function powerSummary(profile){const b=bonuses(profile);let t=b.allDamagePct*ELEMENTS.length+b.eng.upgradeDiscount+b.eng.refundPts;for(const e of ELEMENTS)for(const k of PCT_KEYS)t+=b.el[e][k]||0;return Math.round(t*100)}
-return{ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
+return{legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
 });

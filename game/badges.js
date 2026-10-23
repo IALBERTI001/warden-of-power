@@ -6,9 +6,13 @@ const TIERS={
  all_combos_one_run:'silver',one_chain_four:'silver',one_shatter_three:'silver',perfect_campaign_mission:'silver',close_call:'silver',early_wave_five:'silver',two_elements_only:'silver',three_maps_clear:'silver',first_endless_twenty:'silver',
  restore_water:'silver',restore_fire:'silver',restore_ice:'silver',restore_lightning:'silver',endless_fifty:'silver',
  freeze_twenty_five:'gold',conduction_twenty_five:'gold',shatter_twenty_five:'gold',ten_mission_wins:'gold',engine_reborn:'gold',endless_hundred:'gold',endless_200:'gold',endless_300:'gold',endless_400:'prismatic',
- endless_500:'prismatic'
+ endless_500:'prismatic',
+ tactician_master:'silver',tactician_grandmaster:'gold',tactician_legend:'prismatic',power_rising:'silver',power_towering:'gold',power_overwhelming:'prismatic',
+ eternal_thousand:'mythic'
 };
-const TIER_LABEL={bronze:'Bronze',silver:'Silver',gold:'Gold',prismatic:'Prismatic'};
+// Hidden badges are not listed and not counted until earned (the wave 1000 secret).
+const HIDDEN=new Set(['eternal_thousand']);
+const TIER_LABEL={bronze:'Bronze',silver:'Silver',gold:'Gold',prismatic:'Prismatic',mythic:'Mythic'};
 // Achievements that need campaign maps, restorations or endless mode, which are not playable yet.
 const LATER=new Set([]);
 // Cumulative counters shown as progress while locked.
@@ -17,6 +21,9 @@ function tier(id){return TIERS[id]||'bronze'}
 function image(id,size=256){return `assets/badges/${id}-${size}.png`}
 function progress(id,profile){const p=PROGRESS[id];if(!p)return null;const value=Math.min(p[1],Math.floor(profile?.counters?.[p[0]]||0));return{value,goal:p[1]}}
 function available(id){return !LATER.has(id)}
+function visible(id,profile){return !HIDDEN.has(id)||!!profile?.earned?.[id]}
+function listed(all,profile){return all.filter(a=>visible(a[0],profile))}
+function publicTotal(all){return all.filter(a=>!HIDDEN.has(a[0])).length}
 function equip(profile,id){if(!profile?.earned?.[id])return false;profile.equipped=id;return true}
-return{TIERS,TIER_LABEL,LATER,PROGRESS,tier,image,progress,available,equip};
+return{HIDDEN,visible,listed,publicTotal,TIERS,TIER_LABEL,LATER,PROGRESS,tier,image,progress,available,equip};
 });

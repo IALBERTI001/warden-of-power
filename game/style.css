@@ -70,3 +70,8 @@ dialog.ascension-card::backdrop{background:radial-gradient(ellipse,#f2c75c33,#00
 .auto-wave input{accent-color:#d5b369;width:14px;height:14px;margin:0}
 .auto-wave kbd{font-size:9px}
 @container(max-width:600px){.auto-wave{font-size:8px;margin-top:2px}.auto-wave kbd{display:none}}
+.tactician-line{background:#00000033;border:1px solid #e9c46a55;border-radius:8px;padding:8px 10px}
+dialog.ascension-card[data-rank="mythic"]{border-color:#fff6dc;background:radial-gradient(ellipse at 50% 30%,#2a2a2ef8,#0e0d12f8 70%);box-shadow:0 0 80px #fff3d188,0 20px 60px #000c}
+dialog.ascension-card[data-rank="mythic"] .asc-rays{display:none}
+dialog.ascension-card[data-rank="mythic"] h2{color:#fffaf0;text-shadow:0 0 22px #fff3d1aa}
+dialog.ascension-card[data-rank="mythic"] .eyebrow,dialog.ascension-card[data-rank="mythic"] .asc-power b{color:#fff3d1}

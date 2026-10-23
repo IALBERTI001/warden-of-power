@@ -12,7 +12,7 @@ const LOOPS={
  emberheart:{2:[['smoke',945,20],['ember',880,195,.5]],3:[['smoke',945,20],['smoke',1045,72],['flame',945,30],['flame',1045,82],['ember',880,195,1],['ember',860,215,1]]},
  rimeglass:{2:[['glint',190,490],['glint',260,600]],3:[['glint',190,490],['glint',260,600],['glint',210,650],['glint',285,720],['glint',380,660],['snow',250,560]]},
  stormcrown:{2:[['spark',1060,330]],3:[['spark',1060,330],['spark',1045,380],['bolt',1065,248],['glint',1065,250]]},
- aetherheart:{4:[['glint',560,330],['glint',650,330]],5:[['glint',600,300],['glint',570,330],['glint',640,330],['shimmer',600,290]]},
+ aetherheart:{4:[['glint',560,330],['glint',650,330]],6:[['glint',600,300],['glint',570,330],['glint',640,330],['shimmer',600,290],['shimmer',600,320]],5:[['glint',600,300],['glint',570,330],['glint',640,330],['shimmer',600,290]]},
  atelier:{2:[['window',890,700],['glint',945,722]],3:[['window',890,700],['window',840,690],['glint',945,722],['steam',1000,640],['steam',960,600]]}
 };
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -25,7 +25,7 @@ function feather(img,box,edge=36){const w=box[2]-box[0],h=box[3]-box[1],c=docume
  x.globalCompositeOperation='destination-in';x.drawImage(m,0,0);return c}
 function cropOf(img,box){const w=box[2]-box[0],h=box[3]-box[1],c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,box[0],box[1],w,h,0,0,w,h);return c}
 async function init(canvas,base,restored){FX.canvas=canvas;FX.ctx=canvas.getContext('2d');FX.base=base;FX.restored=restored;
- const jobs=[];for(const id of Object.keys(BOXES)){if(id==='aetherheart'){jobs.push(Promise.all([1,2,3,4,5].map(n=>load(`assets/hub/stages/aetherheart-asc${n}.png`))).then(list=>{FX.art.aetherheart={};list.forEach((im,i)=>{if(im)FX.art.aetherheart[i+1]=feather(im,BOXES.aetherheart,48)})}));continue}if(id==='gate'){jobs.push(load('assets/hub/stages/gate-sealed.png').then(i=>{FX.art.gate={sealed:i?feather(i,BOXES.gate):null,open:null}}));continue}
+ const jobs=[];for(const id of Object.keys(BOXES)){if(id==='aetherheart'){jobs.push(Promise.all([1,2,3,4,5,6].map(n=>load(`assets/hub/stages/aetherheart-asc${n}.png`))).then(list=>{FX.art.aetherheart={};list.forEach((im,i)=>{if(im)FX.art.aetherheart[i+1]=feather(im,BOXES.aetherheart,48)})}));continue}if(id==='gate'){jobs.push(load('assets/hub/stages/gate-sealed.png').then(i=>{FX.art.gate={sealed:i?feather(i,BOXES.gate):null,open:null}}));continue}
   jobs.push(Promise.all([load(`assets/hub/stages/${id}-stage1.png`),load(`assets/hub/stages/${id}-stage2.png`)]).then(([a,b])=>{FX.art[id]={1:a&&feather(a,BOXES[id]),2:b&&feather(b,BOXES[id]),3:feather(cropOf(restored,BOXES[id]),BOXES[id])}}))}
  await Promise.all(jobs)}
 // The best available picture for a facility stage (0 = ruined base, nothing drawn).

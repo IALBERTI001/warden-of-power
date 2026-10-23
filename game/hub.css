@@ -187,3 +187,7 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .checkpoints{display:grid;gap:6px}.checkpoints>div{display:flex;flex-wrap:wrap;gap:6px}.checkpoints small{color:var(--muted)}
 .mastery-buy{display:inline-flex;gap:4px}
 .mastery small{color:var(--muted);font-size:11px;margin-left:4px}
+.power-box{border:1px solid #e9c46a55;border-radius:12px;padding:10px 12px;background:#00000025;display:grid;gap:6px}
+.power-box p{margin:0}.power-num{font:24px var(--game-font);color:var(--brass-hi)}
+.eternal{display:grid;gap:4px;padding:8px 10px;border-radius:10px;background:linear-gradient(135deg,#ffffff14,#fff5d10d);border:1px solid #fff2c466}
+.eternal small{color:var(--muted)}

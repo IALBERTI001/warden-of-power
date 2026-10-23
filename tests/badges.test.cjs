@@ -1,6 +1,6 @@
 // Badge catalogue: every achievement has a tier and artwork; progress and equip rules.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),E=require('../game/engine.js'),B=require('../game/badges.js');
-assert.equal(E.ACHIEVEMENTS.length,31);
+assert.equal(E.ACHIEVEMENTS.length,38);assert.equal(B.publicTotal(E.ACHIEVEMENTS),37);
 const ids=new Set();for(const [id,name,desc] of E.ACHIEVEMENTS){assert(!ids.has(id),'unique id '+id);ids.add(id);assert(B.TIERS[id],'tier for '+id);assert(name&&desc);
  const art=path.join(__dirname,'..','game',B.image(id,256));assert(fs.existsSync(art),'badge art missing: '+art);assert(fs.existsSync(path.join(__dirname,'..','game',B.image(id,128))));}
 for(const id of Object.keys(B.TIERS))assert(ids.has(id),'tier entry without achievement: '+id);
@@ -10,4 +10,4 @@ assert.deepEqual(B.progress('early_wave_five',{counters:{early:2}}),{value:2,goa
 assert.equal(B.progress('first_foundation',{}),null);
 const profile={earned:{first_upgrade:'2026-10-22'}};assert.equal(B.equip(profile,'tutorial_clear'),false,'cannot show an unearned badge');assert.equal(B.equip(profile,'first_upgrade'),true);assert.equal(profile.equipped,'first_upgrade');
 assert(B.available('endless_500'));assert(B.available('first_shatter'));
-console.log('PASS: 31 badges, each with a tier and 256/128 artwork; locked badges cannot be shown; counters show capped progress.');
+console.log('PASS: 38 badges (37 listed + 1 secret), each with a tier and 256/128 artwork; locked badges cannot be shown; counters show capped progress.');
