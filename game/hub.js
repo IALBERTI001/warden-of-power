@@ -37,8 +37,8 @@ function paint(){if(ready&&!HubFX.isPlaying())HubFX.setState(sceneState())}
 // The restoration moment: pins step aside, the area is rebuilt on screen, a banner names what changed.
 function celebrate(id,from,to,title,line){if(!ready){render();return}document.body.classList.add('moment');const banner=$('momentBanner');banner.innerHTML=`<span class="eyebrow">RESTORED</span><h3></h3><p></p><small>Click or press any key to skip</small>`;banner.querySelector('h3').textContent=title;banner.querySelector('p').textContent=line;banner.hidden=true;
  setTimeout(()=>{if(HubFX.isPlaying())banner.hidden=false},reducedMotion?0:1500);
- momentAmb=id;syncAmbience();
- HubFX.playMoment(id,from,to,()=>{momentAmb=null;syncAmbience();banner.hidden=true;document.body.classList.remove('moment');render()})}
+ playAreaCue(id);
+ HubFX.playMoment(id,from,to,()=>{banner.hidden=true;document.body.classList.remove('moment');render()})}
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const skip=()=>{if(HubFX.isPlaying())HubFX.skipMoment()};
 addEventListener('keydown',e=>{if(HubFX.isPlaying()){e.preventDefault();e.stopImmediatePropagation();skip()}},true);
@@ -86,7 +86,7 @@ function play(){persist();location.href='index.html'}
 
 // ---------- side panel -------------------------------------------------------------------------
 let currentPanel=null,lastOpener=null;
-function openPanel(id,opener,keep){const p=PLACES.find(p=>p.id===id);currentPanel=id;if(opener)lastOpener=opener;const body=$('panelBody'),el=placeEl(p);
+function openPanel(id,opener,keep){const p=PLACES.find(p=>p.id===id);if(!keep&&currentPanel!==id)playAreaCue(id);currentPanel=id;if(opener)lastOpener=opener;const body=$('panelBody'),el=placeEl(p);
  let html=`<span class="eyebrow" style="color:${ELEMENT[el].color}">${p.kind==='facility'?ELEMENT[el].name.toUpperCase()+' FACILITY':p.kind==='engine'?'THE HEART OF THE COMPLEX':'THE SOUTH GATE'}</span><h2>${escape(placeName(p))}</h2><p>${escape(p.kind==='tutorial'&&profile.gateOpen?'The south gate of the complex, raised and open. Everything that comes out of the wilds must get past you here.':p.text)}</p>`;
  if(p.kind==='tutorial'){const s=seals();const go=P.gateOffer(profile);
   if(profile.gateOpen){const next=outerNext(),best=profile.outer?.best||0,power=P.powerSummary(profile);const levels=[next,...Array.from({length:Math.min(3,best)},(_,i)=>best-i)];
@@ -104,7 +104,7 @@ function openPanel(id,opener,keep){const p=PLACES.find(p=>p.id===id);currentPane
  $('restoreBtn')&&($('restoreBtn').onclick=()=>restore(id));
  document.querySelectorAll('.pin').forEach(b=>b.classList.toggle('active',b.dataset.place===id));
  if(!keep)setTimeout(()=>$('panel').querySelector('button:not([disabled]):not(.panel-close)')?.focus(),30)}
-function closePanel(){$('panel').hidden=true;currentPanel=null;document.querySelectorAll('.pin').forEach(b=>b.classList.remove('active'));lastOpener?.focus?.()}
+function closePanel(){stopCue();$('panel').hidden=true;currentPanel=null;document.querySelectorAll('.pin').forEach(b=>b.classList.remove('active'));lastOpener?.focus?.()}
 function restore(id){const r=P.restore(profile,id);if(!r.ok){toast('Not yet',r.reason);return}const f=facility(id),p=PLACES.find(p=>p.id===id);
  if(r.stage===1&&f.branch)toast(`${ELEMENT[f.branch].name} skills unlocked`,f.name);
  if(r.stage===3){toast(`${f.name} reawakened`,'RESTORATION COMPLETE');if(p.badge)award(p.badge)}
@@ -196,23 +196,20 @@ $('openGuide').onclick=()=>{profile.hubGuide=0;profile.hubIntroSeen=false;persis
 setInterval(tickGuide,250);addEventListener('resize',tickGuide);
 if(seals().cleared&&!profile.hubIntroSeen)setTimeout(showIntro,500);
 
-// ---------- ambience: only the selected area is heard ---------------------------------------------
-// User feedback (Oct 22): the always-on mix was too aggressive. Now an area's loop plays softly only while
-// its panel is open (or while its restoration moment plays), fading in and out; the hub is quiet otherwise.
+// ---------- area sound: a short cue when you open an area -----------------------------------------
+// User feedback (Oct 22): looping area sound was overbearing even one area at a time. Now opening an area plays
+// its own sound once for about 3 seconds (soft fade in, fade out) and stops. Nothing loops. A restoration moment
+// plays the same cue. Settings -> Sound -> Area sound volume / mute.
 const AMB={moonwell:'water',emberheart:'fire',rimeglass:'ice',stormcrown:'storm',atelier:'gears'};
-const ambPlayers={},ambTarget={};let ambUnlocked=false,momentAmb=null;
+const CUE_LEN=3,CUE_IN=.3,CUE_OUT=.9;let cue=null;
 function audioSettings(){try{return{master:.65,ambience:.35,masterMute:false,ambienceMute:false,...JSON.parse(localStorage.getItem('warden.settings.v1')||'{}')}}catch{return{master:.65,ambience:.35}}}
-function syncAmbience(){const s=audioSettings(),base=(s.masterMute||s.ambienceMute)?0:s.master*s.ambience;const heard=momentAmb||currentPanel;
- for(const [id,name] of Object.entries(AMB)){const st=stage(id);
-  ambTarget[id]=(ambUnlocked&&!document.hidden&&id===heard&&st)?Math.min(1,base*(.5+.17*st)):0;
-  if(ambTarget[id]>0&&!ambPlayers[id]){const a=ambPlayers[id]=new Audio(`assets/hub/ambience/amb-${name}.wav`);a.loop=true;a.volume=0}}}
-function ambStep(){for(const [id,a] of Object.entries(ambPlayers)){const t=ambTarget[id]||0,v=a.volume;
-  const nv=t>v?Math.min(t,v+.03):Math.max(t,v-.02);a.volume=nv;   // ~0.8 s in, ~1.2 s out
-  if(nv>0&&a.paused)a.play().catch(()=>{});if(nv===0&&!a.paused)a.pause()}}
-addEventListener('pointerdown',()=>{if(!ambUnlocked){ambUnlocked=true;syncAmbience()}});
-addEventListener('keydown',()=>{if(!ambUnlocked){ambUnlocked=true;syncAmbience()}});
-document.addEventListener('visibilitychange',syncAmbience);
-setInterval(()=>{syncAmbience();ambStep()},50);
+function stopCue(fast){if(!cue)return;const c=cue;cue=null;if(fast){c.a.pause();clearInterval(c.t);return}c.stopAt=Math.min(c.stopAt,performance.now()/1000+.25)}
+function playAreaCue(id){const name=AMB[id];stopCue(true);if(!name||document.hidden)return;const s=audioSettings(),base=(s.masterMute||s.ambienceMute)?0:s.master*s.ambience;if(base<=0)return;
+ const peak=Math.min(1,base*(.55+.12*stage(id))),a=new Audio(`assets/hub/ambience/amb-${name}.wav`);a.loop=false;a.volume=0;
+ const start=performance.now()/1000,c={a,stopAt:start+CUE_LEN};c.t=setInterval(()=>{const now=performance.now()/1000,t=now-start,left=c.stopAt-now;
+  const v=left<=0?0:peak*Math.min(1,t/CUE_IN,left/CUE_OUT);a.volume=Math.max(0,Math.min(1,v));if(left<=0){a.pause();clearInterval(c.t);if(cue===c)cue=null}},40);
+ cue=c;a.play().catch(()=>{clearInterval(c.t);if(cue===c)cue=null})}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCue(true)});
 function wireAmbienceControls(){const s=audioSettings();$('ambVol').value=s.ambience;$('ambMute').checked=!!s.ambienceMute;
- const write=()=>{const cur=(()=>{try{return JSON.parse(localStorage.getItem('warden.settings.v1')||'{}')}catch{return{}}})();cur.ambience=+$('ambVol').value;cur.ambienceMute=$('ambMute').checked;try{localStorage.setItem('warden.settings.v1',JSON.stringify(cur))}catch{}syncAmbience()};
+ const write=()=>{const cur=(()=>{try{return JSON.parse(localStorage.getItem('warden.settings.v1')||'{}')}catch{return{}}})();cur.ambience=+$('ambVol').value;cur.ambienceMute=$('ambMute').checked;try{localStorage.setItem('warden.settings.v1',JSON.stringify(cur))}catch{}stopCue(true)};
  $('ambVol').oninput=write;$('ambMute').onchange=write}
