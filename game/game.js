@@ -72,6 +72,18 @@ if($('feedbackButton')&&window.WardenFeedback){$('feedbackButton').onclick=()=>{
 if($('skillsButton')){$('skillsButton').hidden=TUT;$('skillsButton').onclick=openBattleSkills}
 function showThousandth(){const d=$('ascension');if(!d)return;d.dataset.rank='mythic';d.querySelector('.eyebrow').textContent='THE THOUSANDTH WAVE';$('ascRoman').textContent='∞';$('ascTitle').textContent='Warden Eternal';$('ascBadge').src=WardenBadges.image('eternal_thousand',256);$('ascBanner').textContent='No Warden was ever meant to stand here.';$('ascPower').innerHTML='<b>A secret badge</b><span>You found something no list ever showed. The crown above the Aetherheart Engine will remember.</span>';
  try{if(!(settings.masterMute||settings.effectsMute)){const a=new Audio('assets/audio/ascension.wav');a.playbackRate=.8;a.volume=Math.min(1,settings.master*Math.max(.35,settings.effects||0));a.play().catch(()=>{})}}catch{}openModal('ascension')}
+// Rest point (Oct 24 2026): every 100 Engine waves the run pauses with a breather card, styled like the Ascension card.
+const REST_CARE=['Stretch, grab some water and rest your eyes.','A good moment to stand up and stretch.','Drink some water, Warden. The seal holds while you are away.','Look away from the screen for a minute. The Engine will wait.'];
+function showRest(ev){const busy=['ascension','skillsDialog'].map($).find(d=>d&&d.open);if(busy){busy.addEventListener('close',()=>setTimeout(()=>showRest(ev),250),{once:true});return}
+ const d=$('restPoint');if(!d)return;const w=ev.wave,P=window.WardenProgression,pr=game.profile,r=E.ASCENSION.rank(pr),next=r<5?E.ASCENSION.trials[r]:null;
+ $('restEyebrow').textContent=`WAVE ${w.toLocaleString()} HELD`;$('restWave').textContent=w.toLocaleString();
+ const ready=P?P.SKILLS.filter(s=>P.skillOffer(pr,s.id).ok).length:0;
+ $('restStats').innerHTML=`<b>+${(ev.banked||0).toLocaleString()} Resonance banked this run</b><span>✦ ${(pr.resonance||0).toLocaleString()} to spend${ready?` · <b>${ready} skill${ready>1?'s':''} ready to learn</b>`:''}</span>${next&&next>w?`<small>Next: Warden Trial at wave ${next}</small>`:''}`;
+ $('restCare').textContent=`${REST_CARE[(w/100-1)%REST_CARE.length]} Your run is saved: leave now and continue from wave ${w.toLocaleString()} whenever you like.`;
+ $('restSkillsText').textContent=ready?'Strengthen your towers':'Open the skill tree';$('restSkills').classList.toggle('glow',!!ready);
+ $('restSkills').onclick=()=>{d.close();openBattleSkills()};$('restHub').onclick=()=>{d.close();goHub()};
+ try{if(!(settings.masterMute||settings.effectsMute)){const a=new Audio('assets/audio/ascension.wav');a.playbackRate=1.25;a.volume=Math.min(1,settings.master*Math.max(.25,settings.effects||0)*.6);a.play().catch(()=>{})}}catch{}
+ openModal('restPoint');setTimeout(()=>(ready?$('restSkills'):$('restGo')).focus(),40)}
 function showAscension(ev){const A=E.ASCENSION.ranks[ev.rank];if(!A)return;const badge=['endless_hundred','endless_200','endless_300','endless_400','endless_500'][ev.rank-1];const d=$('ascension');if(!d)return;
  d.dataset.rank=ev.rank;d.querySelector('.eyebrow').textContent='THE WARDEN TRIAL IS PASSED';$('ascRoman').textContent=ev.rank<5?A.roman:'♛';$('ascTitle').textContent=A.name;$('ascBadge').src=WardenBadges.image(badge,256);$('ascBanner').textContent=`${A.banner} now fly over the Aetherheart Engine`.replace('The Crown of the Unbound now fly','The Crown of the Unbound now floats');
  $('ascPower').innerHTML=ev.rank<5?`<b>New power · ${A.power}</b><span>${A.text}</span><small>All tower damage in Engine Trials ×${E.ASCENSION.mult(ev.rank)}${ev.rank<4?` · checkpoint unlocked: start future runs at wave ${ev.wave}`:''}</small>`:`<b>${A.power}</b><span>${A.text}</span>`;
@@ -159,6 +171,7 @@ function events(){for(const ev of game.drain()){coach()?.event?.(ev);
  if(ev.type==='achievement'){toast(ev.name,'BADGE UNLOCKED');const last=$('toasts').lastElementChild;if(last&&last.insertAdjacentHTML){last.classList.toggle('badge-toast',true);last.insertAdjacentHTML('afterbegin',badgeImg(ev.id,128,'toast-badge'))}runBadges.push(ev.id);store('warden.profile.v1',game.profile)}
  if(ev.type==='ascension'){showAscension(ev);save()}
  if(ev.type==='thousandth'){showThousandth();save()}
+ if(ev.type==='restPoint'){save();showRest(ev)}
  if(ev.type==='overchargeUnlocked'){toast('Tier III towers can now be Overcharged (U)','OVERCHARGE UNLOCKED');save()}
  if(ev.type==='resonance'){toast(`+${ev.amount} Resonance banked`,`WAVE ${ev.wave} · NEW DEPTH`);save()}
  if(ev.type==='upgrade'){const T=ev.tower;fx.push({kind:'tierup',x:T.x,y:T.y,at:game.time,life:1.1,color:E.TYPES[T.type].color,text:'TIER\u2002'+['','I','II','III'][T.tier]});sound('tier_up',true)}

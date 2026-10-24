@@ -160,7 +160,8 @@ class Game{
   for(const [id,n] of [['first_endless_twenty',20],['endless_fifty',50],['endless_hundred',100],['endless_500',500]])if(w>=n)this.award(id);
   if(w%5===0&&w>this.bestBefore){const amount=ENGINE.resonance(w/5);pr.resonance=(pr.resonance||0)+amount;this.banked+=amount;this.emit('resonance',{amount,wave:w})}
    else if(w%5===0&&w>500&&ASCENSION.rank(pr)>=5){const amount=Math.round(ENGINE.resonance(w/5)*ASCENSION.repeatPay);pr.resonance=(pr.resonance||0)+amount;this.banked+=amount;this.emit('resonance',{amount,wave:w,repeat:true})}
-   if(w>=1000&&!pr.earned.eternal_thousand){this.award('eternal_thousand');this.emit('thousandth',{wave:w})}}
+   if(w>=1000&&!pr.earned.eternal_thousand){this.award('eternal_thousand');this.emit('thousandth',{wave:w})}
+  /* Rest point (Oct 24 2026): every 100 waves the run pauses for a breather. */if(w%100===0&&w>(this.start||0))this.emit('restPoint',{wave:w,banked:this.banked})}
  finish(won){if(this.rewarded)return;this.rewarded=true;const pr=this.profile;pr.counters=pr.counters||{};
   if(this.endless){let tac=null;if(PROG&&PROG.tacticianFactor&&!(won&&Number.isFinite(this.limit))&&this.completed>=20){const f=PROG.tacticianFactor(this.completed,pr),proj=PROG.projectedDepth(pr);tac={factor:Math.round(f*100)/100,rank:PROG.tacticianRank(f),projected:proj,power:PROG.powerRating(pr)};if(f>(pr.tacticianBest||0))pr.tacticianBest=tac.factor;for(const [id,min] of [['tactician_master',2],['tactician_grandmaster',3],['tactician_legend',4]])if(f>=min)this.award(id)}
    this.emit('result',{tactician:tac,won,mode:'engine',waves:this.completed,resonance:this.banked,parts:0,seals:[],newBest:this.completed>this.bestBefore,limitReached:won&&Number.isFinite(this.limit),limit:this.limit,bestBefore:this.bestBefore});return}

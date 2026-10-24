@@ -158,3 +158,20 @@ body:has(.inspector:not([hidden])).tower-list-open #toasts{right:17px;top:96px}
 .engine-hint::after{left:26px}
 @media (prefers-reduced-motion:reduce){.new-pulse{animation:none;box-shadow:0 0 0 4px #ffd36baa}}
 .ico-tome{width:1.15em;height:1.15em;vertical-align:-.2em;display:inline-block}.round-button.skills-round .ico-tome{width:26px;height:26px;vertical-align:middle}
+/* Rest point (Oct 24 2026) */
+dialog.rest-card{border-color:#9fd7e6;background:radial-gradient(ellipse at 50% 30%,#1d3340f8,#0d1418f8 70%);box-shadow:0 0 50px #7fd3ec44,0 20px 60px #000c}
+dialog.rest-card::backdrop{background:radial-gradient(ellipse,#7fd3ec22,#000c 70%)}
+.rest-card .asc-rays{opacity:.45;filter:hue-rotate(160deg)}
+.rest-card .eyebrow{color:#9fd7e6}
+.rest-card h2{color:#e8f7ff;text-shadow:0 0 18px #7fd3ec88}
+.rest-medal{display:grid;place-items:center;width:118px;height:118px;margin:10px auto 12px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#2e5566,#0f1d24);border:3px solid #9fd7e6;box-shadow:0 0 0 3px #0d1418,0 0 26px #7fd3ec88;animation:ascPulse 3.2s ease-in-out infinite}
+.rest-medal b{font:700 34px "Warden Quill",Georgia,serif;color:#fff;line-height:1;margin-top:18px}
+.rest-medal small{font:11px "Warden Quill",Georgia,serif;letter-spacing:3px;color:#9fd7e6;margin-bottom:18px}
+.rest-stats b{color:#ffd36b}.rest-stats span{color:#e7d3a1}
+.rest-care{color:#cfe6ee;font-size:15px;line-height:1.4;margin:0 0 14px}
+.rest-actions{display:grid;gap:8px}
+.rest-actions button{width:100%}
+.rest-actions .ico-tome{width:22px;height:22px;vertical-align:-5px}
+.rest-actions .primary.glow{box-shadow:0 0 0 2px #ffd98a,0 0 16px #ffd36b99;animation:skillGlow 2s ease-in-out infinite}
+.rest-actions .ghost-btn{background:none!important;border:1px solid #6d8a94!important;color:#cfe6ee!important;box-shadow:none!important;font-size:14px}
+@media (prefers-reduced-motion:reduce){.rest-medal,.rest-actions .primary.glow{animation:none}}
