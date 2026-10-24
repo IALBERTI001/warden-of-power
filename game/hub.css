@@ -215,3 +215,9 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .stages.compact{margin-top:.5rem}
 .power-box .power-label{font-family:var(--game-font);color:var(--muted);margin-right:.3rem}
 .eternal .hub-h{margin:.4rem 0 .2rem}
+/* Cogwright's Workshop (Oct 24 2026) */
+.workshop li>div{min-width:0}
+.ws-pips{display:inline-flex;gap:3px;margin-left:.5rem;vertical-align:middle}
+.ws-pips i{width:9px;height:9px;transform:rotate(45deg);border:1.5px solid var(--brass);background:transparent;display:inline-block}
+.ws-pips i.on{background:var(--brass-hi)}
+.workshop .primary-btn,.workshop .hub-btn{min-width:104px!important;font-size:14px;padding:0 12px!important}

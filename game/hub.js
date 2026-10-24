@@ -15,7 +15,7 @@ const PLACES=[
  {id:'emberheart',kind:'facility',x:57,y:21,mask:[880,165,245,180],badge:'restore_fire',text:'The great furnace that tempered every tower. Clear the slag and relight it to make your Fire burn hotter.'},
  {id:'rimeglass',kind:'facility',x:15,y:63,mask:[235,640,270,215],badge:'restore_ice',text:'Half-buried vaults of crystal ice. Their cold, once freed, sharpens every Ice tower.'},
  {id:'stormcrown',kind:'facility',x:69,y:42,mask:[1075,420,205,215],badge:'restore_lightning',text:'A spire of copper coils that once caught the storms. Rewire it and Lightning will strike harder and further.'},
- {id:'atelier',kind:'facility',x:61,y:70,mask:[935,690,220,165],text:'The Cogwright\'s workshop of gears and cranes. Restored, it gives every defense more Charge to start with.'},
+ {id:'atelier',kind:'facility',x:61,y:70,mask:[935,690,220,165],text:'The Cogwright\'s workshop of gears and cranes. Restored, it gives every defense more Charge to start with and opens the Workshop, where spare Parts buy upgrades.'},
  {id:'aetherheart',kind:'engine',name:'Aetherheart Engine',x:41.7,y:24,el:'engineering',text:'The sealed heart of the complex. When all four elemental facilities are reawakened, the final mission opens; clearing it unseals the Unbound Gate to endless waves.'}
 ];
 const facility=id=>P.FACILITIES.find(f=>f.id===id);
@@ -98,7 +98,7 @@ function wireInfo(root){root.querySelectorAll('[data-info]').forEach(b=>b.onclic
 // ---------- pins + wallet + play-next ----------------------------------------------------------
 function placeState(p){if(p.kind==='tutorial'){const n=sealCount();if(!profile.gateOpen){const o=P.gateOffer(profile);return{label:'Gate sealed · Raise it',tone:o.ok?'ready':'idle',ready:o.ok}}return{label:`Defend · earn Parts · Level ${outerNext()}`,tone:'ready'}}
  if(p.kind==='engine'){const n=['moonwell','emberheart','rimeglass','stormcrown'].filter(id=>stage(id)>=3).length;const fin=C&&C.available(profile,'aetherheart-1').ok;const awake=EN.available(profile);return{label:fin&&!profile.unboundOpen?'Finale ready':awake?`Engine Trials · best wave ${profile.engineBest||0}${E.ASCENSION.rank(profile)?' · '+E.ASCENSION.ranks[E.ASCENSION.rank(profile)].name:''}`:`Sealed · ${n}/4 facilities reawakened`,tone:fin&&!profile.unboundOpen?'ready':awake?'ready':'locked',ready:(fin&&!profile.unboundOpen)||(awake&&!(profile.engineBest>0))}}
- if(!profile.gateOpen)return{label:'Beyond the gate',tone:'locked',stage:0};const s=stage(p.id),o=P.restorationOffer(profile,p.id);const nm=C&&p.id!=='atelier'?sectorMissions(p.id).find(m=>!profile.missions?.[m.id]?.cleared&&C.available(profile,m.id).ok&&E.MAPS[m.id]?.painted):null;return{label:s>=3?'Reawakened':o.ok?`Restore · stage ${s+1}`:nm?`Mission ${nm.index} ready`:s?`Restoring · ${s}/3`:'Ruined',tone:s>=3?'ok':o.ok||nm?'ready':'idle',ready:o.ok||!!nm,stage:s}}
+ if(!profile.gateOpen)return{label:'Beyond the gate',tone:'locked',stage:0};const s=stage(p.id),o=P.restorationOffer(profile,p.id);const nm=C&&p.id!=='atelier'?sectorMissions(p.id).find(m=>!profile.missions?.[m.id]?.cleared&&C.available(profile,m.id).ok&&E.MAPS[m.id]?.painted):null;const ws=p.id==='atelier'&&P.WORKSHOP&&P.WORKSHOP.unlocked(profile);return{label:ws?'Workshop open':s>=3?'Reawakened':o.ok?`Restore · stage ${s+1}`:nm?`Mission ${nm.index} ready`:s?`Restoring · ${s}/3`:'Ruined',tone:s>=3?'ok':o.ok||nm?'ready':'idle',ready:o.ok||!!nm,stage:s}}
 function render(){
  $('parts').textContent=profile.parts||0;$('resonance').textContent=profile.resonance||0;$('power').textContent=P.powerRating(profile).toLocaleString();for(const [id,min] of P.POWER_BADGES)if(P.powerRating(profile)>=min)award(id);
  const pins=$('pins');pins.innerHTML='';
@@ -114,12 +114,22 @@ function nextStep(){if(!seals().cleared)return{label:'▶ Play the tutorial',go:
  if(C){const m=C.MISSIONS.find(m=>!profile.missions?.[m.id]?.cleared&&C.available(profile,m.id).ok&&E.MAPS[m.id]?.painted);if(m)return{label:`▶ ${m.finale?'The finale':'Mission'} · ${m.name}`,go:()=>openPanel(m.finale?'aetherheart':m.sector)}}
  {const o=P.restorationOffer(profile,'atelier');if(o.ok)return{label:`Restore ${facility('atelier').name} · ${o.cost} Parts`,go:()=>openPanel('atelier')}}
  if(P.SKILLS.some(s=>P.skillOffer(profile,s.id).ok))return{label:'✦ Spend Resonance on skills',go:()=>openSkills()};
+ if(P.WORKSHOP.unlocked(profile)&&['tooling',...P.WORKSHOP.upgrades.map(u=>u.id)].some(id=>P.workshopOffer(profile,id).ok))return{label:"⚙ Spend Parts at the Cogwright's Workshop",go:()=>openPanel('atelier')};
  if(EN.available(profile)&&(profile.engineBest||0)<Math.min(EN.limit(profile),500))return{label:`▶ Engine Trials · earn Resonance`,go:()=>openPanel('aetherheart')};
  if(!(profile.outer?.best))return{label:'▶ Hold the Outer Seal · Level 1 · earn Parts',go:()=>openPanel('outer')};
  return{label:`▶ Hold the Outer Seal · Level ${outerNext()}`,go:()=>openPanel('outer')}}
 function play(){persist();location.href='index.html'}
 
 // ---------- side panel -------------------------------------------------------------------------
+// Cogwright's Workshop (approved Oct 24 2026): spend spare Parts once the Atelier is reawakened.
+function workshopSection(){const W=P.WORKSHOP;if(!W)return'';if(!W.unlocked(profile))return`<h3>Cogwright's Workshop</h3><p class="muted">🔒 Fully reawaken the Atelier to open the Workshop.</p>`;
+ const btn=(id,label)=>{const o=P.workshopOffer(profile,id);if(!o.ok&&!o.cost)return`<button class="hub-btn" disabled>${escape(label)}</button>`;return`<button class="${o.ok?'primary-btn':'hub-btn'}" data-ws="${id}" ${o.ok?'':'disabled'} title="${o.ok?'':escape(o.reason)}">${escape(label)} · ${o.cost.toLocaleString()} ⚙</button>`};
+ const rows=W.upgrades.map(u=>{const n=P.workshopRank(profile,u.id),max=n>=W.max;const pips=Array.from({length:W.max},(_,i)=>`<i class="${i<n?'on':''}"></i>`).join('');return`<li class="${max?'held':''}"><div><b>${escape(u.name)}</b><span class="ws-pips" aria-label="${n} of ${W.max}">${pips}</span><small>${n?escape(u.short(n*u.per)):escape(u.text(u.per))}${n&&!max?` → ${escape(u.short((n+1)*u.per))}`:''}</small></div>${max?'<span class="held-tag">✓ Max</span>':btn(u.id,n?'Upgrade':'Build')}</li>`}).join('');
+ const t=P.workshopRank(profile,'tooling');
+ const tool=`<li class="next"><div><b>Precision Tooling${t?` · rank ${t.toLocaleString()}`:''}</b><small>${t?`Every tower +${t}% damage`:'+1% damage for every tower, per rank. No limit.'}</small></div>${btn('tooling','+1%')}</li>`;
+ const info=`<p>Restoration Parts buy machinery here. Every upgrade is permanent and works in every defense: missions, the Outer Seal and the Engine.</p><p><b>Precision Tooling</b> has no limit: each rank adds +1% damage for every tower and costs a little more than the last.</p>`;
+ return head("Cogwright's Workshop",'workshop',info)+`<ul class="levels workshop">${tool}${rows}</ul>`}
+function buyWorkshopHub(id){const r=P.buyWorkshop(profile,id);if(!r.ok){toast('Not yet',r.reason);return}persist();const u=P.WORKSHOP.upgrades.find(u=>u.id===id);toast(id==='tooling'?`Precision Tooling rank ${r.rank}: every tower +${r.rank}% damage`:`${u.name} ${r.rank}/${P.WORKSHOP.max}: ${u.text(r.rank*u.per)}`,"COGWRIGHT'S WORKSHOP");render()}
 let currentPanel=null,lastOpener=null;
 function openPanel(id,opener,keep){const p=PLACES.find(p=>p.id===id);if(!keep&&currentPanel!==id)playAreaCue(id);currentPanel=id;if(opener)lastOpener=opener;const body=$('panelBody'),el=placeEl(p);
  const intro=p.kind==='tutorial'&&profile.gateOpen?'The south gate of the complex, raised and open. Everything that comes out of the wilds must get past you here.':p.text;
@@ -134,13 +144,14 @@ function openPanel(id,opener,keep){const p=PLACES.find(p=>p.id===id);if(!keep&&c
   html+=engineSection()}
  else{const f=facility(id),s=stage(id),o=P.restorationOffer(profile,id);
   if(C&&id!=='atelier'){const ml=missionList(id);html+=head('Missions','missions',`<p>Each mission you clear opens the next restoration stage here. ${escape(C.SECTORS[id].roleText)}</p>${ml.info}`)+ml.rows}
-  html+=head('Restoration','restoration',`<p>Each stage: ${bonusText(f)}. The first stage opens the ${ELEMENT[f.branch].name} skills.</p>`);
+  if(id==='atelier'&&P.WORKSHOP.unlocked(profile))html+=workshopSection();
+  html+=head('Restoration','restoration',`<p>Each stage: ${bonusText(f)}. The first stage opens the ${ELEMENT[f.branch].name} skills.</p>${id==='atelier'?"<p>Fully reawakened, it opens the <b>Cogwright's Workshop</b>, where spare Parts buy permanent upgrades.</p>":''}`);
   html+=s>=3?`<p class="reawakened">✓ Fully reawakened</p>`:`<button class="primary-btn" id="restoreBtn" ${o.ok?'':'disabled'}>Restore: ${escape(f.stages[s])} · ${f.costs[s]} Parts</button>${o.ok?'':`<p class="why">${escape(o.reason)}</p>${shortOnParts(o)}`}`;
   html+=`<ol class="stages compact">${f.stages.map((name,i)=>`<li class="${i<s?'done':i===s?'next':''}"><span class="stage-name">${i<s?'✓ ':''}${escape(name)}</span><span class="stage-cost">${i<s?'Done':f.costs[i]+' Parts'}</span></li>`).join('')}</ol>`;
   const unlocked=P.branchUnlocked(profile,f.branch);html+=`<h3>${ELEMENT[f.branch].name} skills</h3>${unlocked?`<button class="hub-btn" id="panelSkills">Open ${ELEMENT[f.branch].name} skills</button>`:`<p class="muted">🔒 Restore the first stage to open.</p>`}`}
  body.innerHTML=html;$('panel').hidden=false;wireInfo(body);
  $('panelPlay')&&($('panelPlay').onclick=play);body.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>playOuter(+b.dataset.level));body.querySelectorAll('[data-mission]').forEach(b=>b.onclick=()=>playMission(b.dataset.mission));body.querySelectorAll('[data-goto-outer]').forEach(b=>b.onclick=()=>openPanel('outer'));body.querySelectorAll('[data-engine]').forEach(b=>b.onclick=()=>playEngine());body.querySelectorAll('[data-eternal]').forEach(b=>b.onclick=()=>buyEternalHub(b.dataset.eternal==='max'));body.querySelectorAll('[data-checkpoint]').forEach(b=>b.onclick=()=>{const sv=engineRunInProgress();if(sv&&!b.dataset.armed){b.dataset.armed='1';b.textContent=`Abandon the run at wave ${sv.completed||0}? Click again`;return}playEngine(+b.dataset.checkpoint)});$('panelSkills')&&($('panelSkills').onclick=()=>openSkills(p.kind==='tutorial'?'fire':facility(id).branch));$('gateBtn')&&($('gateBtn').onclick=()=>{const r=P.openGate(profile);if(r.ok){persist();closePanelQuiet();celebrate('gate',0,1,'The Outer Seal Gate rises',`The road into the complex is open · Fire skills unlocked · +${P.GATE.bonus[1]} starting Charge in every defense`)}});
- $('restoreBtn')&&($('restoreBtn').onclick=()=>restore(id));
+ $('restoreBtn')&&($('restoreBtn').onclick=()=>restore(id));body.querySelectorAll('[data-ws]').forEach(b=>b.onclick=()=>buyWorkshopHub(b.dataset.ws));
  document.querySelectorAll('.pin').forEach(b=>b.classList.toggle('active',b.dataset.place===id));
  if(!keep)setTimeout(()=>($('panel').querySelector('.primary-btn:not([disabled])')||$('panel').querySelector('button:not([disabled]):not(.panel-close):not(.hub-q)'))?.focus(),30)}
 function closePanel(){$('panel').hidden=true;currentPanel=null;document.querySelectorAll('.pin').forEach(b=>b.classList.remove('active'));lastOpener?.focus?.()}

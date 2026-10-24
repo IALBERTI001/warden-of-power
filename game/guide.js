@@ -94,6 +94,8 @@ const CHAPTERS=[
   <tr><td><b>⬢ Warden Power</b></td><td>The total of every bonus your towers carry. It applies in every battle.</td></tr></tbody></table>
   <h3>Restoring the complex</h3>
   <p>Raise the <b>Outer Seal Gate</b> first (40 Parts). Each facility then has three restoration stages. <b>Every stage makes every tower stronger, everywhere</b> (+5% damage for that element), and its first stage opens that element's skills. In the campaign, each stage needs its mission cleared first. <b>Cogwright's Atelier</b> has no missions: rebuild it with Parts from anywhere for more starting Charge.</p>
+  <h3>The Cogwright's Workshop</h3><p>Fully reawaken the Atelier and it becomes a workshop where <b>spare Parts buy permanent upgrades</b> that work in every defense:</p>
+  <ul><li><b>Precut Frames</b>: towers cost less to build. <b>Salvage Rig</b>: selling returns more Charge. <b>Reinforced Seal</b>: extra Seal Integrity. <b>Spare Coils</b>: more starting Charge. <b>Quick Crank</b>: Charge each time you send a wave early. Five ranks each.</li><li><b>Precision Tooling</b>: +1% damage for every tower per rank, with no limit. Each rank costs a little more than the last, so Parts always have a use.</li></ul>
   <div class="g-row">${fig('hub-skills.jpg','The skill tree with five branches.','Skills: five branches. Reassign them for free at any time.')}${fig('hub-badges.jpg','The badge gallery.','Badges: 28 to earn. Show your favourite on your profile.')}</div>
   <p class="g-tip"><b>Your progress saves automatically</b> in this browser. Settings → <i>Copy save code</i> moves it to another browser or PC.</p>`},
  {id:'modes',title:'Ways to play',short:'Modes',html:`

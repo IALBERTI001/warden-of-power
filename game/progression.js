@@ -72,7 +72,7 @@ function bonuses(profile){const p=migrate(profile||{});const b={el:{},eng:{start
  for(const f of FACILITIES){const st=Math.min(f.stages.length,p.restorations[f.id]||0);if(st)add(f.branch,f.bonus[0],f.bonus[1]*st,`${f.name} ${st}/3`)}
  for(const br of BRANCHES)for(let t=1;t<=MASTERY.unlockWaves.length;t++){const r=masteryRanks(p,br,t);if(r){const [key,per]=MASTERY.perRank[br];add(br,key,per*r,`Mastery ${['I','II','III','IV','V'][t-1]} ${r}/10`)}}
  // caps from the approved tree
- for(const e of ELEMENTS){b.el[e].slowPts=Math.min(b.el[e].slowPts,.50)}b.eng.upgradeDiscount=Math.min(b.eng.upgradeDiscount,.06);b.eng.refundPts=Math.min(b.eng.refundPts,.15);
+ for(const e of ELEMENTS){b.el[e].slowPts=Math.min(b.el[e].slowPts,.50)}b.eng.upgradeDiscount=Math.min(b.eng.upgradeDiscount,.06);b.eng.refundPts=Math.min(b.eng.refundPts,.15);b.ws=workshopEffects(p);
  return b}
 // ---------- Warden Power v2 (approved Oct 23 2026) ----------
 // One honest number for the account's strength: 100 = a fresh Warden; 400 = handles enemies 4x as tough.
@@ -90,7 +90,8 @@ function powerMultiplier(profile){const p=migrate(profile||{});let m=1;
  const spent={};for(const s of SKILLS){const r=rank(p,s.id);for(let i=0;i<r;i++)spent[s.branch]=(spent[s.branch]||0)+s.costs[i]}
  for(const b of BRANCHES)m*=Math.pow(POWER.branch[b]||1,(spent[b]||0)/BRANCH_COST[b]);
  let mr=0;for(const b of BRANCHES)for(let t=1;t<=MASTERY.unlockWaves.length;t++)mr+=masteryRanks(p,b,t);m*=Math.pow(POWER.mastery,mr/(BRANCHES.length*MASTERY.unlockWaves.length*MASTERY.ranks));
- m*=POWER.asc[Math.max(0,Math.min(5,Math.floor(p.ascension||0)))]||1;m*=eternalFactor(p);return m}
+ m*=POWER.asc[Math.max(0,Math.min(5,Math.floor(p.ascension||0)))]||1;m*=eternalFactor(p);
+ const ws=workshopEffects(p);m*=ws.tooling;m*=Math.pow(WORKSHOP.utilityPower,WORKSHOP.upgrades.reduce((a,u)=>a+workshopRank(p,u.id),0));return m}
 function powerRating(profile){return Math.round(100*powerMultiplier(profile))}
 // Engine depth a Warden of this power reaches with standard play (the simulator's level of placement and timing).
 function projectedDepth(profile){return Math.floor(depthForHp(hpAt(POWER.d0)*powerMultiplier(profile)))}
@@ -110,6 +111,21 @@ function legacyPath(){if(LEGACY)return LEGACY;const p=blankProfile();p.gateOpen=
  for(let t=1;t<=5;t++)for(let k=1;k<=10;k++){for(const b of BRANCHES){p.mastery[b]=p.mastery[b]||{};p.mastery[b][t]=k}pts.push([powerSummary(p),powerRating(p)])}
  pts.sort((a,b)=>a[0]-b[0]);for(let i=1;i<pts.length;i++)pts[i][1]=Math.max(pts[i][1],pts[i-1][1]);return LEGACY=pts}
 function legacyToRating(old){const pts=legacyPath();if(old<=pts[0][0])return pts[0][1];for(let i=1;i<pts.length;i++)if(old<=pts[i][0]){const [a,ra]=pts[i-1],[b,rb]=pts[i];return Math.round(b===a?rb:ra+(rb-ra)*(old-a)/(b-a))}const [a,ra]=pts[pts.length-1];return Math.round(ra*Math.pow(1.02,old-a))}
+// Cogwright's Workshop (approved Oct 24 2026): Parts buy machinery once the Atelier is fully reawakened.
+// Shelf 1 = utility upgrades (5 ranks each); shelf 3 = Precision Tooling, uncapped +1% damage per rank.
+const WORKSHOP={unlocked:p=>Math.min(3,p?.restorations?.atelier||0)>=3,costs:[100,180,300,450,650],
+ upgrades:[{id:'frames',short:v=>`−${Math.round(v*100)}% build cost`,name:'Precut Frames',per:.03,text:v=>`Towers cost ${Math.round(v*100)}% less to build`},
+  {id:'salvage',short:v=>`+${Math.round(v*100)}% sell refund`,name:'Salvage Rig',per:.02,text:v=>`Selling returns ${Math.round(v*100)}% more Charge`},
+  {id:'seal',short:v=>`+${v} Seal Integrity`,name:'Reinforced Seal',per:1,text:v=>`+${v} Seal Integrity`},
+  {id:'coils',short:v=>`+${v} starting Charge`,name:'Spare Coils',per:10,text:v=>`+${v} starting Charge`},
+  {id:'crank',short:v=>`+${v} Charge per early wave`,name:'Quick Crank',per:5,text:v=>`+${v} Charge each time you send a wave early`}],
+ max:5,tooling:{per:.01,cost:n=>250+25*(n-1)},utilityPower:1.004};
+function workshopRank(p,id){return Math.max(0,Math.min(id==='tooling'?1e6:WORKSHOP.max,Math.floor(p?.workshop?.[id]||0)))}
+function workshopOffer(p,id){if(!WORKSHOP.unlocked(p))return{ok:false,reason:"Reawaken Cogwright's Atelier first."};const n=workshopRank(p,id);let cost;
+ if(id==='tooling')cost=WORKSHOP.tooling.cost(n+1);else{if(!WORKSHOP.upgrades.some(u=>u.id===id))return{ok:false,reason:'Unknown upgrade.'};if(n>=WORKSHOP.max)return{ok:false,reason:'Fully upgraded.',rank:n};cost=WORKSHOP.costs[n]}
+ if((p.parts||0)<cost)return{ok:false,reason:`Needs ${cost-(p.parts||0)} more Parts.`,cost,rank:n};return{ok:true,cost,rank:n}}
+function buyWorkshop(p,id){const o=workshopOffer(p,id);if(!o.ok)return o;p.parts-=o.cost;p.workshop={...(p.workshop||{}),[id]:o.rank+1};return{ok:true,cost:o.cost,rank:o.rank+1}}
+function workshopEffects(p){const r=id=>workshopRank(p,id),U=Object.fromEntries(WORKSHOP.upgrades.map(u=>[u.id,u.per]));return{buildDiscount:r('frames')*U.frames,refundPts:r('salvage')*U.salvage,seal:r('seal')*U.seal,startCharge:r('coils')*U.coils,earlyCharge:r('crank')*U.crank,tooling:1+r('tooling')*WORKSHOP.tooling.per}}
 function eternalOffer(p){if(!ETERNAL.unlocked(p))return{ok:false,reason:'Claim the Crown at wave 500 first.'};const n=eternalRanks(p);if(n>=ETERNAL.cap)return{ok:false,reason:'Eternal Mastery is complete.',rank:n};const cost=ETERNAL.cost(n+1);if((p.resonance||0)<cost)return{ok:false,reason:`Needs ${cost-(p.resonance||0)} more Resonance.`,cost,rank:n};return{ok:true,cost,rank:n}}
 function buyEternal(p){const o=eternalOffer(p);if(!o.ok)return o;p.resonance-=o.cost;p.eternal=o.rank+1;return{ok:true,cost:o.cost,rank:o.rank+1}}
 // Total percentage added to an element's direct damage, used for the "Warden power" line.
@@ -117,5 +133,5 @@ function damageBonus(b,type){const e=b.el[type];return e.damagePct+(type==='fire
 // Warden Power: the total of every percentage bonus your towers carry (damage, burn, shatter, range, speed, soak, slow...).
 const PCT_KEYS=['damagePct','impactPct','burnPct','shatterPct','shatterRadiusPct','soakPct','rangePct','speedPct','slowPts','vsFrozenPct','vsBossPct','conductPct','secondaryPct'];
 function powerSummary(profile){const b=bonuses(profile);let t=b.allDamagePct*ELEMENTS.length+b.eng.upgradeDiscount+b.eng.refundPts;for(const e of ELEMENTS)for(const k of PCT_KEYS)t+=b.el[e][k]||0;return Math.round(t*100)}
-return{legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
+return{WORKSHOP,workshopRank,workshopOffer,buyWorkshop,workshopEffects,legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
 });
