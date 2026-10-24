@@ -191,3 +191,11 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .power-box p{margin:0}.power-num{font:24px var(--game-font);color:var(--brass-hi)}
 .eternal{display:grid;gap:4px;padding:8px 10px;border-radius:10px;background:linear-gradient(135deg,#ffffff14,#fff5d10d);border:1px solid #fff2c466}
 .eternal small{color:var(--muted)}
+/* Readability pass (Oct 24 2026) */
+.pin-name{font-size:17px}.pin-sub,.pin small{font-size:13px!important}
+.levels small,.side-panel small{font-size:14px}
+.eyebrow{font-size:12px}
+.overlay-foot,.muted{font-size:15px}
+.node-rank{font-size:12.5px}.branch-state{font-size:13px}
+.explain p{font-size:15px}
+.pin-state{font-size:13.5px}

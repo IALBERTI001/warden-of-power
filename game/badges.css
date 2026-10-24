@@ -31,3 +31,4 @@
 .tier-mythic.earned{border-color:#fff6dc;box-shadow:0 0 22px #fff3d188,0 0 6px #ffffff88;background-image:linear-gradient(110deg,transparent 30%,#ffffff18 45%,transparent 60%);background-size:250% 100%;animation:mythicShine 4s linear infinite}
 @keyframes mythicShine{from{background-position:120% 0}to{background-position:-120% 0}}
 @media (prefers-reduced-motion:reduce){.tier-mythic.earned{animation:none}}
+.achievement p{font-size:14.5px}.badge-tier{font-size:12px}.achievement small{font-size:13px}

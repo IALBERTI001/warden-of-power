@@ -74,3 +74,6 @@
 @container(max-width:1350px){.coach-tracker{width:220px}.coach-tracker li:not(.now){display:none}.coach-tracker h3{font-size:17px}}
 @container(max-width:900px){.coach-tracker{width:200px;top:96px;padding:7px 10px}.coach-tracker h3{font-size:16px}.coach-tracker li{font-size:12px}.coach-callout{width:240px;padding:9px 12px 10px 54px}.coach-face{width:36px;height:36px;font-size:17px}.coach-callout p{font-size:13px}.coach-intro-card h2{font-size:26px}}
 @container(max-width:600px){.coach-tracker{display:none}.coach-callout{width:200px}.coach-intro-card{padding:12px 14px}.coach-intro-card p{font-size:13px}.coach-tower canvas{height:60px!important;width:auto!important}}
+/* Readability pass (Oct 24 2026) */
+.coach-callout p{font-size:16px}.coach-tracker li{font-size:15px}.coach-intro-card p{font-size:17px}
+@container(max-width:850px){.coach-tracker li{font-size:13px}.coach-callout p{font-size:14px}}

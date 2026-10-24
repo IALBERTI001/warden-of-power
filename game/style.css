@@ -110,3 +110,42 @@ body.tower-list-open .inspector,body.tower-list-open .inspector.inspector-left{l
 @container(max-width:850px){.speedbar button{min-width:36px!important;min-height:30px!important;padding:6px 8px!important;font-size:13px!important}.speed-cluster>small{font-size:8px!important}}
 @container(max-width:600px){.speedbar button{min-width:28px!important;min-height:26px!important;padding:4px 5px!important;font-size:11px!important}.speedbar{gap:3px!important}.speed-hint{font-size:11px;max-width:200px}}
 @media (prefers-reduced-motion:reduce){.speedbar.speed-pulse{animation:none;box-shadow:0 0 0 4px #ffd36b88}}
+
+/* ===== Readability pass (playtest feedback, Oct 24 2026) =====
+   Bigger text everywhere in battle; full sentences use the readable book serif (approved companion font),
+   Warden Quill stays for titles, labels and numbers. Placed last so it wins over earlier size rules. */
+:root{--read-font:'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif}
+.sector-plaque .eyebrow{font-size:11px}.sector-caption{font-size:11px}
+.resources small{font-size:11px;letter-spacing:1px}
+.dock-label{font-size:11px}
+.tower-card b{font-size:15px}.tower-card small{font-size:12px}
+.wave-bar>small{font-size:11px}.wave-bar strong{font-size:14px;line-height:1.35}
+#waveHint{font-family:var(--read-font);font-size:14px;letter-spacing:0}
+.feedback{font-family:var(--read-font);font-size:16px;letter-spacing:0;padding:4px 12px}
+.inspector{width:260px}
+.inspector .eyebrow{font-size:11px}
+.inspector h2{font-size:22px}
+.inspector p,.inspector .muted,.inspector .attune-line{font-family:var(--read-font);font-size:15px;line-height:1.45;letter-spacing:0}
+.inspector .stats div{font-size:13px}.inspector .stats b{font-size:18px}
+.inspector label,.inspector select{font-size:14px}
+.inspector button:not(.inspector-head button){font-size:15px}
+.inspector .spec-button small{font-family:var(--read-font);font-size:13px;letter-spacing:0}
+.toast{font-size:15px;max-width:300px}.toast small{font-size:11px}
+#toasts{max-width:300px}
+dialog p,dialog li{font-family:var(--read-font);font-size:16px;line-height:1.5;letter-spacing:0}
+.result-stats{font-size:14px}
+.controls-note p{font-size:15px}
+.tl-main b{font-size:15px}.tl-main>small{font-size:13px}.tl-next{font-size:12px}.tl-next b{font-size:14px}
+.tl-tools{font-size:13px}.tl-foot{font-family:var(--read-font);font-size:13px;letter-spacing:0}
+.tower-list{width:280px}
+body.tower-list-open .inspector,body.tower-list-open .inspector.inspector-left{left:305px}
+.asc-power,.asc-banner{font-family:var(--read-font);letter-spacing:0}
+.auto-wave{font-size:13px}
+/* medium screens */
+@container(max-width:850px){.sector-caption,.resources small,.dock-label,.wave-bar>small{font-size:9px}.tower-card b{font-size:12px}.tower-card small{font-size:10px}.wave-bar strong{font-size:12px}.feedback{font-size:13px}.inspector{width:220px}.inspector p,.inspector .muted,.inspector .attune-line{font-size:13px;display:block}.inspector .stats div{font-size:11px}.inspector .stats b{font-size:15px}.inspector button:not(.inspector-head button){font-size:12px}.toast{font-size:12px}.toast small{font-size:9px}dialog p,dialog li{font-size:14px}.tower-list{width:220px}body.tower-list-open .inspector,body.tower-list-open .inspector.inspector-left{left:240px}.tl-main b{font-size:13px}.tl-main>small{font-size:11px}}
+/* small screens */
+@container(max-width:600px){.resources small,.wave-bar>small{font-size:8px}.tower-card b{font-size:10px}.tower-card small{font-size:9px}.wave-bar strong{font-size:10px}.feedback{font-size:11px}.inspector{width:190px}.inspector p,.inspector .muted{font-size:12px}.inspector .stats div{font-size:10px}.inspector .stats b{font-size:13px}.toast{font-size:11px}dialog p,dialog li{font-size:13px}}
+body:has(.inspector:not([hidden])) #toasts{right:300px}
+body:has(.inspector:not([hidden])).tower-list-open #toasts{right:17px;top:96px}
+.wave-bar{width:310px}.wave-bar strong{font-size:13px}
+@container(max-width:850px){body:has(.inspector:not([hidden])) #toasts{right:250px}}
