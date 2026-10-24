@@ -94,3 +94,19 @@ dialog.ascension-card[data-rank="mythic"] .eyebrow,dialog.ascension-card[data-ra
 .tl-foot{font-size:10px;color:#a99a80;margin:6px 0 0}
 body.tower-list-open .inspector,body.tower-list-open .inspector.inspector-left{left:275px;right:auto}
 @container(max-width:850px){.tower-list{width:200px;padding:6px 8px;border-width:12px}body.tower-list-open .inspector,body.tower-list-open .inspector.inspector-left{left:220px}.tl-row{grid-template-columns:22px 1fr auto;padding:4px 6px}.tl-gem{width:22px;height:22px}}
+
+/* Speed controls: larger and easier to spot (playtest feedback, Oct 2026) */
+.speed-cluster>small{font-size:10px!important;letter-spacing:2px;color:#ffe3a0}
+.speedbar{gap:6px!important}
+.speedbar button{min-width:48px!important;min-height:36px!important;padding:8px 13px!important;font-size:16px!important;font-weight:bold;border-radius:8px}
+.speedbar button[aria-pressed=true]{background:linear-gradient(#ffe39a,#d59a3a)!important;color:#2a1d17!important;border-color:#2a1d17!important;box-shadow:0 0 12px #ffd36b88!important}
+.speedbar.speed-pulse{border-radius:12px;animation:speedPulse 1.2s ease-in-out infinite}
+@keyframes speedPulse{0%,100%{box-shadow:0 0 0 0 #ffd36b00}50%{box-shadow:0 0 0 6px #ffd36b88,0 0 22px #ffd36b88}}
+.speed-hint{position:absolute;bottom:calc(100% + 14px);left:50%;transform:translateX(-50%);width:max-content;max-width:280px;display:grid;gap:4px;justify-items:center;padding:9px 14px;border-radius:12px;background:linear-gradient(#4a3a58,#241b2e);border:2px solid #ffd36b;color:#fff0d1;font-size:13px;box-shadow:0 8px 24px #000a;z-index:6}
+.speed-hint[hidden]{display:none}
+.speed-hint::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:9px solid transparent;border-top-color:#ffd36b}
+.speed-hint b{color:#ffd98a;font-size:14px}.speed-hint kbd{font-size:11px}
+.speed-hint button{margin-top:2px;padding:3px 12px;font-size:12px;border-radius:7px;background:linear-gradient(#ffe39a,#d59a3a);color:#2a1d17;border:1px solid #2a1d17;cursor:pointer}
+@container(max-width:850px){.speedbar button{min-width:36px!important;min-height:30px!important;padding:6px 8px!important;font-size:13px!important}.speed-cluster>small{font-size:8px!important}}
+@container(max-width:600px){.speedbar button{min-width:28px!important;min-height:26px!important;padding:4px 5px!important;font-size:11px!important}.speedbar{gap:3px!important}.speed-hint{font-size:11px;max-width:200px}}
+@media (prefers-reduced-motion:reduce){.speedbar.speed-pulse{animation:none;box-shadow:0 0 0 4px #ffd36b88}}

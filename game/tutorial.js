@@ -7,7 +7,7 @@ const STEPS=[
 ['upgrade','Strengthen the defense','Purchase Tier II with the gold upgrade button. Upgrades take effect immediately without granting a free shot.','#upgradeOne'],
 ['target','Choose what matters','Change Target to Strongest, Last or Nearest. First means furthest along the route; Strongest means highest remaining health.','#targetMode'],
 ['sellView','You can change your mind','Show me highlights Sell without opening it. Press Understood to continue. An unused tower refunds fully; a tower that has fired returns 75%. Selling is optional.','#sellTower'],
-['wave','Put your defense to work','Begin the first wave. Select the tower during combat: the badge above every tower identifies its targeting priority.','#next'],
+['wave','Put your defense to work','Begin the first wave. Select the tower during combat: the badge above every tower identifies its targeting priority. The Battle Speed buttons at the bottom run the fight at 1×, 2× or 5×; Space pauses.','#next'],
 ['water','Prepare a combination','Build Water near the road. Water deals light damage and applies Soaked for 4 seconds. Soaked alone does NOT slow; it primes ice and lightning combos.','[data-type="water"]'],
 ['ice','Add ice to the overlap','After wave one, build Ice beside Water with overlapping coverage. Ice alone chills for 2.7 seconds, slowing by 24% at Tier I. Start wave two when both are ready.','[data-type="ice"]'],
 ['freeze','Watch for the freeze','Let Water soak an enemy, then Ice freeze it. The shell stops movement for 1.5 seconds. Soaked is consumed; natural thaw gives 4 seconds of resistance.',null],
