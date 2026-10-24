@@ -1,0 +1,23 @@
+/* Playtest feedback dialog (shared by hub and battles). */
+dialog.feedback-dialog{width:min(560px,94vw);max-width:none!important;max-height:92vh;overflow:auto;padding:18px 22px;border-radius:16px;background:linear-gradient(#3e2f4c,#1c1525);border:3px solid #2a1d17;outline:2px solid #d5b369;color:#fff0d1;box-shadow:0 14px 40px #000c;font-family:'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif}
+dialog.feedback-dialog::backdrop{background:#07050acc}
+.fb-form{display:grid;gap:12px;margin:0}
+.fb-head{display:flex;justify-content:space-between;align-items:flex-start}
+.fb-head .eyebrow{display:block;font:11px 'Warden Quill',Georgia,serif;letter-spacing:.16em;color:#d5b369}
+.fb-head h2{font:28px 'Warden Quill',Georgia,serif;color:#ffd98a;margin:2px 0 0}
+.fb-close{background:none;border:0;color:#cbb994;font-size:24px;min-width:40px;min-height:40px;cursor:pointer}
+.fb-lead{margin:0;color:#e7d9b8;font-size:14px;line-height:1.45}
+.fb-form>label{display:grid;gap:5px;font-size:14px;color:#ffd98a}
+.fb-form select,.fb-form textarea{font:15px/1.4 'Palatino Linotype',Georgia,serif;background:#130e18;color:#fff0d1;border:1px solid #806944;border-radius:8px;padding:8px}
+.fb-form textarea{resize:vertical;min-height:110px}
+.fb-stars{display:flex;gap:4px}.fb-star{cursor:pointer;font-size:26px;color:#5a4a5f;line-height:1}.fb-star input{position:absolute;opacity:0;pointer-events:none}
+.fb-stars:has(.fb-star:hover) .fb-star{color:#ffd36b}.fb-star:hover~.fb-star{color:#5a4a5f!important}
+.fb-stars .fb-star:has(input:checked),.fb-stars .fb-star:has(~.fb-star input:checked){color:#ffd36b}
+.fb-star input:focus-visible+span{outline:2px solid #fff3c4;outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.fb-check{display:flex!important;grid-template-columns:none;gap:8px;align-items:flex-start;color:#cbb994!important;font-size:13px!important}.fb-check input{margin-top:3px;accent-color:#d5b369}
+.fb-preview{font-size:12px;color:#a99a80}.fb-preview pre{white-space:pre-wrap;word-break:break-word;background:#0d0a12;border-radius:6px;padding:8px;font-size:11px;max-height:140px;overflow:auto}
+.fb-status{min-height:1.2em;margin:0;color:#bfe8b0;font-size:13px}
+.fb-actions{display:flex;justify-content:flex-end;gap:8px}
+.fb-actions button{font:16px 'Warden Quill',Georgia,serif;padding:9px 16px;border-radius:10px;cursor:pointer;border:2px solid #d5b369;background:linear-gradient(#45344f,#211a2c);color:#fff0d1}
+.fb-actions .fb-send{background:linear-gradient(#ffe39a,#d59a3a);color:#2a1d17;border-color:#2a1d17}.fb-actions .fb-send:disabled{opacity:.6}

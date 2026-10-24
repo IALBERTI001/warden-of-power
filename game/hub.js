@@ -145,6 +145,7 @@ function nodeState(s){return WardenSkillTree.nodeState(skillCtx(),s)}
 function skillCtx(){return{get profile(){return profile},get sel(){return selectedSkill},set sel(v){selectedSkill=v},$,persist,toast,after:render,context:'hub'}}
 function renderSkills(){WardenSkillTree.render(skillCtx())}
 $('openSkills').onclick=()=>openSkills();
+if($('openFeedback')&&window.WardenFeedback)$('openFeedback').onclick=()=>WardenFeedback.open();
 let resetArmed=false;$('resetSkills').onclick=()=>{const spent=P.SKILLS.some(s=>P.rank(profile,s.id));if(!spent){toast('Nothing to reassign','You have not learned any skills yet.');return}if(!resetArmed){resetArmed=true;$('resetSkills').textContent='Click again to refund every skill';setTimeout(()=>{resetArmed=false;$('resetSkills').textContent='Reassign all (free)'},4000);return}resetArmed=false;$('resetSkills').textContent='Reassign all (free)';const back=P.resetSkills(profile);persist();toast(`${back} Resonance refunded`,'SKILLS REASSIGNED');render();renderSkills()};
 
 // ---------- badges ----------------------------------------------------------------------------

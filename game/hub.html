@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="badges.css">
 <link rel="stylesheet" href="hub.css">
 <link rel="stylesheet" href="guide.css">
+<link rel="stylesheet" href="feedback.css">
 </head>
 <body>
 <main id="hub" aria-label="The Containment Complex, your home hub">
@@ -30,7 +31,7 @@
       <button id="openSkills" class="hub-btn">✦ Skills</button>
       <button id="openBadges" class="hub-btn">◉ Badges</button>
       <button id="openHandbook" class="hub-btn" title="The Warden's Guide: everything explained, with pictures">📖 Guide</button>
-      <button id="openGuide" class="hub-btn" aria-label="Replay the hub guide" title="How the hub works">?</button>
+      <button id="openFeedback" class="hub-btn feedback-btn" title="Tell us what you think">✉ Feedback</button><button id="openGuide" class="hub-btn" aria-label="Replay the hub guide" title="How the hub works">?</button>
       <button id="openSettings" class="hub-btn" aria-label="Settings and saves">⚙</button>
     </nav>
   </header>
@@ -96,6 +97,6 @@
 <script src="badges.js"></script>
 <script>try{var _p=JSON.parse(localStorage.getItem("warden.profile.v1")||"{}");if(!(_p.seals&&_p.seals.tutorial&&_p.seals.tutorial.cleared)&&!/[?&]stay(&|$)/.test(location.search))location.replace("index.html")}catch(e){}</script>
 <script src="hubfx.js"></script>
-<script src="guide.js"></script><script src="hub.js"></script>
+<script src="feedback.js"></script><script src="guide.js"></script><script src="hub.js"></script>
 </body>
 </html>
