@@ -149,3 +149,11 @@ body:has(.inspector:not([hidden])) #toasts{right:300px}
 body:has(.inspector:not([hidden])).tower-list-open #toasts{right:17px;top:96px}
 .wave-bar{width:310px}.wave-bar strong{font-size:13px}
 @container(max-width:850px){body:has(.inspector:not([hidden])) #toasts{right:250px}}
+/* Tower list on the dock + first-visit highlight (Oct 2026) */
+.speedbar .dock-list{margin-right:8px;color:#ffd98a}
+.speedbar .dock-list[aria-pressed=true]{background:linear-gradient(#6c526d,#3b2a49)!important;color:#ffe3a0!important;border-color:#ffe3a0!important;box-shadow:none!important}
+.new-pulse{animation:newPulse 1.1s ease-in-out infinite;position:relative;z-index:6}
+@keyframes newPulse{0%,100%{box-shadow:0 0 0 0 #ffd36b00}50%{box-shadow:0 0 0 5px #ffd36baa,0 0 20px #ffd36baa}}
+.engine-hint{left:0;transform:none;bottom:calc(100% + 14px)}
+.engine-hint::after{left:26px}
+@media (prefers-reduced-motion:reduce){.new-pulse{animation:none;box-shadow:0 0 0 4px #ffd36baa}}

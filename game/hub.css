@@ -199,3 +199,19 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .node-rank{font-size:12.5px}.branch-state{font-size:13px}
 .explain p{font-size:15px}
 .pin-state{font-size:13.5px}
+/* Info behind "?" (Oct 24 2026): panels lead with buttons; explanations open on demand. */
+.hub-h{display:flex;align-items:center;gap:.5rem;margin:.9rem 0 .35rem}
+.hub-h h3,.hub-h h2{margin:0}
+.hub-h.title{margin:.1rem 0 .4rem}
+.hub-q{flex:0 0 26px;width:26px;height:26px;padding:0;border-radius:50%;border:2px solid var(--brass);background:#2a2036;color:var(--brass-hi);font:bold 14px Georgia,serif;line-height:1;cursor:pointer}
+.hub-q:hover{filter:brightness(1.2)}
+.hub-q[aria-expanded="true"]{background:#e7ca83;color:#261c37}
+.hub-more{margin:.2rem 0 .6rem;padding:.55rem .75rem;border-left:3px solid var(--brass);background:rgba(255,240,200,.05);border-radius:0 8px 8px 0;font-size:14px}
+.hub-more p{margin:.25rem 0}
+.hub-facts{margin:.3rem 0 0;padding-left:1.1rem}
+.hub-facts li{margin:.15rem 0}
+.checklist.compact{margin:.5rem 0}
+.checklist.compact li{padding:.15rem 0}
+.stages.compact{margin-top:.5rem}
+.power-box .power-label{font-family:var(--game-font);color:var(--muted);margin-right:.3rem}
+.eternal .hub-h{margin:.4rem 0 .2rem}

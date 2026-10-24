@@ -1,7 +1,7 @@
 // Browser-independent UI integration smoke test. Not a substitute for visual QA.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const registry=new Map(),all=[],storage=new Map();
-const drawing=new Proxy({}, {get(o,k){return o[k]||(()=>{})},set(o,k,v){o[k]=v;return true}});
+const drawing=new Proxy({}, {get(o,k){if(k in o)return o[k];if(/Gradient/.test(String(k)))return ()=>({addColorStop(){}});return ()=>{}},set(o,k,v){o[k]=v;return true}});
 class Element{
  constructor(tag='div'){this.tagName=tag.toUpperCase();this.dataset={};this.children=[];this.style={};this.listeners={};this.classList={toggle(){}};this.open=false;this.value='';this.checked=false;all.push(this)}
  set innerHTML(s){this.html=s;for(const m of s.matchAll(/id="([^"]+)"/g))registry.set(m[1],new Element())}
