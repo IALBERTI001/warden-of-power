@@ -75,3 +75,22 @@ dialog.ascension-card[data-rank="mythic"]{border-color:#fff6dc;background:radial
 dialog.ascension-card[data-rank="mythic"] .asc-rays{display:none}
 dialog.ascension-card[data-rank="mythic"] h2{color:#fffaf0;text-shadow:0 0 22px #fff3d1aa}
 dialog.ascension-card[data-rank="mythic"] .eyebrow,dialog.ascension-card[data-rank="mythic"] .asc-power b{color:#fff3d1}
+/* Tower list (Engine Trials QoL) */
+.tower-list{position:absolute;left:15px;top:18%;width:250px;z-index:4;max-height:calc(82% - 126px);display:flex;flex-direction:column;padding:10px 12px;background:#251e2b;border-style:solid;border-color:transparent;border-image-source:url('assets/arcane-panel-candidate.png');border-image-slice:160 fill;border-image-width:18px;border-image-repeat:stretch;box-shadow:0 8px 30px #08050caa;color:#fff0d1}
+.tower-list[hidden]{display:none}
+.tl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+.tl-head h2{font-size:17px;margin:2px 0 4px}.tl-head kbd{font-size:10px}
+.tl-head button{background:none;border:0;color:#cbb994;font-size:20px;min-width:32px;min-height:32px;cursor:pointer}
+.tl-tools{display:grid;gap:4px;font-size:11px;color:#cbb994;margin-bottom:6px}
+.tl-tools select{font:inherit;background:#1d1626;color:#fff0d1;border:1px solid #806944;border-radius:6px;padding:2px 4px;margin-left:4px}
+.tl-rows{list-style:none;margin:0;padding:0 2px 0 0;overflow:auto;display:grid;gap:5px;scrollbar-color:#a68a58 #241c2c;scrollbar-width:thin}
+.tl-row{width:100%;display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:9px;background:#1d1626;border:1px solid #5a4a5f;color:#fff0d1;text-align:left;cursor:pointer;font:inherit}
+.tl-row:hover{border-color:var(--el)}.tl-row.is-selected{border-color:#ffd98a;box-shadow:0 0 0 2px #ffd98a66}
+.tl-gem{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:color-mix(in srgb,var(--el) 35%,#1d1626);border:1px solid var(--el);overflow:hidden}.tl-gem img{width:100%;height:100%;object-fit:contain}
+.tl-main{display:grid;min-width:0}.tl-main b{font-size:13px;font-weight:normal}.tl-main b small{color:#a99a80}.tl-main>small{font-size:11px;color:#cbb994}
+.tl-oc{color:#ffe08a}
+.tl-next{display:grid;justify-items:end;font-size:10px;color:#a99a80;white-space:nowrap}.tl-next b{font-weight:normal;font-size:12px;color:#c9a9a9}.tl-next.can b{color:#9fe39a}
+.tl-empty{font-size:12px;color:#cbb994;padding:6px}
+.tl-foot{font-size:10px;color:#a99a80;margin:6px 0 0}
+body.tower-list-open .inspector,body.tower-list-open .inspector.inspector-left{left:275px;right:auto}
+@container(max-width:850px){.tower-list{width:200px;padding:6px 8px;border-width:12px}body.tower-list-open .inspector,body.tower-list-open .inspector.inspector-left{left:220px}.tl-row{grid-template-columns:22px 1fr auto;padding:4px 6px}.tl-gem{width:22px;height:22px}}

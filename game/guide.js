@@ -144,7 +144,7 @@ const CHAPTERS=[
   <tr><td>${key('U')}</td><td>Upgrade the selected tower (Tier III: ${key('←')} ${key('→')} then ${key('Enter')})</td></tr>
   <tr><td>${key('T')}</td><td>Change what the selected tower targets</td></tr><tr><td>${key('X')}</td><td>Sell the selected tower</td></tr>
   <tr><td>${key('N')}</td><td>Start the next wave (or send it early)</td></tr><tr><td>${key('Space')}</td><td>Pause and resume</td></tr>
-  <tr><td>${key('Z')} ${key('C')} ${key('V')}</td><td>Speed 1×, 2×, 5×</td></tr><tr><td>${key('Esc')} / right-click</td><td>Cancel or deselect</td></tr><tr><td>${key('A')}</td><td>Engine Trials: auto waves on/off (the next wave starts 3 seconds after each clear)</td></tr><tr><td>${key('K')} or ✦</td><td>Open the skill tree without leaving the battle (pauses it; new ranks work at once)</td></tr></tbody></table>
+  <tr><td>${key('Z')} ${key('C')} ${key('V')}</td><td>Speed 1×, 2×, 5×</td></tr><tr><td>${key('Esc')} / right-click</td><td>Cancel or deselect</td></tr><tr><td>${key('L')} or ☰</td><td>Engine Trials: list every tower with its tier and Overcharge; click one to open its upgrade window</td></tr><tr><td>${key('A')}</td><td>Engine Trials: auto waves on/off (the next wave starts 3 seconds after each clear)</td></tr><tr><td>${key('K')} or ✦</td><td>Open the skill tree without leaving the battle (pauses it; new ranks work at once)</td></tr></tbody></table>
   <p>Change any key in <b>Settings → Hotkeys</b>. In the hub, every place is a button: ${key('Tab')} moves between them and ${key('Esc')} closes panels.</p>`}
 ];
 let dlg=null,current=0;
