@@ -51,7 +51,7 @@ function unlockAudio(){soundUnlocked=true;syncAudio()}
 function feedback(text){$('feedback').textContent=text}
 // Skill tree inside battles (QoL, Oct 2026): spend Resonance mid-run; bonuses are recomputed at once. Pauses the battle.
 let battleSkillSel=null;
-function battleSkillCtx(){return{get profile(){return game.profile},get sel(){return battleSkillSel},set sel(v){battleSkillSel=v},$,persist(){game.bonus=window.WardenProgression?WardenProgression.bonuses(game.profile):game.bonus;game.checkPowerBadges?.();events();save();refresh()},toast,after(){refresh()},context:'battle'}}
+function battleSkillCtx(){return{get profile(){return game.profile},get sel(){return battleSkillSel},set sel(v){battleSkillSel=v},$,persist(){game.bonus=window.WardenProgression?WardenProgression.bonuses(game.profile):game.bonus;game.checkPowerBadges?.();events();save();refresh()},toast,after(){refresh()},sound(){sound('tier_up',true)},context:'battle'}}
 function openBattleSkills(){if(TUT||!window.WardenSkillTree)return;if(!battleSkillSel)battleSkillSel=WardenSkillTree.firstSelectable(game.profile);WardenSkillTree.render(battleSkillCtx());openModal('skillsDialog');setTimeout(()=>document.querySelector(`#skillsDialog [data-skill="${battleSkillSel}"]`)?.focus(),30)}
 // Tower list (Engine Trials QoL, Oct 2026): every tower in a stack with tier, specialization and Overcharge. Clicking a row
 // selects that tower, so the normal upgrade window opens beside the list. Non-modal: the battle keeps running.

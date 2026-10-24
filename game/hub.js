@@ -167,7 +167,8 @@ const EFFECT=WardenSkillTree.EFFECT,effectAt=WardenSkillTree.effectAt;
 let selectedSkill=null,skillOpener=null;
 function openSkills(branch){skillOpener=document.activeElement;$('skills').hidden=false;if(branch){const first=P.SKILLS.find(s=>s.branch===branch&&P.rank(profile,s.id)<s.maxRank)||P.SKILLS.find(s=>s.branch===branch);selectedSkill=first.id}else if(!selectedSkill)selectedSkill=(P.SKILLS.find(s=>P.skillOffer(profile,s.id).ok)||P.SKILLS[0]).id;renderSkills();setTimeout(()=>document.querySelector(`[data-skill="${selectedSkill}"]`)?.focus(),30)}
 function nodeState(s){return WardenSkillTree.nodeState(skillCtx(),s)}
-function skillCtx(){return{get profile(){return profile},get sel(){return selectedSkill},set sel(v){selectedSkill=v},$,persist,toast,after:render,context:'hub'}}
+function skillCtx(){return{get profile(){return profile},get sel(){return selectedSkill},set sel(v){selectedSkill=v},$,persist,toast,after:render,sound:skillSound,context:'hub'}}
+function skillSound(kind){try{if(kind==='branch'){playFanfare();return}const st=audioSettings();if(st.masterMute)return;const a=new Audio('../previews/audio-v3/tier_up.wav');a.volume=Math.max(0,Math.min(1,st.master*(kind==='max'?.9:.6)));a.play().catch(()=>{})}catch(e){}}
 function renderSkills(){WardenSkillTree.render(skillCtx())}
 $('openSkills').onclick=()=>openSkills();
 if($('openFeedback')&&window.WardenFeedback)$('openFeedback').onclick=()=>WardenFeedback.open();
