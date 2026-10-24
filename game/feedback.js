@@ -3,8 +3,8 @@
 (function(root){'use strict';
 const FORM={
  // The form's /formResponse address and the entry ids of its four short-answer / paragraph questions.
- action:'',   // e.g. https://docs.google.com/forms/d/e/XXXX/formResponse
- entries:{category:'',fun:'',message:'',details:''}
+ action:'https://docs.google.com/forms/d/e/1FAIpQLScA4z2wxUSarXuPQw7GGFjSEsJYWzLYe5BF8REBQnX1R1c3lg/formResponse',
+ entries:{category:'1889728452',fun:'1824800366',message:'902686380',details:'260020857'}
 };
 const CATEGORIES=['Bug','Balance (too easy / too hard)','Confusing','Idea','Something I loved','Other'];
 const configured=()=>!!(FORM.action&&FORM.entries.message);
