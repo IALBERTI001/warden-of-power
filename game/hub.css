@@ -9,8 +9,10 @@ button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px soli
 h1,h2,h3,h4{font-family:var(--game-font);font-weight:normal;margin:0}
 .muted{color:var(--muted)}
 #hub{position:relative;height:100%;width:100%;display:grid;place-items:center}
-#mapFrame{position:relative;width:min(100vw,150vh);aspect-ratio:3/2;max-height:100vh}
-#hubMap{display:block;width:100%;height:100%}
+#mapFrame{position:relative;width:min(100vw,150vh);aspect-ratio:3/2;max-height:100vh;transform:translateX(var(--shift,0px));transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+#hub::before{content:'';position:absolute;inset:-40px;background:url('assets/hub/hub-restored.jpg') center/cover;filter:blur(30px) brightness(.45) saturate(.85);pointer-events:none}
+@media (prefers-reduced-motion:reduce){#mapFrame{transition:none}}
+#hubMap{display:block;width:100%;height:100%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 70px,#000 calc(100% - 70px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 70px,#000 calc(100% - 70px),transparent 100%)}
 
 /* top bar */
 .hub-top{position:absolute;top:12px;left:16px;right:16px;display:flex;gap:14px;align-items:center;justify-content:space-between;pointer-events:none;flex-wrap:wrap}

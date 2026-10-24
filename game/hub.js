@@ -259,3 +259,9 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCue(tru
 function wireAmbienceControls(){const s=audioSettings();$('ambVol').value=s.ambience;$('ambMute').checked=!!s.ambienceMute;
  const write=()=>{const cur=(()=>{try{return JSON.parse(localStorage.getItem('warden.settings.v1')||'{}')}catch{return{}}})();cur.ambience=+$('ambVol').value;cur.ambienceMute=$('ambMute').checked;try{localStorage.setItem('warden.settings.v1',JSON.stringify(cur))}catch{}stopCue(true)};
  $('ambVol').oninput=write;$('ambMute').onchange=write}
+// Center the complex (Oct 24 2026): the painting puts the Aetherheart Engine and the gate at 41.7% of its width,
+// with open grass on the right. With no panel open, slide the map right (within the side margins) so the complex
+// sits in the middle of the screen; when a panel opens, slide back so the grass sits under the panel.
+(function centerComplex(){const frame=$('mapFrame'),panel=$('panel');if(!frame||!panel)return;const AXIS=.417;
+ const place=()=>{const W=frame.getBoundingClientRect().width,vw=innerWidth,room=Math.max(0,(vw-W)/2);const want=panel.hidden?W*(.5-AXIS):0;frame.style.setProperty('--shift',Math.round(Math.min(want,room))+'px')};
+ new MutationObserver(place).observe(panel,{attributes:true,attributeFilter:['hidden']});addEventListener('resize',place);place()})();
