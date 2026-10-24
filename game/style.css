@@ -175,3 +175,14 @@ dialog.rest-card::backdrop{background:radial-gradient(ellipse,#7fd3ec22,#000c 70
 .rest-actions .primary.glow{box-shadow:0 0 0 2px #ffd98a,0 0 16px #ffd36b99;animation:skillGlow 2s ease-in-out infinite}
 .rest-actions .ghost-btn{background:none!important;border:1px solid #6d8a94!important;color:#cfe6ee!important;box-shadow:none!important;font-size:14px}
 @media (prefers-reduced-motion:reduce){.rest-medal,.rest-actions .primary.glow{animation:none}}
+/* Optional rewarded-ad offer (Oct 24 2026): the decline button matches the offer in size, font and color weight. */
+.reward-offer{margin:12px 0 4px;padding:10px 12px;border-radius:10px;border:1px dashed #e9c46a88;background:#00000035;text-align:left}
+.reward-offer p{margin:0 0 8px;display:grid;gap:3px}.reward-offer p b{color:#ffe9b0}.reward-offer p span{color:#e7d3a1;font-size:14px}
+.reward-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.reward-btns button{width:100%;min-height:40px;font-size:15px;border-radius:9px;border:2px solid #d5b369;background:linear-gradient(#45344f,#211a2c);color:#fff0d1}
+.video-ico{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:5px;background:#d5b369;color:#2a1d17;font-size:11px;margin-right:2px;vertical-align:1px}
+.reward-done{color:#bfe8b0;margin:0}
+dialog.rest-card{max-height:96vh;overflow:auto;padding-top:14px;padding-bottom:14px}
+.rest-card .rest-medal{width:92px;height:92px;margin:6px auto 8px}.rest-card .rest-medal b{font-size:28px;margin-top:12px}.rest-card .rest-medal small{margin-bottom:12px}
+.rest-card h2{font-size:26px}.rest-card .asc-banner{margin-bottom:8px}.rest-card .asc-power{margin-bottom:10px}.rest-care{font-size:14px;margin-bottom:10px}
+.rest-card .reward-offer{margin:0 0 10px}
