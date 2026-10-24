@@ -157,3 +157,4 @@ body:has(.inspector:not([hidden])).tower-list-open #toasts{right:17px;top:96px}
 .engine-hint{left:0;transform:none;bottom:calc(100% + 14px)}
 .engine-hint::after{left:26px}
 @media (prefers-reduced-motion:reduce){.new-pulse{animation:none;box-shadow:0 0 0 4px #ffd36baa}}
+.ico-tome{width:1.15em;height:1.15em;vertical-align:-.2em;display:inline-block}.round-button.skills-round .ico-tome{width:26px;height:26px;vertical-align:middle}

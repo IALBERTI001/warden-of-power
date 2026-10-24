@@ -54,6 +54,7 @@ const seals=()=>profile.seals?.tutorial||{};
 const outerNext=()=>(profile.outer?.best||0)+1;
 function outerRec(L){return P.legacyToRating(E.OUTER.recommended(L))}
 function readiness(L){const have=P.powerRating(profile),need=outerRec(L);return have>=need?{label:'Ready',tone:'ok'}:have>=need/1.25?{label:'Tough',tone:'warn'}:{label:'Very hard',tone:'hard'}}
+const TOME_SVG='<svg class="ico-tome" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 16.5h12.6v4H7z" fill="#fff3d6"/><path d="M8 17.8h11M8 19.2h11" stroke="#b89a6a" stroke-width=".7"/><path d="M7 1.8h11.1a1.5 1.5 0 0 1 1.5 1.5v13.4H7z" fill="currentColor"/><path d="M4.4 3.8a2 2 0 0 1 2-2H7.6v19.4H6.4a2 2 0 0 1-2-2z" fill="currentColor" opacity=".72"/><path d="M15.2 16.5v6.2l1.3-1.3 1.3 1.3v-6.2z" fill="#c8453a"/><path d="M13.3 4.8l3.1 4-3.1 4-3.1-4z" fill="#2a1d17"/><path d="M13.3 6.9l1.5 1.9-1.5 1.9-1.5-1.9z" fill="currentColor"/></svg>';
 const C=globalThis.WardenCampaign;
 function sectorMissions(f){return C?C.MISSIONS.filter(m=>m.sector===f):[]}
 function missionState(m){const rec=profile.missions?.[m.id]||{},av=C.available(profile,m.id),painted=!!E.MAPS[m.id]?.painted;return{rec,av,painted,seals:['cleared','held','challenge'].filter(k=>rec[k]).length}}
@@ -106,14 +107,14 @@ function render(){
   const pips=p.kind==='facility'?`<span class="pips" aria-hidden="true">${[1,2,3].map(i=>`<i class="${i<=st.stage?'on':''}"></i>`).join('')}</span>`:'';
   b.innerHTML=`<span class="pin-name">${escape(placeName(p))}</span><span class="pin-state">${st.ready?'<b class="pin-ready" aria-hidden="true">!</b> ':''}${escape(st.label)}</span>${pips}`;
   b.setAttribute('aria-label',`${placeName(p)}: ${st.label}${st.ready?'. A restoration is affordable.':''}`);b.onclick=()=>openPanel(p.id,b);pins.append(b)}
- const n=nextStep();$('playNext').innerHTML=`<small>NEXT STEP</small><span>${escape(n.label)}</span>`;$('playNext').onclick=n.go;
+ const n=nextStep();$('playNext').innerHTML=`<small>NEXT STEP</small><span>${n.icon==='tome'?TOME_SVG+' ':''}${escape(n.label)}</span>`;$('playNext').onclick=n.go;
  if(currentPanel)openPanel(currentPanel,null,true);if(!$('skills').hidden)renderSkills();
  paint()}
 function nextStep(){if(!seals().cleared)return{label:'▶ Play the tutorial',go:()=>play()};if(!profile.gateOpen){const o=P.gateOffer(profile);return o.ok?{label:`Raise the Outer Seal Gate · ${P.GATE.cost} Parts`,go:()=>openPanel('outer')}:{label:'▶ Replay the tutorial for Parts',go:()=>play()}}
  for(const id of ['moonwell','emberheart','rimeglass','stormcrown']){const o=P.restorationOffer(profile,id);if(o.ok)return{label:`Restore ${facility(id).name} · ${o.cost} Parts`,go:()=>openPanel(id)}}
  if(C){const m=C.MISSIONS.find(m=>!profile.missions?.[m.id]?.cleared&&C.available(profile,m.id).ok&&E.MAPS[m.id]?.painted);if(m)return{label:`▶ ${m.finale?'The finale':'Mission'} · ${m.name}`,go:()=>openPanel(m.finale?'aetherheart':m.sector)}}
  {const o=P.restorationOffer(profile,'atelier');if(o.ok)return{label:`Restore ${facility('atelier').name} · ${o.cost} Parts`,go:()=>openPanel('atelier')}}
- if(P.SKILLS.some(s=>P.skillOffer(profile,s.id).ok))return{label:'✦ Spend Resonance on skills',go:()=>openSkills()};
+ if(P.SKILLS.some(s=>P.skillOffer(profile,s.id).ok))return{label:'Learn new skills',icon:'tome',go:()=>openSkills()};
  if(P.WORKSHOP.unlocked(profile)&&['tooling',...P.WORKSHOP.upgrades.map(u=>u.id)].some(id=>P.workshopOffer(profile,id).ok))return{label:"⚙ Spend Parts at the Cogwright's Workshop",go:()=>openPanel('atelier')};
  if(EN.available(profile)&&(profile.engineBest||0)<Math.min(EN.limit(profile),500))return{label:`▶ Engine Trials · earn Resonance`,go:()=>openPanel('aetherheart')};
  if(!(profile.outer?.best))return{label:'▶ Hold the Outer Seal · Level 1 · earn Parts',go:()=>openPanel('outer')};
