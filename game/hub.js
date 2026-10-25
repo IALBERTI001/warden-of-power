@@ -1,3 +1,4 @@
+var wfmt=(typeof globalThis!=='undefined'&&globalThis.wfmt)||function(n){n=Math.floor(Number(n)||0);if(Math.abs(n)<1000)return String(n);var U=['K','M','B','T','Qa','Qi'],k=-1,v=Math.abs(n);while(v>=1000&&k<U.length-1){v/=1000;k++}var d=v<10?2:v<100?1:0,p=Math.pow(10,d);return(n<0?'-':'')+String(Math.floor(v*p)/p)+U[k]};/* fallback if an older cached progression.js is loaded */
 // The Containment Complex: the player's home hub (Phase 2).
 // Restore facilities with Restoration Parts, grow towers with Resonance, browse badges, manage saves.
 'use strict';
