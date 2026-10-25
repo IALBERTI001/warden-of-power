@@ -8,6 +8,18 @@ const CAMP=(typeof module==='object'&&module.exports)?(()=>{try{return require('
 // Compact numbers (Oct 24 2026): no commas; 1000+ shows as 1K, 1.04K, 12.3K, 456K, 1.2M, 3.4B... Never rounds up past the true value.
 function fmt(n){n=Math.floor(Number(n)||0);const neg=n<0;n=Math.abs(n);if(n<1000)return(neg?'-':'')+n;const U=['K','M','B','T','Qa','Qi'];let k=-1,v=n;while(v>=1000&&k<U.length-1){v/=1000;k++}const d=v<10?2:v<100?1:0,p=Math.pow(10,d);return(neg?'-':'')+String(Math.floor(v*p)/p)+U[k]}
 if(typeof globalThis!=='undefined')globalThis.wfmt=fmt;
+// Save hardening (Oct 25 2026): every save, save code and cloud copy passes through here before the game uses it.
+// Keeps only plain data (numbers, booleans, short safe strings, nested plain objects/arrays), drops anything that
+// could inject markup or pollute prototypes, and keeps currencies and progress non-negative and finite.
+const BAD_KEYS=new Set(['__proto__','constructor','prototype']),NONNEG=new Set(['parts','resonance','engineBest','bestEndlessWave','ascension','ascensionSeen','eternal','tacticianBest','hubGuide']);
+function sanitize(v,depth=0,key=''){if(v===null)return null;const t=typeof v;
+ if(t==='number'){if(!Number.isFinite(v))return 0;let n=Math.max(-1e15,Math.min(1e15,v));if(NONNEG.has(key))n=Math.max(0,n);return n}
+ if(t==='boolean')return v;
+ if(t==='string')return v.length<=64&&!/[<>"'`&\\]/.test(v)?v:undefined;
+ if(depth>6||t!=='object')return undefined;
+ if(Array.isArray(v)){const out=[];for(const x of v.slice(0,2000)){const s=sanitize(x,depth+1);if(s!==undefined)out.push(s)}return out}
+ const out={};let n=0;for(const k of Object.keys(v)){if(BAD_KEYS.has(k)||!/^[\w.\-:]{1,64}$/.test(k)||++n>4000)continue;const s=sanitize(v[k],depth+1,k);if(s!==undefined)out[k]=s}return out}
+function sanitizeProfile(p){const s=sanitize(p);return s&&typeof s==='object'&&!Array.isArray(s)?s:{}}
 const ELEMENTS=['fire','water','ice','lightning'];
 const BRANCHES=['fire','water','ice','lightning','engineering'];
 // node: [id, branch, order, name, maxRank, costs[], effect key, per-rank value, cap?]
@@ -48,7 +60,7 @@ const MASTERY={unlockWaves:[50,100,200,300,400],ranks:10,perRank:{fire:['damageP
 
 function blankProfile(){return{earned:{},counters:{freeze:0,conduction:0,shatter:0,early:0},parts:0,resonance:0,skills:{},restorations:{},mastery:{},bestEndlessWave:0,progressionVersion:2}}
 // Upgrade an older save in place: keeps earned badges, counters and Parts; adds the new fields.
-function migrate(profile={}){const p={...blankProfile(),...profile};p.skills={...(profile.skills||{})};p.restorations={...(profile.restorations||{})};p.mastery=JSON.parse(JSON.stringify(profile.mastery||{}));p.progressionVersion=2;return p}
+function migrate(profile={}){profile=sanitizeProfile(profile);const p={...blankProfile(),...profile};p.skills={...(profile.skills||{})};p.restorations={...(profile.restorations||{})};p.mastery=JSON.parse(JSON.stringify(profile.mastery||{}));p.progressionVersion=2;return p}
 const skill=id=>SKILLS.find(s=>s.id===id);
 const rank=(p,id)=>Math.max(0,Math.min(skill(id)?.maxRank||0,Math.floor(p.skills?.[id]||0)));
 // Raising the Outer Seal Gate relights its fire wards: the Fire branch opens first (the tutorial's first element).
@@ -136,5 +148,5 @@ function damageBonus(b,type){const e=b.el[type];return e.damagePct+(type==='fire
 // Warden Power: the total of every percentage bonus your towers carry (damage, burn, shatter, range, speed, soak, slow...).
 const PCT_KEYS=['damagePct','impactPct','burnPct','shatterPct','shatterRadiusPct','soakPct','rangePct','speedPct','slowPts','vsFrozenPct','vsBossPct','conductPct','secondaryPct'];
 function powerSummary(profile){const b=bonuses(profile);let t=b.allDamagePct*ELEMENTS.length+b.eng.upgradeDiscount+b.eng.refundPts;for(const e of ELEMENTS)for(const k of PCT_KEYS)t+=b.el[e][k]||0;return Math.round(t*100)}
-return{fmt,WORKSHOP,workshopRank,workshopOffer,buyWorkshop,workshopEffects,legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
+return{fmt,sanitize,sanitizeProfile,WORKSHOP,workshopRank,workshopOffer,buyWorkshop,workshopEffects,legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
 });

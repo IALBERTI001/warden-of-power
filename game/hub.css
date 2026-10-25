@@ -249,3 +249,7 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .hub-title{padding:7px 14px}.hub-title h1{font-size:22px}
 .hub-actions{gap:6px}
 .hub-actions .hub-btn{padding:8px 11px;font-size:14px}
+
+/* CrazyGames build (Oct 25 2026): playtest-only controls are hidden; no text-selection popups on touch */
+.on-crazygames #feedbackButton,.on-crazygames #openFeedback,.on-crazygames label:has(#testMode),.on-crazygames #testTools{display:none!important}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}textarea,input{-webkit-user-select:text;user-select:text}

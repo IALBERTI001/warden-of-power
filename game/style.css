@@ -196,3 +196,7 @@ dialog.rest-card{max-height:96vh;overflow:auto;padding-top:14px;padding-bottom:1
 /* Tablet / small-window fit (Oct 24 2026): below the 1280x768 design size the whole battle stage scales down
    uniformly instead of re-flowing, so buttons and panels never stack on top of each other. */
 #gameStage.fit-scale{position:absolute;left:50%;top:50%;width:1280px!important;height:768px!important;max-width:none!important;max-height:none!important;transform:translate(-50%,-50%) scale(var(--fit,1));transform-origin:center center}
+
+/* CrazyGames build (Oct 25 2026): playtest-only controls are hidden; no text-selection popups on touch */
+.on-crazygames #feedbackButton,.on-crazygames #openFeedback,.on-crazygames label:has(#testMode),.on-crazygames #testTools{display:none!important}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}textarea,input{-webkit-user-select:text;user-select:text}

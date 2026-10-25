@@ -126,7 +126,7 @@ function nextStep(){if(!seals().cleared)return{label:'▶ Play the tutorial',go:
  if(EN.available(profile)&&(profile.engineBest||0)<Math.min(EN.limit(profile),500))return{label:`▶ Engine Trials · earn Resonance`,go:()=>openPanel('aetherheart')};
  if(!(profile.outer?.best))return{label:'▶ Hold the Outer Seal · Level 1 · earn Parts',go:()=>openPanel('outer')};
  return{label:`▶ Hold the Outer Seal · Level ${outerNext()}`,go:()=>openPanel('outer')}}
-function play(){persist();location.href='index.html'}
+function play(){persist();location.href='index.html?mission=tutorial'}
 
 // ---------- side panel -------------------------------------------------------------------------
 // Cogwright's Workshop (approved Oct 24 2026): spend spare Parts once the Atelier is reawakened.
@@ -192,7 +192,7 @@ $('openBadges').onclick=()=>{renderBadges();openOverlay('badges')};
 function saveCode(){const data={};for(const k of KEYS){try{data[k]=localStorage.getItem(k)}catch{data[k]=null}}data[PROFILE_KEY]=JSON.stringify(profile);return'WARDEN1:'+btoa(unescape(encodeURIComponent(JSON.stringify(data))))}
 $('openSettings').onclick=()=>{wireAmbienceControls();$('saveCode').value=saveCode();$('testMode').checked=testMode();$('testTools').hidden=!testMode();openOverlay('settings')};
 $('copySave').onclick=async()=>{const code=saveCode();$('saveCode').value=code;try{await navigator.clipboard.writeText(code);$('copyStatus').textContent='Copied. Paste it somewhere safe.'}catch{$('saveCode').select();$('copyStatus').textContent='Selected: press Ctrl+C to copy.'}};
-$('importSave').onclick=()=>{const raw=$('saveCode').value.trim();try{if(!raw.startsWith('WARDEN1:'))throw new Error('This is not a Warden save code.');const data=JSON.parse(decodeURIComponent(escape_(atob(raw.slice(8)))));for(const k of KEYS){if(!(k in data))throw new Error('The save code is incomplete.');if(data[k]!==null)JSON.parse(data[k])}for(const k of KEYS){if(data[k]===null)localStorage.removeItem(k);else localStorage.setItem(k,data[k])}profile=load();render();$('importStatus').textContent='Save loaded.';toast('Save loaded','PROGRESS RESTORED')}catch(e){$('importStatus').textContent=e.message||'That save code could not be read.'}};
+$('importSave').onclick=()=>{const raw=$('saveCode').value.trim();try{if(!raw.startsWith('WARDEN1:'))throw new Error('This is not a Warden save code.');if(raw.length>400000)throw new Error('That save code is too long.');const data=JSON.parse(decodeURIComponent(escape_(atob(raw.slice(8)))));if(!data||typeof data!=='object')throw new Error('That save code could not be read.');for(const k of KEYS){if(!(k in data))throw new Error('The save code is incomplete.');if(data[k]!==null)JSON.parse(data[k])}for(const k of KEYS){if(data[k]===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(P.sanitize(JSON.parse(data[k]))??null))}profile=load();render();$('importStatus').textContent='Save loaded.';toast('Save loaded','PROGRESS RESTORED')}catch(e){$('importStatus').textContent=e.message||'That save code could not be read.'}};
 function escape_(s){return Array.from(s,c=>'%'+c.charCodeAt(0).toString(16).padStart(2,'0')).join('')}
 function testMode(){try{return localStorage.getItem('warden.hub.test')==='1'}catch{return false}}
 $('testMode').onchange=e=>{try{localStorage.setItem('warden.hub.test',e.target.checked?'1':'0')}catch{}$('testTools').hidden=!e.target.checked};
@@ -284,3 +284,6 @@ if($('bestPlaque'))$('bestPlaque').onclick=openRecord;
 function placeBest(){const b=$('bestPlaque'),top=document.querySelector('.hub-top');if(!b||!top)return;b.style.top=Math.round(hubRect(top).bottom+10)+'px'}addEventListener('resize',placeBest);document.fonts&&document.fonts.ready.then(placeBest);
 {const _render=render;render=function(){_render.apply(this,arguments);try{renderBest()}catch(e){}}}
 renderBest();
+
+// CrazyGames: the hub is not gameplay; loading ends once the hub is drawn.
+try{window.WardenAds&&(WardenAds.gameplay(false),setTimeout(()=>WardenAds.loadingStop(),300))}catch(e){}
