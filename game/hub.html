@@ -37,6 +37,7 @@
     </nav>
   </header>
 
+  <button id="bestPlaque" class="best-plaque" hidden aria-label="Your best wave: open your record"><canvas id="bestMedal" width="132" height="132" aria-hidden="true"></canvas><span><small>BEST WAVE</small><b id="bestWave">0</b><em id="bestTier"></em></span></button>
   <button id="playNext" class="play-next"></button>
 
   <aside id="panel" class="side-panel" hidden aria-live="polite">
@@ -59,6 +60,14 @@
     </div>
   </section>
 
+  <section id="record" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="recordTitle">
+    <div class="overlay-card record-card">
+      <header class="overlay-head"><div><span class="eyebrow">WARDEN'S RECORD</span><h2 id="recordTitle">Your deepest wave</h2></div><button class="overlay-close" data-close-overlay aria-label="Close your record">×</button></header>
+      <canvas id="recordCard" width="1200" height="630" role="img" aria-label="Your best-wave card"></canvas>
+      <div class="record-actions"><button id="recordSave" class="hub-btn">⤓ Save image</button><button id="recordCopy" class="hub-btn">⧉ Copy a brag</button><span id="recordStatus" class="muted" role="status"></span></div>
+      <p class="muted record-foot">Save the picture to share it with friends. Your medal changes as you go deeper: bronze, silver at wave 50, gold at 100 and the crown at 500.</p>
+    </div>
+  </section>
   <section id="badges" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="badgesTitle">
     <div class="overlay-card">
       <header class="overlay-head"><div><span class="eyebrow">WARDEN'S RECORD</span><h2 id="badgesTitle">Badges</h2></div><p id="badgeSummary" class="muted"></p><button class="overlay-close" data-close-overlay aria-label="Close badges">×</button></header>
@@ -98,6 +107,6 @@
 <script src="badges.js"></script>
 <script>try{var _p=JSON.parse(localStorage.getItem("warden.profile.v1")||"{}");if(!(_p.seals&&_p.seals.tutorial&&_p.seals.tutorial.cleared)&&!/[?&]stay(&|$)/.test(location.search))location.replace("index.html")}catch(e){}</script>
 <script src="hubfx.js"></script>
-<script src="feedback.js"></script><script src="guide.js"></script><script src="hub.js"></script>
+<script src="feedback.js"></script><script src="guide.js"></script><script src="record.js"></script><script src="hub.js"></script>
 </body>
 </html>

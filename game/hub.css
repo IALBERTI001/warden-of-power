@@ -224,3 +224,20 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 .ws-pips i.on{background:var(--brass-hi)}
 .workshop .primary-btn,.workshop .hub-btn{min-width:104px!important;font-size:14px;padding:0 12px!important}
 .ico-tome{width:1.35em;height:1.35em;vertical-align:-.3em;display:inline-block}
+/* Best-wave pride badge (Oct 24 2026) */
+.best-plaque{position:absolute;top:86px;left:16px;z-index:6;display:flex;align-items:center;gap:10px;padding:6px 16px 6px 6px;border-radius:999px 14px 14px 999px;background:linear-gradient(#45344fee,#1d1626ee);border:2px solid var(--brass);box-shadow:0 6px 18px #0009;color:var(--ink);text-align:left;transition:transform .15s}
+.best-plaque:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.best-plaque canvas{width:66px;height:66px;display:block}
+.best-plaque span{display:grid;line-height:1.05}
+.best-plaque small{font:11px var(--game-font);letter-spacing:.16em;color:var(--brass)}
+.best-plaque b{font:30px var(--game-font);color:#fff0d1;font-variant-numeric:tabular-nums}
+.best-plaque em{font-style:normal;font-size:13px;color:var(--muted)}
+.best-plaque[data-tier=silver]{border-color:#d9e3ee}.best-plaque[data-tier=silver] em{color:#d9e3ee}
+.best-plaque[data-tier=gold] em,.best-plaque[data-tier=crown] em{color:#ffd36b}
+.best-plaque[data-tier=crown]{border-color:#ffd36b;box-shadow:0 0 0 1px #c79bff88,0 0 22px #c79bff66,0 6px 18px #0009}
+.best-plaque[data-tier=mythic]{border-color:#fff6dc;box-shadow:0 0 24px #fff3d188,0 6px 18px #0009}
+.record-card{width:min(860px,100%)}
+#recordCard{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 10px 30px #000a}
+.record-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0 6px}
+.record-foot{font-size:13px;margin:6px 0 0}
+@media(max-width:600px){.best-plaque{top:64px;padding-right:12px}.best-plaque canvas{width:48px;height:48px}.best-plaque b{font-size:22px}}

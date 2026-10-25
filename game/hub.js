@@ -195,7 +195,7 @@ let wipeArmed=false;$('resetAll').onclick=()=>{if(!wipeArmed){wipeArmed=true;$('
 // ---------- overlays + keyboard ------------------------------------------------------------------
 let overlayOpener=null;
 function openOverlay(id){overlayOpener=document.activeElement;$(id).hidden=false;setTimeout(()=>$(id).querySelector('.overlay-close')?.focus(),30)}
-function closeOverlays(){let closed=false;for(const id of ['skills','badges','settings'])if(!$(id).hidden){$(id).hidden=true;closed=true}if(closed)(overlayOpener||skillOpener)?.focus?.();return closed}
+function closeOverlays(){let closed=false;for(const id of ['skills','badges','settings','record'])if(!$(id).hidden){$(id).hidden=true;closed=true}if(closed)(overlayOpener||skillOpener)?.focus?.();return closed}
 document.querySelectorAll('[data-close-overlay]').forEach(b=>b.onclick=closeOverlays);
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeOverlays()}));
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(!closeOverlays()&&!$('panel').hidden)closePanel()}});
@@ -265,3 +265,14 @@ function wireAmbienceControls(){const s=audioSettings();$('ambVol').value=s.ambi
 (function centerComplex(){const frame=$('mapFrame'),panel=$('panel');if(!frame||!panel)return;const AXIS=.417;
  const place=()=>{const W=frame.getBoundingClientRect().width,vw=innerWidth,room=Math.max(0,(vw-W)/2);const want=panel.hidden?W*(.5-AXIS):0;frame.style.setProperty('--shift',Math.round(Math.min(want,room))+'px')};
  new MutationObserver(place).observe(panel,{attributes:true,attributeFilter:['hidden']});addEventListener('resize',place);place()})();
+
+// Best-wave pride badge (Oct 24 2026): a medal plaque under the title and a shareable record card.
+function renderBest(){const b=$('bestPlaque'),best=profile.engineBest||0;if(!b||!window.WardenRecord)return;b.hidden=best<1;if(best<1)return;const t=WardenRecord.tierOf(best,profile);
+ $('bestWave').textContent=best.toLocaleString();$('bestTier').textContent=t.name;b.dataset.tier=t.id;const draw=()=>WardenRecord.plaque($('bestMedal'),best,profile,true);draw();document.fonts&&document.fonts.ready.then(draw)}
+function openRecord(){const c=$('recordCard');openOverlay('record');const draw=()=>WardenRecord.card(c,profile,E,P);draw();document.fonts&&document.fonts.ready.then(draw);$('recordStatus').textContent='';
+ const best=profile.engineBest||0,t=WardenRecord.tierOf(best,profile);
+ $('recordSave').onclick=()=>{try{c.toBlob(bl=>{const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=`warden-of-power-wave-${best}.png`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);$('recordStatus').textContent='Saved. Share it with your friends!'},'image/png')}catch(e){$('recordStatus').textContent='Could not save the picture in this browser.'}};
+ $('recordCopy').onclick=async()=>{const text=`I held wave ${best.toLocaleString()} in the Aetherheart Engine in Warden of Power. ${t.name}. Can you hold deeper?`;try{await navigator.clipboard.writeText(text);$('recordStatus').textContent='Copied. Paste it anywhere!'}catch(e){$('recordStatus').textContent=text}}}
+if($('bestPlaque'))$('bestPlaque').onclick=openRecord;
+{const _render=render;render=function(){_render.apply(this,arguments);try{renderBest()}catch(e){}}}
+renderBest();

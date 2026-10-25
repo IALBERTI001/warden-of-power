@@ -186,3 +186,10 @@ dialog.rest-card{max-height:96vh;overflow:auto;padding-top:14px;padding-bottom:1
 .rest-card .rest-medal{width:92px;height:92px;margin:6px auto 8px}.rest-card .rest-medal b{font-size:28px;margin-top:12px}.rest-card .rest-medal small{margin-bottom:12px}
 .rest-card h2{font-size:26px}.rest-card .asc-banner{margin-bottom:8px}.rest-card .asc-power{margin-bottom:10px}.rest-care{font-size:14px;margin-bottom:10px}
 .rest-card .reward-offer{margin:0 0 10px}
+/* New best wave on the Engine results (Oct 24 2026) */
+.newbest{display:flex;align-items:center;gap:14px;margin:4px 0 10px;padding:10px 14px;border-radius:14px;background:radial-gradient(ellipse at 20% 50%,#ffd36b22,transparent 70%),#00000035;border:1px solid #e9c46a77;animation:newBestIn .7s ease-out both}
+.newbest canvas{width:88px;height:88px;flex:none}
+.newbest div{display:grid;gap:2px;text-align:left}.newbest .eyebrow{color:#ffd36b;letter-spacing:3px}
+.newbest b{font:30px "Warden Quill",Georgia,serif;color:#fff0d1}.newbest small{color:#e7d3a1}
+@keyframes newBestIn{0%{opacity:0;transform:scale(.85)}60%{opacity:1;transform:scale(1.04)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.newbest{animation:none}}
