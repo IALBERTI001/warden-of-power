@@ -17,7 +17,7 @@ function medal(x,cx,cy,r,best,t,bare){const g=x.createRadialGradient(cx,cy-r*.3,
  laurel(x,cx,cy+r*.05,r*.68,1,t.ring);laurel(x,cx,cy+r*.05,r*.68,-1,t.ring);
  if(bare){if(t.id==='crown'||t.id==='mythic')crown(x,cx,cy+r*.05,r*.36,t.ring);else{x.save();x.fillStyle=t.ring;x.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.17:r*.4;x.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr)}x.closePath();x.fill();x.restore()}return}
  if(t.id==='crown'||t.id==='mythic')crown(x,cx,cy-r*.52,r*.2,t.ring);
- const s=String(best.toLocaleString());x.fillStyle=t.ink;x.textAlign='center';x.textBaseline='middle';x.font=`${Math.round(r*(s.length>4?.42:s.length>3?.5:.6))}px "Warden Quill", Georgia, serif`;x.shadowColor='#000';x.shadowBlur=r*.08;x.fillText(s,cx,cy+r*.04);x.shadowBlur=0;
+ const s=String(best.toLocaleString());x.fillStyle=t.ink;x.textAlign='center';x.textBaseline='middle';x.font=`${Math.round(r*(s.length>4?.34:s.length>3?.46:.6))}px "Warden Quill", Georgia, serif`;x.shadowColor='#000';x.shadowBlur=r*.08;x.fillText(s,cx,cy+r*.04);x.shadowBlur=0;
  x.font=`${Math.round(r*.13)}px "Warden Quill", Georgia, serif`;x.fillStyle=t.ring;x.fillText('BEST WAVE',cx,cy+r*.42)}
 function fmtDate(iso){try{return new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})}catch(e){return''}}
 // The shareable card, 1200x630.
