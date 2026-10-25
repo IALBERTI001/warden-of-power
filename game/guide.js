@@ -125,7 +125,7 @@ const CHAPTERS=[
   <ul><li>Reaching wave 100 pays enough Resonance to finish the skill tree.</li><li>Pushing toward each Trial pays for the Mastery tier you need to pass it.</li><li>Stuck short of a Trial? Push for a new best depth: every 5 waves past your best banks more Resonance.</li></ul>`},
  {id:'power',title:'Warden Power and your Tactician rating',short:'Power',html:`
   <h3>Warden Power</h3><p>Your strength as a Warden. Every restoration, skill, Mastery rank, Ascension and Eternal Mastery rank makes it grow. Watch it climb.</p>
-  <ul><li>Power badges: <b>Rising</b> (1,000), <b>Towering</b> (10,000) and <b>Overwhelming</b> (100,000).</li></ul>
+  <ul><li>Power badges: <b>Rising</b> (1K), <b>Towering</b> (10K) and <b>Overwhelming</b> (100K).</li></ul>
   <h3>Tactician: how well you play</h3><p>After each Engine run you get a <b>Tactician</b> rating: how far your placement, combos and upgrade timing carried you beyond what raw power would. That is the part no amount of grinding can buy.</p>
   <table class="g-table"><tbody><tr><td>×1</td><td>Adept</td></tr><tr><td>×1.5</td><td>Expert</td></tr><tr><td>×2</td><td>Master <i>(badge)</i></td></tr><tr><td>×3</td><td>Grandmaster <i>(badge)</i></td></tr><tr><td>×4</td><td>Legend <i>(badge)</i></td></tr></tbody></table>
   <h3>Eternal Mastery</h3><p>Once you hold the Crown, one more track opens in the Engine panel and the skill tree: <b>Eternal Mastery</b>, +3% damage for every tower in Engine Trials per rank, up to 94 ranks (about ×16). After the Crown, <b>every run</b> pays Resonance for each 5 waves past 500 (a fifth of the usual amount when it is below your best), so long, dedicated play keeps making you stronger.</p>

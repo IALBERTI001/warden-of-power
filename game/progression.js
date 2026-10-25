@@ -5,6 +5,9 @@
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.WardenProgression=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
 const CAMP=(typeof module==='object'&&module.exports)?(()=>{try{return require('./campaign.js')}catch{return null}})():(globalThis.WardenCampaign||null);
+// Compact numbers (Oct 24 2026): no commas; 1000+ shows as 1K, 1.04K, 12.3K, 456K, 1.2M, 3.4B... Never rounds up past the true value.
+function fmt(n){n=Math.floor(Number(n)||0);const neg=n<0;n=Math.abs(n);if(n<1000)return(neg?'-':'')+n;const U=['K','M','B','T','Qa','Qi'];let k=-1,v=n;while(v>=1000&&k<U.length-1){v/=1000;k++}const d=v<10?2:v<100?1:0,p=Math.pow(10,d);return(neg?'-':'')+String(Math.floor(v*p)/p)+U[k]}
+if(typeof globalThis!=='undefined')globalThis.wfmt=fmt;
 const ELEMENTS=['fire','water','ice','lightning'];
 const BRANCHES=['fire','water','ice','lightning','engineering'];
 // node: [id, branch, order, name, maxRank, costs[], effect key, per-rank value, cap?]
@@ -133,5 +136,5 @@ function damageBonus(b,type){const e=b.el[type];return e.damagePct+(type==='fire
 // Warden Power: the total of every percentage bonus your towers carry (damage, burn, shatter, range, speed, soak, slow...).
 const PCT_KEYS=['damagePct','impactPct','burnPct','shatterPct','shatterRadiusPct','soakPct','rangePct','speedPct','slowPts','vsFrozenPct','vsBossPct','conductPct','secondaryPct'];
 function powerSummary(profile){const b=bonuses(profile);let t=b.allDamagePct*ELEMENTS.length+b.eng.upgradeDiscount+b.eng.refundPts;for(const e of ELEMENTS)for(const k of PCT_KEYS)t+=b.el[e][k]||0;return Math.round(t*100)}
-return{WORKSHOP,workshopRank,workshopOffer,buyWorkshop,workshopEffects,legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
+return{fmt,WORKSHOP,workshopRank,workshopOffer,buyWorkshop,workshopEffects,legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
 });

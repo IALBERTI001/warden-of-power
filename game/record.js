@@ -17,7 +17,7 @@ function medal(x,cx,cy,r,best,t,bare){const g=x.createRadialGradient(cx,cy-r*.3,
  laurel(x,cx,cy+r*.05,r*.68,1,t.ring);laurel(x,cx,cy+r*.05,r*.68,-1,t.ring);
  if(bare){if(t.id==='crown'||t.id==='mythic')crown(x,cx,cy+r*.05,r*.36,t.ring);else{x.save();x.fillStyle=t.ring;x.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.17:r*.4;x.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr)}x.closePath();x.fill();x.restore()}return}
  if(t.id==='crown'||t.id==='mythic')crown(x,cx,cy-r*.52,r*.2,t.ring);
- const s=String(best.toLocaleString());x.fillStyle=t.ink;x.textAlign='center';x.textBaseline='middle';x.font=`${Math.round(r*(s.length>4?.34:s.length>3?.46:.6))}px "Warden Quill", Georgia, serif`;x.shadowColor='#000';x.shadowBlur=r*.08;x.fillText(s,cx,cy+r*.04);x.shadowBlur=0;
+ const s=String(wfmt(best));x.fillStyle=t.ink;x.textAlign='center';x.textBaseline='middle';x.font=`${Math.round(r*(s.length>4?.36:s.length>3?.46:.6))}px "Warden Quill", Georgia, serif`;x.shadowColor='#000';x.shadowBlur=r*.08;x.fillText(s,cx,cy+r*.04);x.shadowBlur=0;
  x.font=`${Math.round(r*.13)}px "Warden Quill", Georgia, serif`;x.fillStyle=t.ring;x.fillText('BEST WAVE',cx,cy+r*.42)}
 function fmtDate(iso){try{return new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})}catch(e){return''}}
 // The shareable card, 1200x630.
@@ -27,9 +27,9 @@ function card(canvas,profile,E,P){const W=1200,H=630;canvas.width=W;canvas.heigh
  x.strokeStyle='#d5b369';x.lineWidth=4;x.strokeRect(14,14,W-28,H-28);x.strokeStyle='#d5b36955';x.lineWidth=2;x.strokeRect(26,26,W-52,H-52);
  medal(x,330,315,215,best,t);
  x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle='#d5b369';x.font='22px "Warden Quill", Georgia, serif';x.fillText('WARDEN OF POWER · AETHERHEART ENGINE',600,150);
- x.fillStyle='#fff0d1';x.font='68px "Warden Quill", Georgia, serif';x.fillText(`Wave ${best.toLocaleString()}`,596,236);
+ x.fillStyle='#fff0d1';x.font='68px "Warden Quill", Georgia, serif';x.fillText(`Wave ${wfmt(best)}`,596,236);
  x.fillStyle=t.ring;x.font='34px "Warden Quill", Georgia, serif';x.fillText(t.name,600,286);
- const lines=[],r=E.ASCENSION.rank(profile);if(r)lines.push(r>=5?'Holder of the Crown of the Unbound':`${E.ASCENSION.ranks[r].name} · ${E.ASCENSION.ranks[r].banner}`);if(profile.tacticianBest)lines.push(`Tactician ×${profile.tacticianBest} · ${P.tacticianRank(profile.tacticianBest)}`);lines.push(`Warden Power ${P.powerRating(profile).toLocaleString()}`);if(profile.engineBestAt)lines.push(`Set ${fmtDate(profile.engineBestAt)}`);
+ const lines=[],r=E.ASCENSION.rank(profile);if(r)lines.push(r>=5?'Holder of the Crown of the Unbound':`${E.ASCENSION.ranks[r].name} · ${E.ASCENSION.ranks[r].banner}`);if(profile.tacticianBest)lines.push(`Tactician ×${profile.tacticianBest} · ${P.tacticianRank(profile.tacticianBest)}`);lines.push(`Warden Power ${wfmt(P.powerRating(profile))}`);if(profile.engineBestAt)lines.push(`Set ${fmtDate(profile.engineBestAt)}`);
  x.fillStyle='#e7d3a1';x.font='26px Georgia, serif';lines.slice(0,4).forEach((l,i)=>x.fillText(l,600,346+i*42));
  x.fillStyle='#ffd98a';x.font='30px "Warden Quill", Georgia, serif';x.fillText('Can you hold deeper?',600,548);return t}
 function plaque(canvas,best,profile,bare){const s=canvas.width;const x=canvas.getContext('2d');x.clearRect(0,0,s,s);medal(x,s/2,s/2,s*.44,best,tierOf(best,profile),bare)}
