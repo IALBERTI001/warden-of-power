@@ -193,3 +193,6 @@ dialog.rest-card{max-height:96vh;overflow:auto;padding-top:14px;padding-bottom:1
 .newbest b{font:30px "Warden Quill",Georgia,serif;color:#fff0d1}.newbest small{color:#e7d3a1}
 @keyframes newBestIn{0%{opacity:0;transform:scale(.85)}60%{opacity:1;transform:scale(1.04)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.newbest{animation:none}}
+/* Tablet / small-window fit (Oct 24 2026): below the 1280x768 design size the whole battle stage scales down
+   uniformly instead of re-flowing, so buttons and panels never stack on top of each other. */
+#gameStage.fit-scale{position:absolute;left:50%;top:50%;width:1280px!important;height:768px!important;max-width:none!important;max-height:none!important;transform:translate(-50%,-50%) scale(var(--fit,1));transform-origin:center center}

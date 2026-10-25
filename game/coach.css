@@ -77,3 +77,5 @@
 /* Readability pass (Oct 24 2026) */
 .coach-callout p{font-size:16px}.coach-tracker li{font-size:15px}.coach-intro-card p{font-size:17px}
 @container(max-width:850px){.coach-tracker li{font-size:13px}.coach-callout p{font-size:14px}}
+/* Oct 24 2026 cleanup: the Warden coach is the tutorial; the old tutorial book, its button and its settings toggle stay hidden */
+.tut-v2 #tutorialBook,.tut-v2 #tutorialBookButton,.tut-v2 label:has(#guide){display:none!important}

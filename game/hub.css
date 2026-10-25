@@ -8,8 +8,10 @@ button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px soli
 .eyebrow{display:block;font:11px var(--game-font);letter-spacing:.16em;color:var(--brass)}
 h1,h2,h3,h4{font-family:var(--game-font);font-weight:normal;margin:0}
 .muted{color:var(--muted)}
-#hub{position:relative;height:100%;width:100%;display:grid;place-items:center}
-#mapFrame{position:relative;width:min(100vw,150vh);aspect-ratio:3/2;max-height:100vh;transform:translateX(var(--shift,0px));transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+#hub{position:relative;height:100%;width:100%;display:grid;place-items:center;container-type:size}
+/* Tablet / small-window fit (Oct 24 2026): below 1280x720 the whole hub is laid out at that size and scaled down */
+#hub.fit-scale{position:fixed;left:0;top:0;transform-origin:0 0;transform:scale(var(--fit,1))}
+#mapFrame{position:relative;width:min(100cqw,150cqh);aspect-ratio:3/2;max-height:100cqh;transform:translate(var(--shift,0px),var(--drop,0px));transition:transform .55s cubic-bezier(.3,.7,.2,1)}
 #hub::before{content:'';position:absolute;inset:-40px;background:url('assets/hub/hub-restored.jpg') center/cover;filter:blur(30px) brightness(.45) saturate(.85);pointer-events:none}
 @media (prefers-reduced-motion:reduce){#mapFrame{transition:none}}
 #hubMap{display:block;width:100%;height:100%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 70px,#000 calc(100% - 70px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 70px,#000 calc(100% - 70px),transparent 100%)}
@@ -71,7 +73,7 @@ h1,h2,h3,h4{font-family:var(--game-font);font-weight:normal;margin:0}
 /* overlays */
 .overlay{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:#07050acc;padding:16px}
 .overlay[hidden],.side-panel[hidden]{display:none}
-.overlay-card{position:relative;width:min(1080px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:20px 24px;border-radius:18px;background:linear-gradient(#3e2f4c,#1c1525);border:3px solid var(--dark);outline:2px solid var(--brass);box-shadow:0 14px 40px #000c}
+.overlay-card{position:relative;width:min(1080px,100%);max-height:calc(100cqh - 32px);overflow:auto;padding:20px 24px;border-radius:18px;background:linear-gradient(#3e2f4c,#1c1525);border:3px solid var(--dark);outline:2px solid var(--brass);box-shadow:0 14px 40px #000c}
 .overlay-head{display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;padding-right:44px;margin-bottom:14px}
 .overlay-head h2{font-size:30px;color:var(--brass-hi)}
 .overlay-wallet{display:flex;gap:12px;align-items:center;font-variant-numeric:tabular-nums}
@@ -114,8 +116,8 @@ hr{border:0;border-top:1px solid #ffffff22;margin:14px 0}
 .toast>div{font-family:var(--game-font);font-size:16px;color:var(--brass-hi)}
 @keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.toast{animation:none}.pin{transition:none}}
-@media(max-width:900px){.skills-body{grid-template-columns:1fr}.board{grid-template-columns:repeat(2,minmax(0,1fr))}.hub-title h1{font-size:18px}.pin-name{font-size:13px}.pin-state{display:none}}
-@media(max-width:600px){.hub-wallet{gap:10px;padding:6px 10px}.hub-wallet b{font-size:16px}.hub-title{display:none}.board{grid-template-columns:1fr}}
+@container (max-width:900px){.skills-body{grid-template-columns:1fr}.board{grid-template-columns:repeat(2,minmax(0,1fr))}.hub-title h1{font-size:18px}.pin-name{font-size:13px}.pin-state{display:none}}
+@container (max-width:600px){.hub-wallet{gap:10px;padding:6px 10px}.hub-wallet b{font-size:16px}.hub-title{display:none}.board{grid-template-columns:1fr}}
 #badges.overlay{width:auto}
 
 /* resources are buttons that explain themselves */
@@ -152,7 +154,7 @@ hr{border:0;border-top:1px solid #ffffff22;margin:14px 0}
 .guide-pulse{box-shadow:0 0 0 3px #ffd36b,0 0 26px 6px #ffb24a!important;animation:guidePulse 1.4s ease-in-out infinite}
 @keyframes guidePulse{50%{box-shadow:0 0 0 5px #ffd36baa,0 0 34px 10px #ffb24a88}}
 @media(prefers-reduced-motion:reduce){.guide-pulse{animation:none}}
-@media(max-width:600px){.intro-res{grid-template-columns:1fr}.guide-callout{width:260px}}
+@container (max-width:600px){.intro-res{grid-template-columns:1fr}.guide-callout{width:260px}}
 
 /* restoration moment */
 body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;pointer-events:none;transition:opacity .3s}
@@ -240,4 +242,10 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 #recordCard{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 10px 30px #000a}
 .record-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0 6px}
 .record-foot{font-size:13px;margin:6px 0 0}
-@media(max-width:600px){.best-plaque{top:64px;padding-right:12px}.best-plaque canvas{width:48px;height:48px}.best-plaque b{font-size:22px}}
+@container (max-width:600px){.best-plaque{top:64px;padding-right:12px}.best-plaque canvas{width:48px;height:48px}.best-plaque b{font-size:22px}}
+/* Header fits one row at the 1366px design width (Oct 24 2026) */
+.hub-top{gap:8px}
+.hub-wallet{gap:12px;padding:8px 12px}
+.hub-title{padding:7px 14px}.hub-title h1{font-size:22px}
+.hub-actions{gap:6px}
+.hub-actions .hub-btn{padding:8px 11px;font-size:14px}

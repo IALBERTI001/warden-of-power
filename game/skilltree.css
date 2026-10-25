@@ -43,7 +43,7 @@ dialog#skillsDialog::backdrop{background:#07050acc}
 .st-scope .primary-btn.small{width:auto;margin:0;padding:6px 16px;font-size:15px}
 .st-scope .mastery-buy{display:inline-flex;gap:4px}
 .st-scope .mastery small{color:var(--muted);font-size:11px;margin-left:4px}
-@media(max-width:900px){.st-scope .skills-body{grid-template-columns:1fr}.st-scope .board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container (max-width:900px){.st-scope .skills-body{grid-template-columns:1fr}.st-scope .board{grid-template-columns:repeat(2,minmax(0,1fr))}}
 dialog#skillsDialog{max-width:none!important;width:min(1080px,96vw)!important;font-size:16px;line-height:1.35}
 .st-scope p,.st-scope .node-rank,.st-scope .compare b,.st-scope .compare small,.st-scope .overlay-wallet{font-family:var(--body-font);letter-spacing:0;text-transform:none}
 .st-scope .skill-detail h3,.st-scope .node-name,.st-scope .branch h3{letter-spacing:0}
@@ -118,7 +118,7 @@ dialog#skillsDialog{max-width:none!important;width:min(1080px,96vw)!important;fo
 .fx-complete .capstone .sk-medal{animation:skPopC .7s ease-out}
 @keyframes skFlash{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
 @media(prefers-reduced-motion:reduce){.sk-link.lit,.st-available .sk-medal,.fx-rank .sk-medal,.fx-max .sk-medal,.fx-complete .sk-medal,.fx-complete::before{animation:none!important}.sk-medal::after{display:none}}
-@media(max-width:900px){.board.tree2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container (max-width:900px){.board.tree2{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .mastery .mt-name{display:grid;gap:3px;font-family:var(--game-font,'Warden Quill',Georgia);font-size:14px}
 .sk-pips.mt{justify-content:flex-start;gap:3px}.sk-pips.mt i{width:7px;height:7px}
 .mastery li.mt-locked{opacity:.6}

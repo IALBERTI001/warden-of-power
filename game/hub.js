@@ -1,4 +1,10 @@
 var wfmt=(typeof globalThis!=='undefined'&&globalThis.wfmt)||function(n){n=Math.floor(Number(n)||0);if(Math.abs(n)<1000)return String(n);var U=['K','M','B','T','Qa','Qi'],k=-1,v=Math.abs(n);while(v>=1000&&k<U.length-1){v/=1000;k++}var d=v<10?2:v<100?1:0,p=Math.pow(10,d);return(n<0?'-':'')+String(Math.floor(v*p)/p)+U[k]};/* fallback if an older cached progression.js is loaded */
+// Tablet / small-window fit (Oct 24 2026): lay the hub out at >=1366x768 and scale it to the screen.
+const HUBFIT={s:1,W:innerWidth,H:innerHeight};
+function fitHub(){const hub=document.getElementById('hub');if(!hub)return;const vw=innerWidth,vh=innerHeight,s=Math.min(1,vw/1366,vh/768);HUBFIT.s=s;HUBFIT.W=vw/s;HUBFIT.H=vh/s;
+ if(s<1){hub.classList.add('fit-scale');hub.style.width=HUBFIT.W+'px';hub.style.height=HUBFIT.H+'px';hub.style.setProperty('--fit',s.toFixed(4))}else{hub.classList.remove('fit-scale');hub.style.width='';hub.style.height='';hub.style.removeProperty('--fit')}}
+function hubRect(el){const r=el.getBoundingClientRect(),s=HUBFIT.s;return{left:r.left/s,top:r.top/s,right:r.right/s,bottom:r.bottom/s,width:r.width/s,height:r.height/s}}
+addEventListener('resize',fitHub);addEventListener('orientationchange',()=>setTimeout(fitHub,200));fitHub();
 // The Containment Complex: the player's home hub (Phase 2).
 // Restore facilities with Restoration Parts, grow towers with Resonance, browse badges, manage saves.
 'use strict';
@@ -210,7 +216,7 @@ const EXPLAIN={
  parts:['Restoration Parts','Earned by holding the Outer Seal (40 Parts for a first hold of level 1, more for each level) and by winning missions. Spend them to rebuild the ruined facilities. Each restored stage gives every tower a permanent bonus and the first stage opens that element\'s skills.'],
  resonance:['Resonance','Earned only in the Aetherheart Engine, at the heart of the complex: the deeper you hold there, the more you earn and the higher you rank. Spend it in Skills to make your towers stronger. You can reassign skills for free at any time.'],
  power:['Warden Power','Your strength as a Warden. It grows with everything you restore, learn and master.']};
-function explain(key,anchor){const [t,d]=typeof EXPLAIN[key]==='function'?EXPLAIN[key]():EXPLAIN[key];const box=$('explain');box.innerHTML=`<button class="panel-close" aria-label="Close">×</button><h3>${t}</h3><p>${d}</p>`;box.hidden=false;const r=anchor.getBoundingClientRect();box.style.left=Math.max(12,Math.min(innerWidth-332,r.left))+'px';box.style.top=(r.bottom+10)+'px';box.querySelector('button').onclick=()=>{box.hidden=true;anchor.focus()};box.querySelector('button').focus()}
+function explain(key,anchor){const [t,d]=typeof EXPLAIN[key]==='function'?EXPLAIN[key]():EXPLAIN[key];const box=$('explain');box.innerHTML=`<button class="panel-close" aria-label="Close">×</button><h3>${t}</h3><p>${d}</p>`;box.hidden=false;const r=hubRect(anchor);box.style.left=Math.max(12,Math.min(HUBFIT.W-332,r.left))+'px';box.style.top=(r.bottom+10)+'px';box.querySelector('button').onclick=()=>{box.hidden=true;anchor.focus()};box.querySelector('button').focus()}
 document.querySelectorAll('[data-explain]').forEach(b=>b.onclick=()=>explain(b.dataset.explain,b));
 
 const GUIDE=[
@@ -234,9 +240,9 @@ function tickGuide(){const box=$('guideCallout');const step=guideStep();document
  const overlayOpen=['badges','settings'].some(id=>!$(id).hidden);if(overlayOpen){box.hidden=true;return}
  t.classList.add('guide-pulse');
  const key=step.id;if(box.dataset.step!==key){box.dataset.step=key;box.innerHTML=`<div class="coach-face" aria-hidden="true">✦</div><span class="eyebrow">HUB GUIDE · ${(profile.hubGuide||0)+1} OF ${GUIDE.length}</span><h4>${step.title}</h4><p>${step.text}</p><div class="guide-actions">${step.ack?`<button class="primary-btn small" id="guideAck">${step.ack}</button>`:''}<button class="ghost" id="guideSkipAll">Skip guide</button></div>`;if($('guideAck'))$('guideAck').onclick=advanceGuide;$('guideSkipAll').onclick=()=>{profile.hubGuide=GUIDE.length;persist();tickGuide()}}
- box.hidden=false;const r=t.getBoundingClientRect(),W=box.offsetWidth,H=box.offsetHeight;let x=r.right+16,y=r.top+r.height/2-H/2,side='left';
- if(x+W>innerWidth-12){x=r.left-W-16;side='right'}if(x<12){x=Math.max(12,r.left+r.width/2-W/2);y=r.top-H-16;side='down';if(y<12){y=r.bottom+16;side='up'}}
- y=Math.max(12,Math.min(innerHeight-H-12,y));box.style.left=x+'px';box.style.top=y+'px';box.dataset.arrow=side}
+ box.hidden=false;const r=hubRect(t),W=box.offsetWidth,H=box.offsetHeight;let x=r.right+16,y=r.top+r.height/2-H/2,side='left';
+ if(x+W>HUBFIT.W-12){x=r.left-W-16;side='right'}if(x<12){x=Math.max(12,r.left+r.width/2-W/2);y=r.top-H-16;side='down';if(y<12){y=r.bottom+16;side='up'}}
+ y=Math.max(12,Math.min(HUBFIT.H-H-12,y));box.style.left=x+'px';box.style.top=y+'px';box.dataset.arrow=side}
 $('openHandbook')&&($('openHandbook').onclick=()=>WardenGuide.open());
 $('openGuide').onclick=()=>{profile.hubGuide=0;profile.hubIntroSeen=false;persist();showIntro()};
 setInterval(tickGuide,250);addEventListener('resize',tickGuide);
@@ -264,7 +270,7 @@ function wireAmbienceControls(){const s=audioSettings();$('ambVol').value=s.ambi
 // with open grass on the right. With no panel open, slide the map right (within the side margins) so the complex
 // sits in the middle of the screen; when a panel opens, slide back so the grass sits under the panel.
 (function centerComplex(){const frame=$('mapFrame'),panel=$('panel');if(!frame||!panel)return;const AXIS=.417;
- const place=()=>{const W=frame.getBoundingClientRect().width,vw=innerWidth,room=Math.max(0,(vw-W)/2);const want=panel.hidden?W*(.5-AXIS):0;frame.style.setProperty('--shift',Math.round(Math.min(want,room))+'px')};
+ const place=()=>{const W=hubRect(frame).width/1,vw=HUBFIT.W,room=Math.max(0,(vw-W)/2);const want=panel.hidden?W*(.5-AXIS):0;frame.style.setProperty('--shift',Math.round(Math.min(want,room))+'px');const slack=Math.max(0,HUBFIT.H-hubRect(frame).height);frame.style.setProperty('--drop',Math.round(Math.min(slack/2,140))+'px')};
  new MutationObserver(place).observe(panel,{attributes:true,attributeFilter:['hidden']});addEventListener('resize',place);place()})();
 
 // Best-wave pride badge (Oct 24 2026): a medal plaque under the title and a shareable record card.
@@ -275,6 +281,6 @@ function openRecord(){const c=$('recordCard');openOverlay('record');const draw=(
  $('recordSave').onclick=()=>{try{c.toBlob(bl=>{const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=`warden-of-power-wave-${best}.png`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);$('recordStatus').textContent='Saved. Share it with your friends!'},'image/png')}catch(e){$('recordStatus').textContent='Could not save the picture in this browser.'}};
  $('recordCopy').onclick=async()=>{const text=`I held wave ${wfmt(best)} in the Aetherheart Engine in Warden of Power. ${t.name}. Can you hold deeper?`;try{await navigator.clipboard.writeText(text);$('recordStatus').textContent='Copied. Paste it anywhere!'}catch(e){$('recordStatus').textContent=text}}}
 if($('bestPlaque'))$('bestPlaque').onclick=openRecord;
-function placeBest(){const b=$('bestPlaque'),top=document.querySelector('.hub-top');if(!b||!top)return;b.style.top=Math.round(top.getBoundingClientRect().bottom+10)+'px'}addEventListener('resize',placeBest);document.fonts&&document.fonts.ready.then(placeBest);
+function placeBest(){const b=$('bestPlaque'),top=document.querySelector('.hub-top');if(!b||!top)return;b.style.top=Math.round(hubRect(top).bottom+10)+'px'}addEventListener('resize',placeBest);document.fonts&&document.fonts.ready.then(placeBest);
 {const _render=render;render=function(){_render.apply(this,arguments);try{renderBest()}catch(e){}}}
 renderBest();
