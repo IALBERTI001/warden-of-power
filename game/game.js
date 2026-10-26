@@ -78,7 +78,7 @@ function showThousandth(){const d=$('ascension');if(!d)return;d.dataset.rank='my
 // The offer shows exactly what the doubled amount buys; "No thanks" is as large as the offer.
 let adDoubled=0;
 function rewardWorth(kind,amount){const P=window.WardenProgression,pr=game.profile;if(!P)return'';const after={...pr,[kind]:(pr[kind]||0)+amount};
- if(kind==='resonance'){const plan=res=>{const q=JSON.parse(JSON.stringify(pr));q.resonance=res;const got=[];for(let i=0;i<200;i++){const o=P.SKILLS.map(s=>[s,P.skillOffer(q,s.id)]).filter(([,o])=>o.ok).sort((a,b)=>a[1].cost-b[1].cost)[0];if(!o)break;P.buySkill(q,o[0].id);got.push(o[0].name)}return got};
+ if(kind==='resonance'){const plan=res=>{const q=P.migrate(JSON.parse(JSON.stringify(pr)));q.resonance=res;const got=[];for(let i=0;i<200;i++){const o=P.SKILLS.map(s=>[s,P.skillOffer(q,s.id)]).filter(([,o])=>o.ok).sort((a,b)=>a[1].cost-b[1].cost)[0];if(!o)break;P.buySkill(q,o[0].id);got.push(o[0].name)}return got};
   const a=plan(pr.resonance||0),b=plan(after.resonance),extra=b.slice(a.length),names=[...new Set(extra)];return extra.length?`That's ${extra.length} more skill rank${extra.length>1?'s':''}, including ${names.slice(0,2).join(' and ')}.`:''}
  const f=P.FACILITIES.find(f=>{const a=P.restorationOffer(pr,f.id),b=P.restorationOffer(after,f.id);return!a.ok&&b.ok});if(f)return`Enough to restore ${f.name}.`;
  if(P.WORKSHOP&&P.WORKSHOP.unlocked(pr)){let n=0,c=after.parts||0,k=P.workshopRank(pr,'tooling');while(true){const cost=P.WORKSHOP.tooling.cost(k+1);if(c<cost)break;c-=cost;k++;n++}if(n)return`Enough for ${n} rank${n>1?'s':''} of Precision Tooling.`}return''}

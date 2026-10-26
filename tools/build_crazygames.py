@@ -32,6 +32,7 @@ for dp,dn,fn in os.walk(GAME):
         if 'candidate' in f and f not in alltext: continue
         if f in SKIP: continue
         if f.endswith(TEXT): continue
+        if f in ('README.md',): continue
         dst=os.path.join(DIST,rel); os.makedirs(os.path.dirname(dst),exist_ok=True); shutil.copy2(src,dst)
 
 # 2) audio -> MP3, inside the game folder
@@ -56,11 +57,19 @@ for rel,s in texts.items():
     for a,b,f in REPL:
         if rel==f:
             assert a in s,(f,a); s=s.replace(a,b)
+    if rel.endswith('.html'):
+        # CrazyGames build: no playtest feedback form at all, and a CSP that lets their SDK load its ad and
+        # account scripts and frames (it pulls them from several https hosts). Injected inline scripts stay blocked.
+        s=re.sub(r'<script src="feedback\.js[^"]*"></script>','',s); s=re.sub(r'<link rel="stylesheet" href="feedback\.css[^"]*">','',s)
+        s=s.replace("script-src 'self' https://sdk.crazygames.com https://*.crazygames.com","script-src 'self' https:")
+        s=re.sub(r'<button id="(feedbackButton|openFeedback)"[^>]*>[^<]*</button>','',s)
+        s=s.replace('<html lang="en">','<html lang="en" class="on-crazygames">',1)
+    if rel in ('feedback.js','feedback.css'): continue
     assert '../' not in re.sub(r'//.*','',s) or rel.endswith('.css'),('parent path left in',rel)
     dst=os.path.join(DIST,rel); os.makedirs(os.path.dirname(dst),exist_ok=True); open(dst,'w',encoding='utf-8').write(s)
 
 # 5) checks and zip
-left=[rel for rel,s in texts.items() if re.search(r"\.wav['\"`]",open(os.path.join(DIST,rel),encoding='utf-8').read())]
+left=[rel for rel,s in texts.items() if os.path.exists(os.path.join(DIST,rel)) and re.search(r"\.wav['\"`]",open(os.path.join(DIST,rel),encoding='utf-8').read())]
 assert not left,('wav still referenced in',left)
 files=[os.path.join(dp,f) for dp,dn,fn in os.walk(DIST) for f in fn]
 total=sum(os.path.getsize(f) for f in files)
