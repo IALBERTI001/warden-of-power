@@ -14,7 +14,7 @@
  window.__terrain=()=>{const K=4;const t=document.createElement('canvas');t.width=1000*K;t.height=600*K;const c=t.getContext('2d');c.scale(K,K);c.drawImage(art.map,0,0,1000,600);c.fillStyle='#10272010';c.fillRect(0,0,1000,600);terrain=t};
  window.__terrain();
  // store art stays clean: no target or tier badges over the towers
- try{window.targetBadge=function(){};window.tierMarks=function(){};window.drawSealBar=function(){}}catch(e){}
+ try{CAP.tierMarks=window.tierMarks;window.targetBadge=function(){};window.tierMarks=function(t){if(CAP.showTier&&CAP.showTier(t))CAP.tierMarks(t)};window.drawSealBar=function(){}}catch(e){}
  // manual clock
  window.frame=function(){};
  window.capStep=function(dt,sim=1){try{fx=fx.filter(v=>v.kind!=='label')}catch(e){}realTime+=dt;if(ready&&!paused&&!modalPaused&&game.status==='playing'){accumulator+=dt*sim;let s=0;while(accumulator>=1/60&&s<200){game.step(1/60);events();accumulator-=1/60;s++}}draw()};
