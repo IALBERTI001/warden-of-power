@@ -64,7 +64,7 @@ for rel,s in texts.items():
         s=s.replace("script-src 'self' https://sdk.crazygames.com https://*.crazygames.com","script-src 'self' https:")
         s=re.sub(r'<button id="(feedbackButton|openFeedback)"[^>]*>[^<]*</button>','',s)
         s=s.replace('<html lang="en">','<html lang="en" class="on-crazygames">',1)
-    if rel in ('feedback.js','feedback.css'): continue
+    if rel in ('feedback.js','feedback.css','fp-bridge.js'): continue
     assert '../' not in re.sub(r'//.*','',s) or rel.endswith('.css'),('parent path left in',rel)
     dst=os.path.join(DIST,rel); os.makedirs(os.path.dirname(dst),exist_ok=True); open(dst,'w',encoding='utf-8').write(s)
 
