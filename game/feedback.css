@@ -1,5 +1,5 @@
 /* Playtest feedback dialog (shared by hub and battles). */
-dialog.feedback-dialog{width:min(560px,94vw);max-width:none!important;max-height:92vh;overflow:auto;padding:18px 22px;border-radius:16px;background:linear-gradient(#3e2f4c,#1c1525);border:3px solid #2a1d17;outline:2px solid #d5b369;color:#fff0d1;box-shadow:0 14px 40px #000c;font-family:'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif}
+dialog.feedback-dialog{width:min(560px,94vw);max-width:none!important;max-height:92vh;overflow:auto;padding:18px 22px;border-radius:16px;background:linear-gradient(#3e2f4c,#1c1525);border:3px solid #2a1d17;outline:2px solid #d5b369;color:#fff0d1;box-shadow:0 14px 40px #000c;font-family:'Warden Text','Segoe UI',system-ui,sans-serif}
 dialog.feedback-dialog::backdrop{background:#07050acc}
 .fb-form{display:grid;gap:12px;margin:0}
 .fb-head{display:flex;justify-content:space-between;align-items:flex-start}
@@ -8,7 +8,7 @@ dialog.feedback-dialog::backdrop{background:#07050acc}
 .fb-close{background:none;border:0;color:#cbb994;font-size:24px;min-width:40px;min-height:40px;cursor:pointer}
 .fb-lead{margin:0;color:#e7d9b8;font-size:14px;line-height:1.45}
 .fb-form>label{display:grid;gap:5px;font-size:14px;color:#ffd98a}
-.fb-form select,.fb-form textarea{font:15px/1.4 'Palatino Linotype',Georgia,serif;background:#130e18;color:#fff0d1;border:1px solid #806944;border-radius:8px;padding:8px}
+.fb-form select,.fb-form textarea{font:15px/1.4 'Warden Text','Segoe UI',system-ui,sans-serif;background:#130e18;color:#fff0d1;border:1px solid #806944;border-radius:8px;padding:8px}
 .fb-form textarea{resize:vertical;min-height:110px}
 .fb-stars{display:flex;gap:4px}.fb-star{cursor:pointer;font-size:26px;color:#5a4a5f;line-height:1}.fb-star input{position:absolute;opacity:0;pointer-events:none}
 .fb-stars:has(.fb-star:hover) .fb-star{color:#ffd36b}.fb-star:hover~.fb-star{color:#5a4a5f!important}

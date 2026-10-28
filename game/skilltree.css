@@ -1,5 +1,5 @@
 /* Skill tree inside battles (QoL, Oct 2026): the hub's approved skill-tree styles, scoped to the battle dialog. */
-.st-scope{--plum-hi:#45344f;--plum-lo:#1d1626;--brass:#d5b369;--brass-hi:#ffd98a;--ink:#fff0d1;--muted:#cbb994;--dark:#2a1d17;--game-font:'Warden Quill',Georgia,serif;--body-font:'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;font-family:var(--body-font);color:var(--ink)}
+.st-scope{--plum-hi:#45344f;--plum-lo:#1d1626;--brass:#d5b369;--brass-hi:#ffd98a;--ink:#fff0d1;--muted:#cbb994;--dark:#2a1d17;--game-font:'Warden Quill',Georgia,serif;--body-font:'Warden Text','Segoe UI',system-ui,sans-serif;font-family:var(--body-font);color:var(--ink)}
 .st-scope h2,.st-scope h3,.st-scope h4{font-family:var(--game-font);font-weight:normal;margin:0}
 .st-scope .eyebrow{display:block;font:11px var(--game-font);letter-spacing:.16em;color:var(--brass)}.st-scope .muted{color:var(--muted)}
 .st-scope button{font:inherit;color:inherit;cursor:pointer}

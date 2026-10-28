@@ -1,5 +1,5 @@
 /* Warden coach layer + restyled handbook/toasts (review candidate: ?tutorial=v2). Scoped to body.tut-v2. */
-.tut-v2{--body-font:'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;--plum-hi:#45344f;--plum-lo:#1d1626;--brass:#d5b369;--brass-hi:#ffd98a;--ink-dark:#2a1d17}
+.tut-v2{--body-font:'Warden Text','Segoe UI',system-ui,sans-serif;--plum-hi:#45344f;--plum-lo:#1d1626;--brass:#d5b369;--brass-hi:#ffd98a;--ink-dark:#2a1d17}
 
 /* G. Typography: Warden Quill for titles, labels and numbers; a readable serif for sentences. */
 .tut-v2 .coach-callout p,.tut-v2 .coach-intro p,.tut-v2 .coach-tracker li,.tut-v2 .coach-foes span,.tut-v2 .toast>div,.tut-v2 .toast p,

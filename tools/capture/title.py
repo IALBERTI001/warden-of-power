@@ -1,9 +1,9 @@
-# title.py IN OUT W H  — crop/scale frame to WxH (cover), add vignette + "Warden of Power" title in Warden Quill
+# title.py IN OUT W H  — crop/scale frame to WxH (cover), add vignette + "Warden of Power" title in Lilita One (the game's display font)
 import sys
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 src,out,W,H=sys.argv[1],sys.argv[2],int(sys.argv[3]),int(sys.argv[4])
 fx=float(sys.argv[5]) if len(sys.argv)>5 else .5; fy=float(sys.argv[6]) if len(sys.argv)>6 else .5
-FONT='/home/claude/wop/site/game/assets/fonts/warden-quill.ttf'
+FONT='/home/claude/warden-of-power/game/assets/fonts/LilitaOne-Regular.ttf'
 im=Image.open(src).convert('RGB')
 s=max(W/im.width,H/im.height); im=im.resize((round(im.width*s),round(im.height*s)),Image.LANCZOS)
 x=int((im.width-W)*fx); y=int((im.height-H)*fy); im=im.crop((x,y,x+W,y+H))

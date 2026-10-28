@@ -10,7 +10,7 @@
 .badge-text{min-width:0;display:flex;flex-direction:column;gap:3px}
 .badge-text strong{font-size:16px}
 .badge-tier{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#cbb994}
-.achievement p{margin:2px 0;font-family:'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;font-size:13px;line-height:1.35}
+.achievement p{margin:2px 0;font-family:'Warden Text','Segoe UI',system-ui,sans-serif;font-size:13px;line-height:1.35}
 .achievement small{color:#b8a98d}
 .tier-silver.earned{border-color:#cfd6dd}.tier-gold.earned{border-color:#f0c766;box-shadow:0 0 14px #f0c76633}
 .tier-prismatic.earned{border-color:#e8d2ff;box-shadow:0 0 18px #b98cff55,0 0 6px #7fe0f555}

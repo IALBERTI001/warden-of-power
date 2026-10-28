@@ -1,6 +1,6 @@
 /* The Containment Complex hub. Matches the in-game plum/brass panels; Warden Quill for titles, a readable serif for sentences. */
-@font-face{font-family:'Warden Quill';src:url('assets/fonts/warden-quill.ttf') format('truetype');font-display:swap}
-:root{--plum-hi:#45344f;--plum-lo:#1d1626;--brass:#d5b369;--brass-hi:#ffd98a;--ink:#fff0d1;--muted:#cbb994;--dark:#2a1d17;--bg:#0d0a12;--game-font:'Warden Quill',Georgia,serif;--body-font:'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;color-scheme:dark}
+@font-face{font-family:'Warden Quill';src:url('assets/fonts/LilitaOne-Regular.ttf') format('truetype');font-display:swap}@font-face{font-family:'Warden Text';src:url('assets/fonts/Nunito-Variable.ttf') format('truetype');font-weight:200 1000;font-display:swap}
+:root{--plum-hi:#45344f;--plum-lo:#1d1626;--brass:#d5b369;--brass-hi:#ffd98a;--ink:#fff0d1;--muted:#cbb994;--dark:#2a1d17;--bg:#0d0a12;--game-font:'Warden Quill',Georgia,serif;--body-font:'Warden Text','Segoe UI',system-ui,sans-serif;color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--body-font);overflow:hidden}
 button{font:inherit;color:inherit;cursor:pointer}
@@ -253,3 +253,5 @@ body.moment #pins,body.moment .play-next,body.moment .guide-callout{opacity:0;po
 /* CrazyGames build (Oct 25 2026): playtest-only controls are hidden; no text-selection popups on touch */
 .on-crazygames #feedbackButton,.on-crazygames #openFeedback,.on-crazygames label:has(#testMode),.on-crazygames #testTools{display:none!important}
 body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}textarea,input{-webkit-user-select:text;user-select:text}
+html{font-synthesis-weight:none}
+/* QA Oct 28 2026: open panels sit above passing toasts */.overlay:not([hidden])~#toasts,body:has(.overlay:not([hidden])) #toasts{visibility:hidden}

@@ -1,5 +1,5 @@
 /* The Warden's Guide (Oct 23 2026) */
-@font-face{font-family:'Warden Quill';src:url('assets/fonts/warden-quill.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'Warden Quill';src:url('assets/fonts/LilitaOne-Regular.ttf') format('truetype');font-display:swap}@font-face{font-family:'Warden Text';src:url('assets/fonts/Nunito-Variable.ttf') format('truetype');font-weight:200 1000;font-display:swap}
 .warden-guide{--g-ink:#fff0d1;--g-muted:#cbb994;--g-brass:#d5b369;--g-brass-hi:#ffd98a;--g-plum:#2a2133;--g-plum-lo:#17121d;
  width:min(1120px,96vw);height:min(860px,92vh);max-width:none;max-height:none;padding:0;border:2px solid var(--g-brass);border-radius:16px;background:linear-gradient(160deg,#2b2236,#151019);color:var(--g-ink);box-shadow:0 30px 80px #000c;overflow:hidden}
 .warden-guide::backdrop{background:#07050acc}
@@ -17,7 +17,7 @@
 .warden-guide .g-nav button.on{background:#d5b36926;border-color:#d5b36988;color:var(--g-brass-hi)}
 .warden-guide .g-select-wrap{display:none}
 .warden-guide .g-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.warden-guide .g-body{overflow:auto;padding:16px 26px 26px;font:16px/1.55 'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;outline:none}
+.warden-guide .g-body{overflow:auto;padding:16px 26px 26px;font:16px/1.55 'Warden Text','Segoe UI',system-ui,sans-serif;outline:none}
 .warden-guide .g-body:focus-visible{box-shadow:inset 0 0 0 2px var(--g-brass)}
 .warden-guide .g-lead{font-size:18px;color:#fff6e2}
 .warden-guide p,.warden-guide li{max-width:72ch}

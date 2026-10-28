@@ -3,10 +3,8 @@ const assert=require('node:assert/strict'),E=require('../game/engine.js'),{Guide
 const g=new E.Game(),guide=new Guide();
 let p=C.plan(g,guide);assert.equal(p.index,0);assert.equal(p.step.id,'place');assert.equal(C.introDue(g,guide),0);
 guide.record('intro_0');assert.equal(C.introDue(g,guide),null);
-assert(g.build('fire',{x:230,y:300}).ok);guide.sync(g);assert.equal(C.plan(g,guide).step.id,'inspect');
-for(const k of ['inspect','upgradeView'])guide.record(k);assert.equal(C.plan(g,guide).step.id,'upgrade');
-g.upgrade(g.towers[0].id);guide.sync(g);assert.equal(C.plan(g,guide).step.id,'target');
-guide.record('target');guide.record('sellView');assert.equal(C.plan(g,guide).step.id,'wave');
+assert(g.build('fire',{x:230,y:300}).ok);guide.sync(g);assert.equal(C.plan(g,guide).step.id,'wave','QA Oct 28: build, then straight into wave 1');
+g.upgrade(g.towers[0].id);guide.sync(g);
 assert(g.startWave().ok);guide.sync(g);p=C.plan(g,guide);assert.equal(p.index,0,'wave 1 in progress stays on lesson 1');assert.equal(p.step,null);assert.equal(C.introDue(g,guide),null,'no briefing while enemies are on the route');
 for(let i=0;i<60*120&&(g.spawnQueue.length||g.enemies.some(e=>e.alive));i++)g.step(1/60);
 p=C.plan(g,guide);assert.equal(p.index,1);assert.equal(p.step.id,'water');assert.equal(C.introDue(g,guide),1);
