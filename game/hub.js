@@ -164,7 +164,7 @@ function openPanel(id,opener,keep){const p=PLACES.find(p=>p.id===id);if(!keep&&c
  if(!keep)setTimeout(()=>($('panel').querySelector('.primary-btn:not([disabled])')||$('panel').querySelector('button:not([disabled]):not(.panel-close):not(.hub-q)'))?.focus(),30)}
 function closePanel(){$('panel').hidden=true;currentPanel=null;document.querySelectorAll('.pin').forEach(b=>b.classList.remove('active'));lastOpener?.focus?.()}
 function restore(id){const r=P.restore(profile,id);if(!r.ok){toast('Not yet',r.reason);return}const f=facility(id),p=PLACES.find(p=>p.id===id);
- if(r.stage===1&&f.branch)toast(`${ELEMENT[f.branch].name} skills unlocked`,f.name);
+ if(r.stage===1&&f.branch&&!guidedOn())toast(`${ELEMENT[f.branch].name} skills unlocked`,f.name);
  if(r.stage===3){toast(`${f.name} reawakened`,'RESTORATION COMPLETE');if(p.badge)award(p.badge)}
  persist();closePanelQuiet();celebrate(id,r.stage-1,r.stage,`${f.stages[r.stage-1]}`,`${f.name} · stage ${r.stage} of 3 · ${bonusText(f)}`)}
 function closePanelQuiet(){$('panel').hidden=true;currentPanel=null}

@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),P=require('../game/progression.js'),E
 // The approved 20-node tree: 5 branches x 4 nodes, three 3-rank nodes and a capstone each.
 assert.equal(P.SKILLS.length,20);for(const b of P.BRANCHES){const n=P.SKILLS.filter(s=>s.branch===b);assert.equal(n.length,4);assert.deepEqual(n.map(s=>s.maxRank),[3,3,3,1])}
 // Empty profile = no change at all to the tutorial numbers.
-const plain=new E.Game();assert.equal(plain.charge,165);plain.build('fire',{x:230,y:300});const t0=plain.towers[0];assert.equal(plain.stats(t0).damage,14);assert.equal(plain.upgradeCost(t0),83);
+const plain=new E.Game();assert.equal(plain.charge,165);plain.build('fire',{x:230,y:300});const t0=plain.towers[0];assert.equal(plain.stats(t0).damage,11,'Oct 28 2026 rebalance: Fire 14 -> 11');assert.equal(plain.upgradeCost(t0),83);
 // An old save migrates without losing badges, counters or Parts.
 const old={earned:{first_upgrade:'2026-10-20'},counters:{freeze:7},parts:80};const m=P.migrate(old);assert.equal(m.parts,80);assert.equal(m.counters.freeze,7);assert.equal(m.earned.first_upgrade,'2026-10-20');assert.equal(m.resonance,0);assert.deepEqual(m.skills,{});
 // Skills: branch locked until its facility's first restoration; selecting never spends; prerequisites and costs enforced.
@@ -16,7 +16,7 @@ assert.equal(P.buySkill(p,'fire_furnace').cost,50);assert.equal(P.buySkill(p,'fi
 assert.equal(P.buySkill(p,'fire_pursuit').ok,true);
 // Every bonus strengthens towers everywhere: tutorial game with this profile.
 const g=new E.Game(p);g.build('fire',{x:230,y:300});const s=g.stats(g.towers[0]);
-assert(Math.abs(s.damage-14*(1+.05+.06))<1e-9,'Emberheart stage 1 (+5%) and Hot pursuit 1 (+6%)');assert(Math.abs(s.burn-3*(1+.24+.05))<1e-9,'Furnace tuning 3 (+24% burn) plus facility damage');
+assert(Math.abs(s.damage-11*(1+.05+.06))<1e-9,'Emberheart stage 1 (+5%) and Hot pursuit 1 (+6%)');assert(Math.abs(s.burn-3*(1+.24+.05))<1e-9,'Furnace tuning 3 (+24% burn) plus facility damage');
 // Free reassignment refunds every rank at full price.
 const before=p.resonance;const back=P.resetSkills(p);assert.equal(back,25+50+75+40);assert.equal(p.resonance,before+back);assert.deepEqual(p.skills,{});
 // Engineering: starting Charge, discount cap 6%, refund cap 90%, Stable current every fifth wave.

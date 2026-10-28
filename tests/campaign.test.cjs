@@ -22,7 +22,7 @@ const a1=JSON.stringify(new E.Game({},{mission:'moonwell-3',seed:5}).waves),a2=J
 // placement uses the painted floor
 const gm=new E.Game({},{mission:'moonwell-1',seed:1});assert(!gm.placement(500,20).ok,'not on the walls');
 console.log('PASS: 13 painted missions, unlock chain, Seal Parts, finale opens the Unbound Gate, divers/shields/splitters, seeded variety, painted build floor.');
-{const l=new E.Game({},{mission:'moonwell-2',seed:1});l.completed=6;l.finish(false);assert.equal(l.profile.parts,Math.floor(90*6/12*.3),'first-attempt loss keeps a little');
+{const l=new E.Game({},{mission:'moonwell-2',seed:1});l.completed=6;l.finish(false);assert.equal(l.profile.parts,Math.floor(90*6/l.waves.length*.3),'first-attempt loss keeps a little (missions shortened Oct 28 2026)');
  const k=new E.Game({missions:{'moonwell-2':{cleared:true}}},{mission:'moonwell-2',seed:1});k.completed=6;k.finish(false);assert.equal(k.profile.parts||0,0,'a loss after clearing pays nothing');
  const s=new E.Game({missions:{'moonwell-2':{cleared:true}}},{mission:'moonwell-2',seed:1});s.completed=12;s.health=20;s.uses=new Set(['fire','water','ice']);s.finish(true);assert.equal(s.profile.parts,15,'replay: only the new Held Seal pays');}
 console.log('PASS: campaign replays pay only new Seals.');
