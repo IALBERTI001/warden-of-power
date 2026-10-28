@@ -13,7 +13,8 @@ const VIEW={scale:1,x:0,y:0};
 const DEFAULT_KEYS={fire:'1',water:'2',ice:'3',lightning:'4',upgrade:'u',sell:'x',target:'t',pause:' ',next:'n',normal:'z',double:'c',fast:'v'};
 function read(key,fallback){try{const v=JSON.parse(localStorage.getItem(key));if(v==null)return fallback;return window.WardenProgression?WardenProgression.sanitize(v)??fallback:v}catch{return fallback}}
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));$('saveStatus').textContent='Progress saved locally.'}catch{$('saveStatus').textContent='Storage unavailable — keep this tab open.'}}
-let settings={master:.65,effects:.7,music:.25,ambience:.35,masterMute:false,effectsMute:false,musicMute:true,ambienceMute:false,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,guide:true,...read('warden.settings.v1',{})};
+let settings={master:.65,effects:.7,music:.2,ambience:.35,masterMute:false,effectsMute:false,musicMute:false,ambienceMute:false,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,guide:true,...read('warden.settings.v1',{})};
+/* Oct 28 2026 (user): battle music plays by default at a low volume */if(settings.musicVersion!==1){if(settings.musicMute!==false){settings.musicMute=false;settings.music=.2}settings.musicVersion=1;store('warden.settings.v1',settings)}
 if(settings.teachingVersion!==3){settings.guide=true;settings.teachingVersion=3;store('warden.settings.v1',settings);}
 let keys={...DEFAULT_KEYS,...read('warden.keys.v1',{})},game=new E.Game(read('warden.profile.v1',{}),MISSION);
 const teach=()=>TUT&&settings.guide&&!coach();/* Oct 24 2026: the old tutorial book stays off while the Warden coach runs the tutorial */
@@ -31,6 +32,14 @@ if(saved?.version===1&&saved.status==='playing'&&(game.endless||saved.wave<=game
 const art={};const paths={base:'../art-reference/approved-elemental-sprites-v1.png',walk:'../art-reference/enemy-walk-candidates-v1.png',death:'../art-reference/enemy-death-candidates-v1.png',map:game.map.art,tiers:'assets/water-tiers-candidate.png',elementTiers:'assets/element-tiers-candidate.png'};
 const loads=Object.entries(paths).map(([key,path])=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{art[key]=im;resolve()};im.onerror=()=>reject(new Error(path));im.src=path}));
 const music=new Audio('../previews/audio-v2/broken-conduit.wav');music.loop=true;
+/* Gapless music loop (Oct 28 2026): an <audio> loop leaves a silent gap each time it repeats, so the track plays through Web Audio,
+   looping only the sounding part (silence at both ends is skipped). Falls back to the <audio> element if Web Audio is unavailable. */
+const musicLoop=(()=>{const AC=globalThis.AudioContext||globalThis.webkitAudioContext;if(!AC)return null;let ctx=null,gain=null,buf=null,src=null,want=false,loading=null,a=0,b=0;
+ function load(){if(loading)return loading;ctx=new AC();gain=ctx.createGain();gain.gain.value=0;gain.connect(ctx.destination);
+  loading=fetch(music.src).then(r=>r.arrayBuffer()).then(d=>ctx.decodeAudioData(d)).then(x=>{buf=x;const c=x.getChannelData(0),n=c.length;let i=0,j=n-1;while(i<n&&Math.abs(c[i])<.002)i++;while(j>i&&Math.abs(c[j])<.002)j--;a=i/x.sampleRate;b=(j+1)/x.sampleRate;if(want)start()}).catch(()=>{musicLoopFailed=true;syncAudio()});return loading}
+ function start(){if(!buf||src)return;src=ctx.createBufferSource();src.buffer=buf;src.loop=true;src.loopStart=a;src.loopEnd=b;src.connect(gain);src.start(0,a)}
+ return{set(on,vol){want=on;if(!ctx){if(!on)return;load()}gain.gain.setTargetAtTime(on?vol:0,ctx.currentTime,.08);if(on){if(ctx.state==='suspended')ctx.resume().catch(()=>{});start()}else if(ctx.state==='running')setTimeout(()=>{if(!want)ctx.suspend().catch(()=>{})},300)},
+  restart(){if(src){try{src.stop()}catch(e){}src.disconnect();src=null}if(want)start()}}})();let musicLoopFailed=false;
 const voicePool=[];let lastSounds={};
 let adPlaying=false;
 function effective(category){return adPlaying||settings.masterMute||settings[category+'Mute']?0:settings.master*settings[category]}
@@ -47,7 +56,7 @@ function sound(name,priority=false){
  voice.mixGain=(contact?.50:priority?.64:.74)/Math.sqrt(1+active.length*.4);
  voice.volume=effective('effects')*voice.mixGain;voice.play().catch(()=>{});
 }
-function syncAudio(){music.volume=effective('music');if(soundUnlocked&&!paused&&!modalPaused&&settings.musicMute===false)music.play().catch(()=>{});else music.pause();for(const voice of voicePool){voice.volume=effective('effects')*(voice.mixGain||.5);if(paused||modalPaused||effective('effects')===0)voice.pause()}}
+function syncAudio(){const musicOn=soundUnlocked&&!paused&&!modalPaused&&settings.musicMute===false&&effective('music')>0;if(musicLoop&&!musicLoopFailed){music.pause();musicLoop.set(musicOn,effective('music'))}else{music.volume=effective('music');if(musicOn)music.play().catch(()=>{});else music.pause()}for(const voice of voicePool){voice.volume=effective('effects')*(voice.mixGain||.5);if(paused||modalPaused||effective('effects')===0)voice.pause()}}
 
 function unlockAudio(){soundUnlocked=true;syncAudio()}
 function feedback(text){$('feedback').textContent=text}
@@ -113,7 +122,7 @@ for(const dialog of document.querySelectorAll('dialog')){dialog.addEventListener
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
 function confirmAction(title,text,action){$('confirmTitle').textContent=title;$('confirmText').textContent=text;pendingAction=action;openModal('confirm')}
 $('confirmAction').onclick=()=>{const action=pendingAction;pendingAction=null;$('confirm').close();action?.();refresh()};
-function restart(){clearInterval(guidedTimer);guidedTimer=null;for(const dialog of document.querySelectorAll('dialog[open]'))dialog.close();delete MISSION.seed;game=new E.Game(game.profile,MISSION);guide=new WardenTutorial.Guide();settings.guide=true;bookPage=0;settings.bookPage=0;spotlightStep=null;buildType='fire';selected=null;enemySelected=null;paused=false;modalPaused=false;speed=1;accumulator=0;fx=[];music.currentTime=0;runBadges=[];coach()?.reset?.();save();refresh();syncAudio()}
+function restart(){clearInterval(guidedTimer);guidedTimer=null;for(const dialog of document.querySelectorAll('dialog[open]'))dialog.close();delete MISSION.seed;game=new E.Game(game.profile,MISSION);guide=new WardenTutorial.Guide();settings.guide=true;bookPage=0;settings.bookPage=0;spotlightStep=null;buildType='fire';selected=null;enemySelected=null;paused=false;modalPaused=false;speed=1;accumulator=0;fx=[];music.currentTime=0;musicLoop?.restart();runBadges=[];coach()?.reset?.();save();refresh();syncAudio()}
 $('restart').onclick=()=>confirmAction(TUT?'Restart the tutorial?':'Restart this level?','The current defense will be reset. Your earned badges and banked Restoration Parts will remain.',restart);
 $('playAgain').onclick=restart;
 /* Oct 28 2026 (user): the panel's x closes the selected tower or enemy */if($('closeInspector'))$('closeInspector').onclick=()=>{selected=null;enemySelected=null;specPick=null;refresh();document.getElementById('battle')?.focus?.()};

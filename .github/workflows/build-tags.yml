@@ -1,0 +1,29 @@
+# Tags every shipped build so any uploaded zip can be found again (game-build-and-ship skill).
+# Pushing tags from the Claude workspace is refused, so GitHub creates them here instead:
+#  - build/warden-<version> on the commit that first carries that ?v= version in game/index.html
+#  - any extra "tag commit" lines listed in tools/build-tags.txt (older builds)
+name: Tag builds
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create missing build tags
+        run: |
+          set -e
+          git fetch --tags --quiet
+          make_tag () {
+            if git rev-parse -q --verify "refs/tags/$1" >/dev/null; then echo "exists: $1"; else git tag "$1" "$2" && git push origin "refs/tags/$1" && echo "tagged: $1 -> $2"; fi
+          }
+          v=$(grep -oE 'v=[0-9]{8}[a-z]' game/index.html | head -1 | cut -d= -f2)
+          [ -n "$v" ] && make_tag "build/warden-$v" "$GITHUB_SHA"
+          if [ -f tools/build-tags.txt ]; then
+            grep -vE '^\s*(#|$)' tools/build-tags.txt | while read -r t c; do make_tag "$t" "$c"; done
+          fi
