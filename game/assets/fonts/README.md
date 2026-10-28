@@ -1,3 +1,9 @@
+# Fonts
+
+Shipped: Lilita One (display, OFL) and Nunito (body, OFL); their licence texts are alongside. The CSS family name "Warden Quill" now points at Lilita One.
+
+Retired Oct 27 2026: warden-quill.ttf, the original generated lettering below (it rendered mixed case as random capitals). It stays here for reference and is left out of the upload builds.
+
 # Warden Quill
 
 Original fantasy lettering created for Warden of Power. Outlines are defined in previews/build_warden_font.py; no third-party font outlines, font files or traced letterforms are included. The design uses rounded pen strokes, gently slanted stems, curved bowls and uncial proportions. Includes Latin upper/lowercase, numbers and common UI punctuation. Browser fallback supplies symbols/emoji not in this font.

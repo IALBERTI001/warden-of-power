@@ -17,8 +17,8 @@ const TUTORIAL_PLAN=[['fire',230,300],['water',410,260],['ice',440,410],['lightn
 function autoPlan(g,count=12){const spots=[];for(let x=g.map.play.left+10;x<=g.map.play.right-10;x+=10)for(let y=g.map.play.top+10;y<=g.map.play.bottom-10;y+=10){if(!g.placement(x,y).ok)continue;let cover=0;for(const R of g.routes)for(let d=0;d<R.total;d+=8){const q=R.position(d);if(Math.hypot(q.x-x,q.y-y)<=150)cover++}spots.push([cover,x,y])}
  spots.sort((a,b)=>b[0]-a[0]);const chosen=[];for(const s of spots){if(chosen.every(c=>Math.hypot(c[1]-s[1],c[2]-s[2])>=95))chosen.push(s);if(chosen.length>=count)break}
  const order=['fire','water','ice','lightning'];return chosen.map((c,i)=>[order[i%4],c[1],c[2]])}
-function run({profile={},mission='tutorial',level=1,seed=1,limit,start,dt=1/60,maxSeconds=3600}={}){
- const g=new E.Game(profile,{mission,level,seed,limit,start});const PLAN=mission==='tutorial'?TUTORIAL_PLAN:autoPlan(g,+(process.env.SIM_TOWERS||12));let built=0;const log=[];let t=0;
+function run({profile={},mission='tutorial',level=1,seed=1,limit,start,dt=1/60,maxSeconds=3600,tier3Lock=[]}={}){
+ const g=new E.Game(profile,{mission,level,seed,limit,start});g.tier3Lock=tier3Lock;const PLAN=mission==='tutorial'?TUTORIAL_PLAN:autoPlan(g,+(process.env.SIM_TOWERS||12));let built=0;const log=[];let t=0;
  const tryBuild=()=>{while(built<PLAN.length){const [type,x,y]=PLAN[built];if(!g.unlocked(type)||g.charge<E.TYPES[type].cost)return;const r=g.build(type,{x,y});if(!r.ok){built++;continue}built++}};
  const tryUpgrade=()=>{for(const tw of [...g.towers].sort((a,b)=>a.tier-b.tier||a.id-b.id)){if(tw.tier>=3)continue;const cost=g.upgradeCost(tw);const reserve=built<PLAN.length&&g.unlocked(PLAN[built][0])?E.TYPES[PLAN[built][0]].cost:0;if(g.charge-cost<reserve)continue;g.upgrade(tw.id,tw.tier===2?0:undefined)}};
  const tryOvercharge=()=>{if(!g.endless||built<PLAN.length)return;for(let k=0;k<200;k++){const t=[...g.towers].filter(t=>t.tier>=3).sort((a,b)=>(a.oc||0)-(b.oc||0)||a.id-b.id)[0];if(!t||g.charge<g.overchargeCost(t)+50)break;g.overcharge(t.id)}};

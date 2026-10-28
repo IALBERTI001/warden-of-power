@@ -15,7 +15,7 @@ class Element{
  focus(){}remove(){}get firstChild(){return this.children[0]}
 }
 const html=fs.readFileSync('game/index.html','utf8');for(const m of html.matchAll(/id="([^"]+)"/g))registry.set(m[1],new Element(m[1]==='battle'?'canvas':'div'));
-const dialogs=['settings','confirm','badges','tiers','result','help'].map(id=>registry.get(id));
+const dialogs=['settings','confirm','badges','result','help'].map(id=>registry.get(id));
 const document={getElementById(id){return registry.get(id)||null},createElement(tag){return new Element(tag)},querySelectorAll(selector){if(selector==='dialog')return dialogs;if(selector==='[data-type]')return all.filter(e=>e.dataset.type);if(selector==='#padButtons button')return registry.get('padButtons').children;if(selector==='dialog[open]')return dialogs.filter(e=>e.open);return[]},querySelector(selector){if(selector==='dialog[open]')return dialogs.find(e=>e.open)||null;if(selector==='.briefing')return registry.get('lessonText');if(selector==='.controls-note p')return registry.get('feedback');if(selector==='.inspector')return registry.get('selection');return null},addEventListener(){},hidden:false};
 class Img{constructor(){this.width=1448;this.height=1086}set src(s){this.path=s;this.onload?.()}}
 class Audio{constructor(){this.paused=true;this.ended=false;this.currentTime=0}play(){this.paused=false;return Promise.resolve()}pause(){this.paused=true}}

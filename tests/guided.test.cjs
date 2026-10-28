@@ -20,3 +20,20 @@ assert.deepEqual(log.filter(s=>s.startsWith('mission')).map(s=>s.slice(8)),G.ORD
 for(const f of G.SECTORS)assert.equal(p.restorations[f],3,f+' reawakened');
 assert.equal(log[0],'gate');assert.equal(log[1],'mission:moonwell-1');assert.equal(log[2],'restore:moonwell');
 console.log('PASS: guided campaign goes tutorial -> gate -> 13 missions with automatic restorations -> finale, no Parts stalls.',log.length,'steps');
+
+// Oct 28 2026: one new thing per mission (Tier III opens at each sector's mission 2 while guided)
+{const assert=require('assert');const G=require('../game/guided.js');const E=require('../game/engine.js');
+ const p={seals:{tutorial:{cleared:true}},missions:{}};
+ assert.deepStrictEqual(G.tier3Locked(p,'moonwell-1'),['water','fire','ice','lightning']);
+ assert.deepStrictEqual(G.tier3Locked(p,'moonwell-2'),['fire','ice','lightning']);
+ assert.deepStrictEqual(G.tier3Locked(p,'stormcrown-2'),[]);
+ const q={seals:{tutorial:{cleared:true}},missions:{'emberheart-2':{cleared:true}}};assert.ok(!G.tier3Locked(q,'outer').includes('fire'));
+ const done={seals:{tutorial:{cleared:true}},missions:{'aetherheart-1':{cleared:true}}};assert.deepStrictEqual(G.tier3Locked(done,'moonwell-1'),[]);
+ assert.strictEqual(G.missionNews('moonwell-1').eyebrow,'NEW ENEMY');
+ assert.strictEqual(G.missionNews('moonwell-2',el=>E.TYPES[el].paths).title,'Water Tier III: Deluge or Pressure Lance');
+ assert.ok(/Two entrances/.test(G.missionNews('rimeglass-3').title));
+ assert.ok(G.missionNews('aetherheart-1'));
+ const g=new E.Game({},{mission:'outer',level:1});g.tier3Lock=['fire'];g.charge=9999;const r=g.build('fire',(()=>{for(let y=100;y<560;y+=10)for(let x=60;x<940;x+=10)if(g.placement(x,y).ok)return{x,y}})());
+ const t=g.towers[0];assert.ok(t,'built');assert.ok(g.upgrade(t.id).ok);const u=g.upgrade(t.id,0);assert.strictEqual(u.ok,false);assert.ok(u.locked);
+ g.tier3Lock=[];assert.ok(g.upgrade(t.id,0).ok);
+ console.log('guided tier III locks and mission news ok')}

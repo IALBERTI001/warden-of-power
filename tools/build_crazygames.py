@@ -13,7 +13,7 @@ sys.argv=[a for a in sys.argv if a!='--full-launch']
 OUT=os.path.abspath(sys.argv[1] if len(sys.argv)>1 else os.path.join(ROOT,'..','wop','dist'))
 DIST=os.path.join(OUT,'warden-of-power'); ZIP=os.path.join(OUT,'warden-of-power-crazygames.zip')
 TEXT=('.js','.html','.css')
-SKIP={'broken-conduit-weathered-road-v2.png'}  # only reachable through the ?map=v2 review switch
+SKIP={'broken-conduit-weathered-road-v2.png','warden-quill.ttf'}  # only reachable through the ?map=v2 review switch
 
 def sh(*a): subprocess.run(a,check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
 def mp3(src,dst,rate='96k'):
@@ -51,8 +51,8 @@ os.makedirs(os.path.join(DIST,'assets','art'),exist_ok=True)
 for f in set(re.findall(r"\.\./art-reference/([\w.\-]+)",alltext)): shutil.copy2(os.path.join(ROOT,'art-reference',f),os.path.join(DIST,'assets','art',f))
 
 # 3b) the five big sprite atlases ship as WebP (q92 keeps them sharp; ~9 MB -> ~2.5 MB of the first download)
-WEBP=['assets/element-tiers-candidate.png','assets/water-tiers-candidate.png','assets/art/enemy-walk-candidates-v1.png',
-      'assets/art/approved-elemental-sprites-v1.png','assets/art/enemy-death-candidates-v1.png']
+WEBP=['assets/towers/element-tiers.png','assets/towers/water-tiers.png','assets/enemies/enemy-walk.png',
+      'assets/towers/tower-base.png','assets/enemies/enemy-death.png','assets/maps/broken-conduit.png']
 from PIL import Image
 for rel in WEBP:
     src=os.path.join(DIST,rel); assert os.path.exists(src),('atlas missing',rel)
