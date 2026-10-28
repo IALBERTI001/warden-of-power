@@ -93,12 +93,12 @@ function playEngine(start){persist();if(start){try{localStorage.removeItem('ward
 function playOuter(L){persist();location.href=`index.html?mission=outer&level=${L}`}
 const sealCount=()=>['cleared','held','challenge'].filter(k=>seals()[k]).length;
 const bonusText=f=>f.bonus[0]==='damagePct'?`+${Math.round(f.bonus[1]*100)}% ${ELEMENT[f.branch].name} damage for every tower`:`+${f.bonus[1]} starting Charge in every defense`;
-function award(id){if(!profile.earned[id]){profile.earned[id]=new Date().toISOString();const a=E.ACHIEVEMENTS.find(a=>a[0]===id);toast(a?a[1]:id,'BADGE UNLOCKED',id)}}
+function award(id){if(!profile.earned[id]){profile.earned[id]=new Date().toISOString();const a=E.ACHIEVEMENTS.find(a=>a[0]===id);toast(a?a[1]:id,`BADGE ${Object.keys(profile.earned).length} OF ${E.ACHIEVEMENTS.length}`,id)}}
 function toast(title,sub,badge){const el=document.createElement('div');el.className='toast'+(badge?' badge-toast':'');el.innerHTML=(badge?`<img class="toast-badge" src="${B.image(badge,128)}" alt="">`:'')+`<small></small><div></div>`;el.querySelector('small').textContent=sub;el.querySelector('div').textContent=title;$('toasts').append(el);while($('toasts').children.length>3)$('toasts').firstChild.remove();setTimeout(()=>el.remove(),5200)}
 function escape(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c])}
 // Info behind a "?" (Oct 24 2026): panels lead with play/upgrade buttons; explanations open on demand.
 const infoOpen=(()=>{try{return JSON.parse(localStorage.getItem('warden.hubinfo.v1'))||{}}catch(e){return{}}})();
-function qBtn(key,label){return`<button class="info-toggle hub-q" data-info="${key}" aria-expanded="${!!infoOpen[key]}" aria-label="About ${escape(label)}" title="About ${escape(label)}">?</button>`}
+function qBtn(key,label){return`<button class="info-toggle hub-q" data-info="${key}" aria-expanded="${!!infoOpen[key]}" aria-label="About ${escape(label)}" data-tip="About ${escape(label)}">?</button>`}
 function qBody(key,html){return`<div class="hub-more" data-info-body="${key}"${infoOpen[key]?'':' hidden'}>${html}</div>`}
 function head(title,key,html){return`<div class="hub-h"><h3>${title}</h3>${html?qBtn(key,title.replace(/<[^>]+>/g,'')):''}</div>${html?qBody(key,html):''}`}
 function wireInfo(root){root.querySelectorAll('[data-info]').forEach(b=>b.onclick=()=>{const k=b.dataset.info,open=!infoOpen[k];infoOpen[k]=open;try{localStorage.setItem('warden.hubinfo.v1',JSON.stringify(infoOpen))}catch(e){}b.setAttribute('aria-expanded',String(open));root.querySelectorAll(`[data-info-body="${k}"]`).forEach(d=>d.hidden=!open);b.blur()})}
@@ -131,7 +131,7 @@ function play(){persist();location.href='index.html?mission=tutorial'}
 // ---------- side panel -------------------------------------------------------------------------
 // Cogwright's Workshop (approved Oct 24 2026): spend spare Parts once the Atelier is reawakened.
 function workshopSection(){const W=P.WORKSHOP;if(!W)return'';if(!W.unlocked(profile))return`<h3>Cogwright's Workshop</h3><p class="muted">🔒 Fully reawaken the Atelier to open the Workshop.</p>`;
- const btn=(id,label)=>{const o=P.workshopOffer(profile,id);if(!o.ok&&!o.cost)return`<button class="hub-btn" disabled>${escape(label)}</button>`;return`<button class="${o.ok?'primary-btn':'hub-btn'}" data-ws="${id}" ${o.ok?'':'disabled'} title="${o.ok?'':escape(o.reason)}">${escape(label)} · ${wfmt(o.cost)} ⚙</button>`};
+ const btn=(id,label)=>{const o=P.workshopOffer(profile,id);if(!o.ok&&!o.cost)return`<button class="hub-btn" disabled>${escape(label)}</button>`;return`<button class="${o.ok?'primary-btn':'hub-btn'}" data-ws="${id}" ${o.ok?'':'disabled'} data-tip="${o.ok?'':escape(o.reason)}">${escape(label)} · ${wfmt(o.cost)} ⚙</button>`};
  const rows=W.upgrades.map(u=>{const n=P.workshopRank(profile,u.id),max=n>=W.max;const pips=Array.from({length:W.max},(_,i)=>`<i class="${i<n?'on':''}"></i>`).join('');return`<li class="${max?'held':''}"><div><b>${escape(u.name)}</b><span class="ws-pips" aria-label="${n} of ${W.max}">${pips}</span><small>${n?escape(u.short(n*u.per)):escape(u.text(u.per))}${n&&!max?` → ${escape(u.short((n+1)*u.per))}`:''}</small></div>${max?'<span class="held-tag">✓ Max</span>':btn(u.id,n?'Upgrade':'Build')}</li>`}).join('');
  const t=P.workshopRank(profile,'tooling');
  const tool=`<li class="next"><div><b>Precision Tooling${t?` · rank ${wfmt(t)}`:''}</b><small>${t?`Every tower +${t}% damage`:'+1% damage for every tower, per rank. No limit.'}</small></div>${btn('tooling','+1%')}</li>`;

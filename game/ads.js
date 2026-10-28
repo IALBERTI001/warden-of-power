@@ -10,7 +10,7 @@ if(wanted)try{document.documentElement.classList.add('on-crazygames')}catch(e){}
 const SAVE_KEYS=/^warden\./;
 function progressScore(raw){try{const p=JSON.parse(raw)||{};const sum=o=>Object.values(o||{}).reduce((a,v)=>a+(typeof v==='number'?v:typeof v==='object'&&v?sum(v):0),0);
  return (p.engineBest||0)*1e6+sum(p.restorations)*1e4+sum(p.skills)*1e3+sum(p.mastery)*100+sum(p.workshop)*100+Object.keys(p.earned||{}).length*10+((p.parts||0)+(p.resonance||0))/1e9}catch(e){return -1}}
-const Ads={ready:false,busy:false,sdk:null,_playing:null,_loading:false,
+const Ads={/* Oct 28 2026: rewarded ads stay OFF during Basic Launch (CrazyGames disables ads there, so the offer would be a dead button). The Full Launch build sets <html data-rewards="on">; ?rewards=on tests it locally. */rewardsOn:(()=>{try{return document.documentElement.dataset.rewards==='on'||/[?&]rewards=on(&|$)/.test(location.search)}catch(e){return false}})(),ready:false,busy:false,sdk:null,_playing:null,_loading:false,
  async init(){if(!wanted)return false;try{if(!root.CrazyGames)await new Promise((ok,fail)=>{const s=document.createElement('script');s.src=SDK_URL;s.onload=ok;s.onerror=fail;document.head.appendChild(s)});
   const S=root.CrazyGames.SDK;await S.init();this.sdk=S;this.ready=S.environment==='crazygames'||S.environment==='local';}catch(e){this.ready=false}
   if(this.ready){if(this._loading)this.loadingStop(true);await this.syncSaves();if(this._playing!=null){const p=this._playing;this._playing=null;this.gameplay(p)}}return this.ready},

@@ -1,0 +1,31 @@
+/* Oct 28 2026: no browser defaults (shared by battle and hub). Game-styled tooltips, checkboxes, sliders, selects,
+   segmented target buttons, focus rings and no stray text selection. */
+html{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
+img{-webkit-user-drag:none}
+.game-tip{position:fixed;z-index:200;max-width:280px;padding:6px 10px;border-radius:8px;background:linear-gradient(#3e2f4c,#1c1525);border:1px solid #d5b369;box-shadow:0 6px 18px #000a;color:#fff0d1;font:13px/1.35 'Warden Text','Segoe UI',system-ui,sans-serif;pointer-events:none}
+.game-tip[hidden]{display:none}
+:focus{outline:none}
+:focus-visible{outline:2px solid #ffd36b;outline-offset:2px;border-radius:6px}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:20px;height:20px;margin:0 8px 0 0;flex:none;vertical-align:-4px;border-radius:5px;border:2px solid #d5b369;background:#130e18;cursor:pointer;display:inline-grid;place-content:center}
+input[type=checkbox]::after{content:'';width:10px;height:6px;border:solid #2a1d17;border-width:0 0 3px 3px;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+input[type=checkbox]:checked{background:linear-gradient(#ffe39a,#d59a3a)}
+input[type=checkbox]:checked::after{opacity:1}
+input[type=range]{appearance:none;-webkit-appearance:none;height:22px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#d59a3a,#5a4a5f);border:1px solid #2a1d17}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:#5a4a5f;border:1px solid #2a1d17}
+input[type=range]::-moz-range-progress{height:6px;border-radius:3px;background:#d59a3a}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-7px;border-radius:50%;background:linear-gradient(#ffe39a,#d59a3a);border:2px solid #2a1d17;box-shadow:0 2px 4px #0008}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:linear-gradient(#ffe39a,#d59a3a);border:2px solid #2a1d17}
+select{appearance:none;-webkit-appearance:none;padding:5px 28px 5px 10px;border-radius:8px;border:1px solid #d5b369;color:#fff0d1;font:inherit;cursor:pointer;background:#130e18 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23ffd36b' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 9px center}
+select option{background:#1c1525;color:#fff0d1}
+.target-row{display:flex;align-items:flex-start;gap:8px;margin:6px 0 8px}
+.target-row>span{font-size:13px;color:#cbb994;padding-top:7px}
+.target-seg{display:grid;grid-template-columns:1fr 1fr;flex:1;gap:2px;padding:2px;border-radius:9px;background:#130e18;border:1px solid #806944}
+.target-seg button{flex:1;min-height:30px;padding:2px 4px;border:0;border-radius:7px;background:none;color:#cbb994;font:12px 'Warden Text','Segoe UI',system-ui,sans-serif;cursor:pointer}
+.target-seg button:hover{color:#fff0d1;background:#ffffff10}
+.target-seg button.on{background:linear-gradient(#ffe39a,#d59a3a);color:#2a1d17;font-weight:700}
+.build-stamp{margin:12px 0 0;font-size:11px;color:#8f8370;text-align:right;letter-spacing:.02em}
+/* CrazyGames build: no test cheats in player settings (Reset progress stays) */
+html.on-crazygames label:has(#testMode),html.on-crazygames [data-test],html.on-crazygames #testTools>p.muted{display:none!important}
+html.on-crazygames #testTools{display:block!important}

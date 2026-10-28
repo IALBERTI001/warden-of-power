@@ -8,6 +8,9 @@ then zips it. Run from the repo root:  python3 tools/build_crazygames.py [out_di
 import os, re, shutil, subprocess, sys, zipfile
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GAME=os.path.join(ROOT,'game'); OUT=os.path.abspath(sys.argv[1] if len(sys.argv)>1 else os.path.join(ROOT,'..','wop','dist'))
+FULL='--full-launch' in sys.argv  # rewarded ads only in the Full Launch build (Basic Launch has ads disabled)
+sys.argv=[a for a in sys.argv if a!='--full-launch']
+OUT=os.path.abspath(sys.argv[1] if len(sys.argv)>1 else os.path.join(ROOT,'..','wop','dist'))
 DIST=os.path.join(OUT,'warden-of-power'); ZIP=os.path.join(OUT,'warden-of-power-crazygames.zip')
 TEXT=('.js','.html','.css')
 SKIP={'broken-conduit-weathered-road-v2.png'}  # only reachable through the ?map=v2 review switch
@@ -72,7 +75,7 @@ for rel,s in texts.items():
         s=re.sub(r'<script src="feedback\.js[^"]*"></script>','',s); s=re.sub(r'<link rel="stylesheet" href="feedback\.css[^"]*">','',s)
         s=s.replace("script-src 'self' https://sdk.crazygames.com https://*.crazygames.com","script-src 'self' https:")
         s=re.sub(r'<button id="(feedbackButton|openFeedback)"[^>]*>[^<]*</button>','',s)
-        s=s.replace('<html lang="en">','<html lang="en" class="on-crazygames">',1)
+        s=s.replace('<html lang="en">','<html lang="en" class="on-crazygames"'+(' data-rewards="on"' if FULL else '')+'>',1)
     if rel in ('feedback.js','feedback.css','fp-bridge.js'): continue
     assert '../' not in re.sub(r'//.*','',s) or rel.endswith('.css'),('parent path left in',rel)
     dst=os.path.join(DIST,rel); os.makedirs(os.path.dirname(dst),exist_ok=True); open(dst,'w',encoding='utf-8').write(s)

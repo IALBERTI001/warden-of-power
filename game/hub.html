@@ -6,12 +6,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Warden of Power · The Containment Complex</title>
 <link rel="preload" href="assets/fonts/LilitaOne-Regular.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="badges.css?v=20261028d">
-<link rel="stylesheet" href="hub.css?v=20261028d">
-<link rel="stylesheet" href="skilltree.css?v=20261028d">
-<link rel="stylesheet" href="guide.css?v=20261028d">
-<link rel="stylesheet" href="feedback.css?v=20261028d">
-</head>
+<link rel="stylesheet" href="badges.css?v=20261028e">
+<link rel="stylesheet" href="hub.css?v=20261028e">
+<link rel="stylesheet" href="skilltree.css?v=20261028e">
+<link rel="stylesheet" href="guide.css?v=20261028e">
+<link rel="stylesheet" href="feedback.css?v=20261028e">
+<link rel="stylesheet" href="ui-polish.css?v=20261028e"></head>
 <body>
 <main id="hub" aria-label="The Containment Complex, your home hub">
   <div id="mapFrame">
@@ -32,8 +32,8 @@
     <nav class="hub-actions" aria-label="Hub menu">
       <button id="openSkills" class="hub-btn"><svg class="ico-tome" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 16.5h12.6v4H7z" fill="#fff3d6"/><path d="M8 17.8h11M8 19.2h11" stroke="#b89a6a" stroke-width=".7"/><path d="M7 1.8h11.1a1.5 1.5 0 0 1 1.5 1.5v13.4H7z" fill="currentColor"/><path d="M4.4 3.8a2 2 0 0 1 2-2H7.6v19.4H6.4a2 2 0 0 1-2-2z" fill="currentColor" opacity=".72"/><path d="M15.2 16.5v6.2l1.3-1.3 1.3 1.3v-6.2z" fill="#c8453a"/><path d="M13.3 4.8l3.1 4-3.1 4-3.1-4z" fill="#2a1d17"/><path d="M13.3 6.9l1.5 1.9-1.5 1.9-1.5-1.9z" fill="currentColor"/></svg> Skills</button>
       <button id="openBadges" class="hub-btn">◉ Badges</button>
-      <button id="openHandbook" class="hub-btn" title="The Warden's Guide: everything explained, with pictures">📖 Guide</button>
-      <button id="openFeedback" class="hub-btn feedback-btn" title="Tell us what you think">✉ Feedback</button><button id="openGuide" class="hub-btn" aria-label="Replay the hub guide" title="How the hub works">?</button>
+      <button id="openHandbook" class="hub-btn" data-tip="The Warden's Guide: everything explained, with pictures">📖 Guide</button>
+      <button id="openFeedback" class="hub-btn feedback-btn" data-tip="Tell us what you think">✉ Feedback</button><button id="openGuide" class="hub-btn" aria-label="Replay the hub guide" data-tip="How the hub works">?</button>
       <button id="openSettings" class="hub-btn" aria-label="Settings and saves">⚙</button>
     </nav>
   </header>
@@ -94,6 +94,7 @@
         <div class="save-row"><button data-test="parts" class="hub-btn">+100 Parts</button><button data-test="resonance" class="hub-btn">+100 Resonance</button><button data-test="wave" class="hub-btn">Pretend endless wave 100</button></div>
         <div class="save-row"><button id="resetAll" class="danger">Reset all progress…</button><span id="resetStatus" class="muted" role="status"></span></div>
       </div>
+      <p id="buildStamp" class="build-stamp"></p>
     </div>
   </section>
 
@@ -103,11 +104,11 @@
   <div id="guidedCard" class="guided-card" hidden role="status" aria-live="polite"></div><div id="momentBanner" class="moment-banner" hidden role="status"></div>
   <div id="toasts" aria-live="polite"></div>
 </main>
-<script src="campaign.js?v=20261028d"></script><script src="progression.js?v=20261028d"></script><script src="skilltree.js?v=20261028d"></script>
-<script src="engine.js?v=20261028d"></script>
-<script src="badges.js?v=20261028d"></script>
-<script src="hub-gate.js?v=20261028d"></script>
-<script src="hubfx.js?v=20261028d"></script>
-<script src="feedback.js?v=20261028d"></script><script src="guide.js?v=20261028d"></script><script src="ads.js?v=20261028d"></script><script src="record.js?v=20261028d"></script><script src="guided.js?v=20261028d"></script><script src="hub.js?v=20261028d"></script>
+<script src="campaign.js?v=20261028e"></script><script src="progression.js?v=20261028e"></script><script src="skilltree.js?v=20261028e"></script>
+<script src="engine.js?v=20261028e"></script>
+<script src="badges.js?v=20261028e"></script>
+<script src="hub-gate.js?v=20261028e"></script>
+<script src="hubfx.js?v=20261028e"></script>
+<script src="feedback.js?v=20261028e"></script><script src="guide.js?v=20261028e"></script><script src="ads.js?v=20261028e"></script><script src="record.js?v=20261028e"></script><script src="tip.js?v=20261028e"></script><script src="guided.js?v=20261028e"></script><script src="hub.js?v=20261028e"></script>
 </body>
 </html>
