@@ -212,3 +212,4 @@ html{font-synthesis-weight:none}
 .feedback:empty{visibility:hidden}
 /* Oct 28 2026: upgrades show before -> after */
 .upgrade-preview{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;margin:4px 0 8px;font-size:13px;color:#cbb994;line-height:1.45}.upgrade-preview b{color:#ffe08a;white-space:nowrap;font-weight:600}
+.guided-next{margin:10px 0 0;font-size:16px;color:#ffd36b}.guided-next b{font-size:20px}

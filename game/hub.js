@@ -38,7 +38,7 @@ addEventListener('storage',e=>{if(e.key===PROFILE_KEY){profile=load();render()}}
 // ---------- map painting (HubFX draws stages, living effects and restoration moments) ------------
 const canvas=$('hubMap');
 const img={};let ready=false;
-Promise.all([['ruined','assets/hub/hub-ruined.jpg'],['restored','assets/hub/hub-restored.jpg']].map(([k,src])=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>{img[k]=i;ok()};i.onerror=()=>bad(src);i.src=src}))).then(()=>HubFX.init(canvas,img.ruined,img.restored)).then(()=>{ready=true;paint();ascensionMoment()}).catch(src=>{toast('Could not load the hub painting',String(src))});
+Promise.all([['ruined','assets/hub/hub-ruined.jpg'],['restored','assets/hub/hub-restored.jpg']].map(([k,src])=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>{img[k]=i;ok()};i.onerror=()=>bad(src);i.src=src}))).then(()=>HubFX.init(canvas,img.ruined,img.restored)).then(()=>{ready=true;paint();ascensionMoment();runDirector()}).catch(src=>{toast('Could not load the hub painting',String(src))});
 function sceneState(){const s={gate:profile.gateOpen?1:0,aetherheart:profile.earned?.eternal_thousand&&profile.thousandthSeen?6:Math.max(0,Math.min(5,profile.ascensionSeen??(profile.ascension||0)))};for(const id of ['moonwell','emberheart','rimeglass','stormcrown','atelier'])s[id]=stage(id);return s}
 function paint(){if(ready&&!HubFX.isPlaying())HubFX.setState(sceneState())}
 // The restoration moment: pins step aside, the area is rebuilt on screen, a banner names what changed.
@@ -232,7 +232,7 @@ let guideAnchor=null;
 function guideStep(){const g=profile.hubGuide||0;return g<GUIDE.length?GUIDE[g]:null}
 function advanceGuide(){profile.hubGuide=(profile.hubGuide||0)+1;persist();guideAnchor=null;tickGuide()}
 function showIntro(){const s=seals(),earnedRes=(profile.resonance||0);const el=$('guideIntro');el.innerHTML=`<div class="overlay-card intro-card"><span class="eyebrow">THE OUTER SEAL HOLDS</span><h2 id="guideTitle">The Containment Complex</h2><p>Beyond the Outer Seal lies your home: an ancient complex in ruins. Between battles you rebuild it and grow your towers. Everything you earn here makes <b>every tower stronger in every battle</b>. First, its gate must be raised.</p><div class="intro-res"><div><i aria-hidden="true">⚙</i><b>Restoration Parts · ${wfmt(profile.parts||0)}</b><span>Rebuild the ruined facilities. Earned by holding the Outer Seal and winning missions.</span></div><div><i aria-hidden="true">✦</i><b>Resonance · ${earnedRes}</b><span>Learn skills that strengthen your towers. Earned only in the Aetherheart Engine.</span></div></div><p class="muted">You won ${['cleared','held','challenge'].filter(k=>s[k]).length} of 3 Seals on the tutorial (+${E.SEAL_PARTS} Parts each). Let's spend your first rewards.</p><p class="muted">New to Warden? The <b>📖 Guide</b> button (top right) explains towers, combos, enemies and the complex, with pictures.</p><div class="intro-actions"><button class="primary-btn" id="guideGo">Show me</button><button class="ghost" id="guideSkip">Skip the guide</button></div></div>`;el.hidden=false;$('guideGo').onclick=()=>{el.hidden=true;profile.hubGuide=0;profile.hubIntroSeen=true;persist();tickGuide()};$('guideSkip').onclick=()=>{el.hidden=true;profile.hubIntroSeen=true;profile.hubGuide=GUIDE.length;persist();tickGuide()};setTimeout(()=>$('guideGo').focus(),30)}
-function tickGuide(){const box=$('guideCallout');const step=guideStep();document.querySelectorAll('.guide-pulse').forEach(e=>e.classList.remove('guide-pulse'));
+function tickGuide(){const box=$('guideCallout');if(guidedOn()||!$('guidedCard').hidden){box.hidden=true;return}const step=guideStep();document.querySelectorAll('.guide-pulse').forEach(e=>e.classList.remove('guide-pulse'));
  if(!profile.hubIntroSeen||!step||!$('guideIntro').hidden){box.hidden=true;return}
  if(step.done&&step.done()){advanceGuide();return}
  let t=step.target();if(!t&&step.fallback){step.fallback();t=step.target()}
@@ -246,7 +246,7 @@ function tickGuide(){const box=$('guideCallout');const step=guideStep();document
 $('openHandbook')&&($('openHandbook').onclick=()=>WardenGuide.open());
 $('openGuide').onclick=()=>{profile.hubGuide=0;profile.hubIntroSeen=false;persist();showIntro()};
 setInterval(tickGuide,250);addEventListener('resize',tickGuide);
-if(seals().cleared&&!profile.hubIntroSeen)setTimeout(showIntro,500);
+if(seals().cleared&&!profile.hubIntroSeen&&!guidedOn()&&!campaignRevealDue())setTimeout(showIntro,500);
 
 // ---------- area sound: a short cue when you open an area -----------------------------------------
 // User feedback (Oct 22): looping area sound was overbearing even one area at a time. Now opening an area plays
@@ -287,3 +287,49 @@ renderBest();
 
 // CrazyGames: the hub is not gameplay; loading ends once the hub is drawn.
 try{window.WardenAds&&(WardenAds.gameplay(false),setTimeout(()=>WardenAds.loadingStop(),300))}catch(e){}
+
+// ---------- Guided campaign director (Oct 28 2026) ----------------------------------------------------
+// Until the finale is won the hub runs itself: a welcome the first time, then every restoration a win has paid
+// for (with its animation), then "<sector> is under attack! Prepare to defend!" with a 5..1 countdown straight
+// into the next mission. No buttons. After the finale the Engine, skills and Workshop are revealed together.
+const GD=globalThis.WardenGuided;
+function guidedOn(){const g=globalThis.WardenGuided;return !!g&&g.active(profile)}
+function campaignRevealDue(){const g=globalThis.WardenGuided;return !!g&&!!profile.missions?.[g.FINALE]?.cleared&&!profile.campaignRevealSeen}
+const ALARM={moonwell:'The Moonwell Cisterns are under attack!',emberheart:'The Emberheart Forge is under attack!',rimeglass:'The Rimeglass Vaults are under attack!',stormcrown:'The Stormcrown Spire is under attack!',aetherheart:'The Aetherheart Engine is under siege!',outer:'Monsters are hammering the Outer Seal!'};
+let directing=false;
+function guidedCard(html,cls=''){const c=$('guidedCard');c.className='guided-card '+cls;c.innerHTML=html;c.hidden=false;return c}
+const gwait=ms=>new Promise(r=>setTimeout(r,ms));
+const momentDone=()=>new Promise(r=>{const t=setInterval(()=>{if(!document.body.classList.contains('moment')){clearInterval(t);r()}},200)});
+async function guidedCaption(eyebrow,title,text,ms){guidedCard(`<span class="eyebrow">${eyebrow}</span><h2>${title}</h2><p>${text}</p>`,'caption');await gwait(ms);$('guidedCard').hidden=true}
+async function guidedAlarm(a){const key=a.type==='outer'?'outer':a.sector;const pin=document.querySelector(`[data-place="${key==='outer'?'outer':key}"]`);pin?.classList.add('under-attack');
+ const m=a.id&&C?C.mission(a.id):null;const sub=a.type==='outer'?'Hold the gate to earn Parts.':m?`${m.finale?'The finale':'Mission '+m.index} · ${m.name}`:'';
+ playAreaCue(key==='outer'?'emberheart':key==='aetherheart'?'atelier':key);
+ const card=guidedCard(`<span class="eyebrow alarm-eyebrow">⚠ UNDER ATTACK</span><h2>${ALARM[key]||ALARM.outer}</h2><p>${sub}</p><strong class="prep">Prepare to defend!</strong><div class="count" aria-live="assertive">5</div>`,'alarm');
+ for(let n=5;n>=1;n--){card.querySelector('.count').textContent=n;card.querySelector('.count').classList.remove('tick');void card.offsetWidth;card.querySelector('.count').classList.add('tick');await gwait(1000)}
+ card.querySelector('.count').textContent='Defend!';await gwait(500)}
+async function runDirector(){
+ if(campaignRevealDue()){await momentDone();return campaignReveal()}
+ if(!guidedOn()||directing)return;directing=true;document.body.classList.add('guided');closePanelQuiet();
+ await gwait(700);await momentDone();
+ if(!profile.guidedWelcome){profile.guidedWelcome=true;persist();await guidedCaption('HOME BASE','Welcome home, Warden','This is the Containment Complex, your base. Every victory restores a piece of it and makes your towers stronger.',5200)}
+ for(let i=0;i<24;i++){const a=GD.next(profile,P,C);
+  if(a.type==='gate'){const r=P.openGate(profile);if(!r.ok)break;persist();closePanelQuiet();celebrate('gate',0,1,'The Outer Seal Gate rises',`The road into the complex is open · +${P.GATE.bonus[1]} starting Charge in every defense`);await gwait(300);await momentDone();await gwait(500);continue}
+  if(a.type==='restore'){restore(a.id);await gwait(300);await momentDone();await gwait(500);continue}
+  if(a.type==='mission'){await guidedAlarm(a);playMission(a.id);return}
+  if(a.type==='outer'){await guidedAlarm(a);playOuter(outerNext());return}
+  if(a.type==='tutorial'){play();return}
+  break}
+ directing=false;document.body.classList.remove('guided')}
+function campaignReveal(){profile.campaignRevealSeen=true;profile.hubIntroSeen=true;const pi=GUIDE.findIndex(g=>g.id==='power');if(pi>=0&&(profile.hubGuide||0)<pi)profile.hubGuide=pi;persist();render();
+ const c=guidedCard(`<span class="eyebrow">CAMPAIGN COMPLETE</span><h2>The Aetherheart Engine awakens</h2><p>You reawakened the whole complex. Now the real climb begins:</p><ul><li><b>Engine Trials</b> · endless waves, how deep can you go?</li><li><b>Skills</b> · spend Resonance from the Engine on every element</li><li><b>Cogwright's Workshop</b> · spend spare Parts on engineering upgrades</li></ul><button class="primary" id="guidedGo">Explore the complex</button>`,'reveal');
+ $('guidedGo').onclick=()=>{c.hidden=true;tickGuide()};setTimeout(()=>$('guidedGo')?.focus(),50)}
+
+// ---------- Click a building to open it (Oct 28 2026) ------------------------------------------------
+// The painted buildings are clickable, not just their name pins: click the Aetherheart Engine, a facility or the
+// gate to open its panel. Hit areas are ellipses in painting pixels (1536 x 1024); the nearest one wins.
+(function buildingClicks(){const map=$('hubMap');if(!map)return;
+ const HOT=PLACES.map(p=>p.mask?{id:p.id,cx:p.mask[0],cy:p.mask[1],rx:p.mask[2],ry:p.mask[3]}:p.id==='aetherheart'?{id:p.id,cx:626,cy:410,rx:200,ry:185}:p.id==='outer'?{id:p.id,cx:640,cy:840,rx:190,ry:165}:null).filter(Boolean);
+ const hit=e=>{const r=map.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*1536,y=(e.clientY-r.top)/r.height*1024;let best=null;for(const h of HOT){const d=Math.hypot((x-h.cx)/h.rx,(y-h.cy)/h.ry);if(d<=1&&(!best||d<best.d))best={id:h.id,d}}return best&&best.id};
+ let hov=null;map.addEventListener('mousemove',e=>{const id=hit(e);if(id===hov)return;hov=id;map.style.cursor=id?'pointer':'';document.querySelectorAll('.pin').forEach(b=>b.classList.toggle('hover',b.dataset.place===id))});
+ map.addEventListener('mouseleave',()=>{hov=null;map.style.cursor='';document.querySelectorAll('.pin.hover').forEach(b=>b.classList.remove('hover'))});
+ map.addEventListener('click',e=>{if(document.body.classList.contains('moment'))return;const id=hit(e);if(id)openPanel(id,document.querySelector(`[data-place="${id}"]`))})})();
