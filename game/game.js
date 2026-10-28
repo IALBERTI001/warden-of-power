@@ -131,8 +131,11 @@ function autoWaveOn(){return ENGINE_RUN&&!!settings.autoWave||GUIDED_BATTLE}
 // Guided campaign (Oct 28 2026): until the finale is won, missions start already fighting (a Fire tower is placed
 // on the best spot and wave 1 is sent), later waves send themselves, and a result carries on by itself.
 const GUIDED_BATTLE=!!globalThis.WardenGuided&&(CAMPAIGN||MISSION.mission==='outer')&&WardenGuided.active(game.profile);
-function bestSpot(type){const R=E.TYPES[type].range*.92,pts=[];for(const r of (game.routes||[game.route])){for(let d=0;d<=r.total;d+=12){const q=r.position(d);pts.push({x:q.x,y:q.y,w:1+.6*(1-d/r.total)})}}
- let best=null;for(let y=30;y<=570;y+=15)for(let x=30;x<=970;x+=15){if(!game.placement(x,y).ok)continue;let s=0;for(const q of pts)if(Math.hypot(q.x-x,q.y-y)<=R)s+=q.w;if(!best||s>best.s)best={x,y,s}}return best}
+function bestSpot(type){/* Oct 28 2026 (user): the starter tower guards the seal, never a spawn point. Score only the last part of each road, stay close to the seal and well away from every entrance; widen the search only if nothing fits. */
+ const R=E.TYPES[type].range*.92,routes=game.routes||[game.route],seal=routes[0].position(routes[0].total),starts=routes.map(r=>r.position(0)),pts=[];
+ for(const r of routes)for(let d=r.total*.45;d<=r.total;d+=12){const q=r.position(d);pts.push({x:q.x,y:q.y,w:.4+d/r.total})}
+ for(const near of [230,320,450,9999]){let best=null;for(let y=30;y<=570;y+=15)for(let x=30;x<=970;x+=15){if(Math.hypot(x-seal.x,y-seal.y)>near)continue;if(starts.some(st=>Math.hypot(x-st.x,y-st.y)<220))continue;if(!game.placement(x,y).ok)continue;let sc=0;for(const q of pts)if(Math.hypot(q.x-x,q.y-y)<=R)sc+=q.w;if(sc>0&&(!best||sc>best.s))best={x,y,s:sc}}if(best)return best}
+ return null}
 function guidedTick(){if(!GUIDED_BATTLE||game.status!=='playing'||!ready)return;
  if(!game.__gs&&game.wave===0&&!game.towers.length){game.__gs=realTime+1.2;const s=bestSpot('fire');if(s){const r=game.build('fire',{x:s.x,y:s.y});if(r.ok){fx.push({kind:'tierup',x:s.x,y:s.y,color:E.TYPES.fire.color,at:game.time,life:1.1,small:true});events();refresh()}}feedback('Wave 1 incoming! Build more towers as they come.')}
  if(typeof game.__gs==='number'&&realTime>=game.__gs){game.__gs=true;if(game.wave===0){nextWave();autoArmed=true}}
