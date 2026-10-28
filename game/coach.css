@@ -79,3 +79,18 @@
 @container(max-width:850px){.coach-tracker li{font-size:13px}.coach-callout p{font-size:14px}}
 /* Oct 24 2026 cleanup: the Warden coach is the tutorial; the old tutorial book, its button and its settings toggle stay hidden */
 .tut-v2 #tutorialBook,.tut-v2 #tutorialBookButton,.tut-v2 label:has(#guide){display:none!important}
+/* Oct 28 2026 field study: drop-in opening. A pointing hand on the one thing to press, non-blocking element banners, quest rewards */
+.coach-hand{position:absolute;z-index:12;pointer-events:none;width:40px;height:46px;margin:-6px 0 0 -12px;filter:drop-shadow(0 3px 3px #000a);animation:coachTap 1s ease-in-out infinite}
+.coach-hand[hidden]{display:none}
+@keyframes coachTap{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(4px,9px) scale(.92)}}
+.coach-intro.coach-banner{inset:auto 0 auto 0;top:64px;display:flex;justify-content:center;background:none}
+.coach-banner .coach-intro-card{width:auto;max-width:min(560px,80%);padding:8px 18px 10px;animation:bannerIn .35s ease-out both;pointer-events:none}
+.coach-banner .coach-intro-card h2{font-size:24px;margin:2px 0}
+.coach-banner .coach-recipe{margin:4px 0}
+.coach-banner .coach-tower canvas{height:58px!important;width:auto!important}
+.coach-banner .coach-foes{margin-top:2px}
+@keyframes bannerIn{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
+.coach-tracker .coach-reward{font-style:normal;color:#ffd36b;font-size:.9em;white-space:nowrap}
+@media(prefers-reduced-motion:reduce){.coach-hand,.coach-banner .coach-intro-card{animation:none}}
+.coach-callout .coach-act{display:block;margin:8px 0 0;width:100%;min-height:40px;font:18px var(--game-font)}
+.coach-callout .coach-act:disabled{opacity:.6}

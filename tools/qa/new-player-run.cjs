@@ -8,12 +8,11 @@ const {chromium}=require('/opt/npm-tools/node_modules/playwright');const B=proce
  const W=async(x,y)=>pg.evaluate(([x,y])=>{const c=document.getElementById('battle');const r=c.getBoundingClientRect();const p=G.project(x,y);return[r.left+p.x*r.width/1000,r.top+p.y*r.height/600]},[x,y]);
  const place=async(key,x,y)=>{await pg.keyboard.press(key);const [a,c]=await W(x,y);await pg.mouse.click(a,c);await pg.waitForTimeout(300)};
  await pg.goto(B);await pg.waitForTimeout(1500);await shot('01-load');
- await think();await btnText("Let.s begin");await pg.waitForTimeout(400);await shot('02-begin');
- await think();await place('1',370,290);await shot('03-fire');
- await think();await pg.keyboard.press('Escape');await pg.keyboard.press('n');await pg.waitForTimeout(400);await shot('04-wave1');for(let i=0;i<8;i++){await pg.waitForTimeout(1500);if(await pg.evaluate(()=>game.enemies.some(e=>e.burning>0))){await pg.waitForTimeout(250);await shot('04b-first-burn');break}}
+ await pg.waitForTimeout(1500);await shot('02-dropped-in');
+ await think();await pg.keyboard.press('u');await pg.waitForTimeout(400);await shot('03-upgraded');await shot('04-wave1');for(let i=0;i<8;i++){await pg.waitForTimeout(1500);if(await pg.evaluate(()=>game.enemies.some(e=>e.burning>0))){await pg.waitForTimeout(250);await shot('04b-first-burn');break}}
  const waitWave=async n=>{for(let s=0;s<180;s++){await pg.waitForTimeout(500);const st=await pg.evaluate(()=>({busy:game.spawnQueue.length>0||game.enemies.some(e=>e.alive),done:game.completed,frz:game.combos.freeze}));if(!st.busy&&st.done>=n)return}};
  await waitWave(1);await shot('05-wave1-done');
- await think();await btnText("Let.s build");await pg.waitForTimeout(300);
+ await pg.waitForTimeout(1200);await shot('05b-banner');
  const pads=await pg.evaluate(()=>WardenEngine.TUTORIAL_PADS);
  await think();await place('2',175,330);await shot('06a-water');await think();await place('3',305,330);await shot('06-water-ice');
  await think();await pg.keyboard.press('Escape');await pg.keyboard.press('n');let frz=null;

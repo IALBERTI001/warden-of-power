@@ -1,15 +1,17 @@
 // In-world tutorial (coach) lesson plan + placement amendment. Pure logic; browser visuals verified separately.
 const assert=require('node:assert/strict'),E=require('../game/engine.js'),{Guide}=require('../game/tutorial.js'),C=require('../game/coach.js');
 const g=new E.Game(),guide=new Guide();
-let p=C.plan(g,guide);assert.equal(p.index,0);assert.equal(p.step.id,'place');assert.equal(C.introDue(g,guide),0);
+let p=C.plan(g,guide);assert.equal(p.index,0);assert.equal(p.step.id,'upgrade','Oct 28 drop-in: the first goal is upgrading the Fire tower that already stands');assert.equal(C.introDue(g,guide),0);
 guide.record('intro_0');assert.equal(C.introDue(g,guide),null);
-assert(g.build('fire',{x:230,y:300}).ok);guide.sync(g);assert.equal(C.plan(g,guide).step.id,'wave','QA Oct 28: build, then straight into wave 1');
-g.upgrade(g.towers[0].id);guide.sync(g);
-assert(g.startWave().ok);guide.sync(g);p=C.plan(g,guide);assert.equal(p.index,0,'wave 1 in progress stays on lesson 1');assert.equal(p.step,null);assert.equal(C.introDue(g,guide),null,'no briefing while enemies are on the route');
+assert(g.build('fire',{x:230,y:300}).ok);guide.sync(g);assert.equal(C.plan(g,guide).step.id,'upgrade');
+g.upgrade(g.towers[0].id);guide.sync(g);assert.equal(C.plan(g,guide).step.id,'hold1','after the upgrade: hold wave 1');
+assert(g.startWave().ok);guide.sync(g);p=C.plan(g,guide);assert.equal(p.index,0,'wave 1 in progress stays on lesson 1');assert.equal(p.step.id,'hold1');assert.equal(C.introDue(g,guide),null,'no briefing while enemies are on the route');
 for(let i=0;i<60*120&&(g.spawnQueue.length||g.enemies.some(e=>e.alive));i++)g.step(1/60);
 p=C.plan(g,guide);assert.equal(p.index,1);assert.equal(p.step.id,'water');assert.equal(C.introDue(g,guide),1);
 // Every lesson's goals are real Guide steps (or the final win), so the tracker cannot drift from actual actions.
-const ids=new Set(require('../game/tutorial.js').STEPS.map(s=>s[0]));for(const l of C.LESSONS)for(const [id] of l.goals)assert(ids.has(id),id);
+const ids=new Set(require('../game/tutorial.js').STEPS.map(s=>s[0]));for(const l of C.LESSONS)for(const [id] of l.goals)assert(ids.has(id)||id==='hold1',id);
+// Quest rewards are shown and paid once.
+assert.deepEqual(C.LESSONS.flatMap(l=>l.goals.filter(g=>g[2]).map(g=>[g[0],g[2]])),[['freeze',40],['conduction',40],['shatter',60]]);
 assert.equal(C.LESSONS.length,E.WAVES.length);assert.equal(C.INTROS.length,E.WAVES.length);
 // Placement amendment: anywhere on the visible courtyard floor except the route and doorways; route never blocked.
 const h=new E.Game();

@@ -47,6 +47,14 @@ for dp,dn,fn in os.walk(os.path.join(GAME,'assets')):
 os.makedirs(os.path.join(DIST,'assets','art'),exist_ok=True)
 for f in set(re.findall(r"\.\./art-reference/([\w.\-]+)",alltext)): shutil.copy2(os.path.join(ROOT,'art-reference',f),os.path.join(DIST,'assets','art',f))
 
+# 3b) the five big sprite atlases ship as WebP (q92 keeps them sharp; ~9 MB -> ~2.5 MB of the first download)
+WEBP=['assets/element-tiers-candidate.png','assets/water-tiers-candidate.png','assets/art/enemy-walk-candidates-v1.png',
+      'assets/art/approved-elemental-sprites-v1.png','assets/art/enemy-death-candidates-v1.png']
+from PIL import Image
+for rel in WEBP:
+    src=os.path.join(DIST,rel); assert os.path.exists(src),('atlas missing',rel)
+    Image.open(src).save(src[:-4]+'.webp','WEBP',quality=92,method=6); os.remove(src)
+
 # 4) rewrite paths in the text files
 REPL=[("'../previews/audio-v3/'+name+variant+'.wav'","'assets/sfx/'+name+variant+'.mp3'",'game.js'),
       ("'../previews/audio-v3/tier_up.wav'","'assets/sfx/tier_up.mp3'",'hub.js'),
@@ -54,6 +62,7 @@ REPL=[("'../previews/audio-v3/'+name+variant+'.wav'","'assets/sfx/'+name+variant
       ("assets/hub/ambience/amb-${name}.wav","assets/hub/ambience/amb-${name}.mp3",'hub.js')]
 for rel,s in texts.items():
     s=s.replace('../art-reference/','assets/art/').replace("assets/audio/ascension.wav","assets/audio/ascension.mp3")
+    for w in WEBP: s=s.replace(os.path.basename(w),os.path.basename(w)[:-4]+'.webp')
     for a,b,f in REPL:
         if rel==f:
             assert a in s,(f,a); s=s.replace(a,b)
