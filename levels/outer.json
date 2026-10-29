@@ -4,18 +4,51 @@
   1000,
   600
  ],
- "note": "Outer Seal, Oct 29 2026 kit layout. Road: straights + 90-degree arcs of one radius; straight approach over the bridge into the seal plaza. World units; the map image is 1620x971 (x1.62).",
+ "image": [
+  1620,
+  971
+ ],
+ "note": "Outer Seal, kit build (Oct 29 2026). The layout is fitted to the painted ground: meadow x100-748 y70-500, moat banks 753-772 and 843-861 (water between), courtyard from 864, entry earth at the left edge around y416. World units; image = world x1.62. Positions of standing pieces are their BASE points (bottom centre).",
+ "ground": {
+  "src": "art/incoming/outer-seal-ground_v1_20261029.png",
+  "crop": [
+   0,
+   49,
+   1536,
+   970
+  ],
+  "clones": [
+   {
+    "from": [
+     0,
+     738,
+     130,
+     52
+    ],
+    "to": [
+     0,
+     682
+    ],
+    "feather": 8,
+    "why": "cover the painted entry earth that showed as a strip below the road (road moved to y395)"
+   }
+  ]
+ },
+ "kit": {
+  "dir": "art/kits/outer",
+  "scale": 0.5
+ },
  "road": {
   "width": 54,
   "radius": 60,
   "points": [
    [
     -40,
-    420
+    395
    ],
    [
     180,
-    420
+    395
    ],
    [
     180,
@@ -27,98 +60,71 @@
    ],
    [
     420,
-    420
+    395
    ],
    [
     600,
-    420
+    395
    ],
    [
     600,
-    290
+    270
    ],
    [
-    900,
-    290
+    932,
+    270
    ]
-  ]
+  ],
+  "stopX": 760,
+  "strips": "art/kits/outer/road_strips.png"
  },
- "walls": {
-  "top": {
-   "from": [
-    52,
-    92
-   ],
-   "to": [
-    728,
-    92
+ "walls": [
+  {
+   "y": 96,
+   "x0": 110,
+   "x1": 730,
+   "mid": [
+    420
    ]
   },
-  "bottom": {
-   "from": [
-    52,
-    486
-   ],
-   "to": [
-    728,
-    486
+  {
+   "y": 506,
+   "x0": 110,
+   "x1": 730,
+   "mid": [
+    420
    ]
-  },
-  "left": {
-   "from": [
-    52,
-    92
-   ],
-   "to": [
-    52,
-    486
-   ],
-   "openings": [
-    [
-     420,
-     74
-    ]
-   ]
-  },
-  "right": {
-   "from": [
-    728,
-    92
-   ],
-   "to": [
-    728,
-    486
-   ],
-   "openings": [
-    [
-     290,
-     74
-    ]
-   ]
-  },
-  "pillarEvery": 112
- },
- "moat": {
-  "x0": 748,
-  "x1": 812
- },
+  }
+ ],
+ "pillars": [],
  "bridge": {
-  "from": [
-   736,
-   290
-  ],
-  "to": [
-   824,
-   290
+  "center": [
+   807,
+   270
   ]
  },
- "plaza": {
-  "center": [
-   900,
-   290
-  ],
-  "size": 132,
-  "pillars": 4
+ "seal": {
+  "at": [
+   932,
+   270
+  ]
  },
- "sealLabelSlot": "auto"
+ "plazaPillars": [
+  [
+   890,
+   222
+  ],
+  [
+   975,
+   222
+  ],
+  [
+   890,
+   398
+  ],
+  [
+   975,
+   398
+  ]
+ ]
 }

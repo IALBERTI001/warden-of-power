@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),E=require('../game/engine.js');
 const t=new E.Game({});assert.equal(t.mission,'tutorial');assert.equal(t.route.total,E.TOTAL,'tutorial route unchanged');assert.equal(t.waves,E.WAVES);assert(!t.unlocked('ice'),'tutorial still unlocks elements by lesson');
 const g=new E.Game({},{mission:'outer',level:1});assert.equal(g.map.id,'outer');assert.notDeepEqual(g.map.path,E.PATH,'not the tutorial map');assert.equal(g.waves.length,8);assert(['fire','water','ice','lightning'].every(x=>g.unlocked(x)),'all elements open');
-assert(!g.placement(240,300).ok,'road blocked');assert(g.placement(370,320).ok,'meadow buildable');assert(!g.placement(880,250).ok,'gate kept clear');
+assert(!g.placement(180,300).ok,'road blocked');assert(g.placement(300,320).ok,'meadow buildable');assert(!g.placement(880,250).ok,'gate kept clear');
 // incremental strength
 const hp=L=>{const x=new E.Game({},{mission:'outer',level:L});return x.spawn('slime',1).maxHp};assert(Math.abs(hp(2)/hp(1)-1.15)<1e-9,'+15% health per level');assert(hp(10)>hp(9));
 const w=L=>E.outerWaves(L);assert(w(2).every(v=>!v.attunes.length),'no attuned foes before level 3');assert(w(3).some(v=>v.attunes.length),'attuned from level 3');assert(w(9).every(v=>v.attunes.length<=2),'at most two attunement kinds per wave');

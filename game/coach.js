@@ -43,7 +43,7 @@ function install(){
  let collapsed=false,dismissed={},pops=[],slowUntil=0,clock=0,lastKey='',introShown=null,dropAt=0,bannerUntil=0;
  const hand=el('div','coach-hand');hand.setAttribute('aria-hidden','true');hand.innerHTML='<svg viewBox="0 0 48 56" width="40" height="46"><path d="M18 4c3 0 5 2 5 5v15l3-1c3-1 5 1 6 2l2-1c3-1 5 1 6 3l1 0c3 0 5 2 5 5v8c0 8-6 14-14 14h-4c-5 0-9-2-12-6L6 36c-2-2-1-5 1-6 2-2 5-1 7 1l1 1V9c0-3 0-5 3-5z" fill="#fff6e2" stroke="#2a1d17" stroke-width="3" stroke-linejoin="round"/></svg>';hand.hidden=true;stage.append(hand);
 
- const SPOTS=game.map.id==='outer'?{place:{x:370,y:290},water:{x:175,y:330},ice:{x:305,y:330},lightning:{x:175,y:240}}:{place:{x:210,y:310}}; /* QA Oct 28: a glowing spot for every new tower, near the entrance so the first freeze comes fast */
+ const SPOTS=game.map.id==='outer'?{place:{x:345,y:240},water:{x:255,y:240},ice:{x:345,y:320},lightning:{x:255,y:320}}:{place:{x:210,y:310}}; /* QA Oct 28: a glowing spot for every new tower, near the entrance so the first freeze comes fast */
  const spotFor=()=>{const s=plan(game,guide).step;return s&&SPOTS[s.id]&&!game.towers.some(t=>Math.hypot(t.x-SPOTS[s.id].x,t.y-SPOTS[s.id].y)<40)?{id:s.id,...SPOTS[s.id]}:null};
  const TOWER_RECTS={fire:[20,0,340,457],water:[390,35,325,420],lightning:[755,0,310,457],ice:[1100,40,348,415]};
  const ENEMY_RECTS={slime:[40,515,315,270],beetle:[395,560,300,220],golem:[705,465,360,330]};

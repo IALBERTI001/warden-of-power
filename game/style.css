@@ -225,3 +225,11 @@ html{font-synthesis-weight:none}
 #gameStage.fit-compact .resources small,#gameStage.fit-compact .dock-label,#gameStage.fit-compact [data-type] small,#gameStage.fit-compact .speed-hint span,#gameStage.fit-compact .speed-hint{font-size:14px!important}
 .opening-quiet .coach-tracker .coach-eyebrow{display:none}
 #gameStage.fit-compact .dock-label{font-size:13.9px!important;transform:translateY(-4px)}
+
+/* Oct 29 2026: caption and hint slot under the top bar on maps whose road runs along the bottom (captionSlot in game.js) */
+.caption-top .feedback{top:12.2%;bottom:auto}
+.speed-hint.top-slot{position:absolute;top:12.2%;bottom:auto;left:50%;transform:translateX(-50%);z-index:6}
+.speed-hint.top-slot::after{display:none}
+.caption-top:has(.speed-hint.top-slot:not([hidden])) .feedback{visibility:hidden}
+.caption-top:has(#speedHint:not([hidden])) .speed-cluster{box-shadow:0 0 0 2px #ffd36b,0 0 18px #ffd36b88;border-radius:12px}
+.feedback{transition:opacity .4s}.feedback:not(.show){opacity:0}
