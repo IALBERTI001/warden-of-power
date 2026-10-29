@@ -126,7 +126,7 @@ def edge_polyline(pts, offset):
     return P + n * offset, t
 
 
-def draw_road(ground, pts, half, sheet, stop_mask=None, seed=11):
+def draw_road(ground, pts, half, sheet, stop_mask=None, seed=11, cob_sat=1.0):
     """ground: float32 HxWx3 (modified copy returned). pts: dense centre line in pixels. half: road half-width px."""
     H, W = ground.shape[:2]
     bands = strip_bands(sheet)
@@ -144,6 +144,8 @@ def draw_road(ground, pts, half, sheet, stop_mask=None, seed=11):
             (round(c.shape[1] * scale), round(c.shape[0] * scale)), Image.LANCZOS)).astype(np.float32)
         cob_src.append(c)
     cob = quilt(cob_src, W, H, patch=max(24, int(min(c.shape[0] for c in cob_src)) - 2), overlap=8, seed=seed)
+    if cob_sat != 1.0:                                        # pull the fill toward the kit's sandstone
+        lum = cob.mean(axis=2, keepdims=True); cob = lum + (cob - lum) * cob_sat
     # stones
     stones = []
     for b in bands:

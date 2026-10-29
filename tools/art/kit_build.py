@@ -39,15 +39,19 @@ def post_width(wall):
     return x
 
 
+def bay_limits(wall):
+    """Source columns of the plain bay between a wall piece's two end posts."""
+    return post_width(wall) + 6, wall.width - post_width(wall.transpose(Image.FLIP_LEFT_RIGHT)) - 6
+
+
+def wall_post(wall, s):
+    """The left end post of a wall piece, cut out whole, at kit scale s."""
+    return scaled(wall.crop((0, 0, post_width(wall) + 2, wall.height)), s)
+
+
 def wall_bay(wall, length_px, s):
     """The middle of a wall piece (end posts cut off), cropped to length_px at kit scale s."""
-    a = np.asarray(wall)[..., 3] > 128
-    top = np.array([np.argmax(a[:, x]) if a[:, x].any() else a.shape[0] for x in range(a.shape[1])])
-    w = a.shape[1]
-    body = top[int(w * 0.3):int(w * 0.7)]
-    lvl = np.median(body)
-    inner = np.flatnonzero(top >= lvl - 6)                 # posts stand taller than the bay
-    x0, x1 = inner.min() + 6, inner.max() - 6
+    x0, x1 = bay_limits(wall)
     need = round(length_px / s)
     if need > x1 - x0:
         raise SystemExit('wall bay too short: need %d src px, piece has %d (add pillars)' % (need, x1 - x0))
@@ -60,8 +64,8 @@ def cast_shadow(sprite, flat=False):
     sprite's top-left."""
     al = sprite.getchannel('A')
     if flat:
-        sh = al.filter(ImageFilter.GaussianBlur(4))
-        return sh, 5, 6
+        sh = al.filter(ImageFilter.GaussianBlur(5))
+        return sh, 7, 10
     w, h = sprite.size
     k = 0.42
     flip = al.transpose(Image.FLIP_TOP_BOTTOM).resize((w, max(1, round(h * k))), Image.LANCZOS)
@@ -84,7 +88,15 @@ def main():
         if dx == 0: ImageDraw.Draw(m).rectangle((0, f, f, h - 1 - f), fill=255)          # image edge: no fade needed
         m = m.filter(ImageFilter.GaussianBlur(f / 2))
         ground.paste(patch, (dx, dy), m)
+    if g.get('sharpen'):
+        r, pct = g['sharpen']; ground = ground.filter(ImageFilter.UnsharpMask(radius=r, percent=pct, threshold=2))
     img = np.asarray(ground).astype(np.float32)
+    for x0, y0, x1, y1 in g.get('flattenLight', []):            # map px: remove broad painted light/shadow bands
+        from scipy.ndimage import gaussian_filter
+        reg = img[y0:y1, x0:x1]; lum = reg.mean(axis=2)
+        broad = gaussian_filter(lum, 45, mode='reflect')
+        reg *= (broad.mean() / np.maximum(broad, 1))[..., None]
+        img[y0:y1, x0:x1] = reg
 
     # road
     rd = lay['road']
@@ -92,7 +104,7 @@ def main():
     pts_px = [(x * S, y * S) for x, y in dense]
     yy, xx = np.mgrid[0:H, 0:W]
     stop = xx > rd['stopX'] * S
-    img, _ = draw_road(img, pts_px, rd['width'] / 2 * S, Image.open(rd['strips']), stop_mask=stop)
+    img, _ = draw_road(img, pts_px, rd['width'] / 2 * S, Image.open(rd['strips']), stop_mask=stop, cob_sat=rd.get('saturation', 1.0))
     canvas = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).convert('RGBA')
 
     kit = lay['kit']['dir']; ks = lay['kit']['scale']
@@ -113,39 +125,67 @@ def main():
         flats.append((sprite, x, y)); record.append({'piece': name, 'centre': [cx, cy],
             'box': [x / S, y / S, (x + sprite.width) / S, (y + sprite.height) / S]})
 
+    post = wall_post(walls[0], ks)
+    max_bay = min(bay_limits(w)[1] - bay_limits(w)[0] for w in walls) * ks
+    tuck = 7                                                   # px each bay runs under the pillar/post beside it
     for i, wl in enumerate(lay['walls']):
-        # a wall run = whole wall pieces chained post over post, orb pillars at the ends (and any listed between);
-        # the last piece is cut where it runs under the end pillar, so no cut edge is ever visible
-        xa, xb = wl['x0'] * S, wl['x1'] * S
-        post = round(post_width(walls[0]) * ks)
-        x, j, run = xa, 0, []
-        while x < xb:
-            pc = scaled(walls[(i + j) % 2], ks)
-            if x + pc.width > xb + pillar.width * 0.3:
-                if xb - x < max(pillar.width / 2, post + 4): break
-                pc = pc.crop((0, 0, round(xb - x), pc.height))
-            run.append((pc, x)); x += pc.width - post; j += 1
-        for pc, x in run:
-            stand(pc, (x + pc.width / 2) / S, wl['y'] - 0.5, 'wall')
-        for px in [wl['x0'], wl['x1']] + wl.get('mid', []):
+        # a wall run: orb pillars at the ends (and 'mid'); each span between pillars is split into EQUAL bays with a stone
+        # post between bays, so every span is identical and mirrored about the middle pillar (no stubs, no doubled posts)
+        cs = sorted([wl['x0'], wl['x1']] + wl.get('mid', []))
+        for c0, c1 in zip(cs[:-1], cs[1:]):
+            f0 = c0 * S + pillar.width / 2; f1 = c1 * S - pillar.width / 2
+            span = f1 - f0
+            k = 1
+            while (span - (k - 1) * post.width) / k + 2 * tuck > max_bay: k += 1
+            bay = (span - (k - 1) * post.width) / k
+            x = f0
+            for b in range(k):
+                pc = wall_bay(walls[(i + b) % 2], bay + 2 * tuck, ks)
+                stand(pc, (x + bay / 2) / S, wl['y'] - 0.6, 'wall_bay')
+                x += bay
+                if b < k - 1:
+                    stand(post, (x + post.width / 2) / S, wl['y'] - 0.3, 'wall_post'); x += post.width
+        for px in cs:
             stand(pillar, px, wl['y'] + 0.5, 'pillar')
     for bx, by in lay.get('pillars', []):
         stand(pillar, bx, by, 'pillar')
     for bx, by in lay.get('plazaPillars', []):
         stand(pillar, bx, by, 'pillar')
-    flat(deck, *lay['bridge']['center'], 'bridge_deck')
+        bed = Image.new('RGBA', (round(pillar.width * 1.25), round(pillar.width * 0.45)))
+        ImageDraw.Draw(bed).ellipse((0, 0, bed.width - 1, bed.height - 1), fill=(58, 84, 36, 210))
+        bed = bed.filter(ImageFilter.GaussianBlur(3))
+        flats.append((bed, round(bx * S - bed.width / 2), round(by * S - bed.height * 0.75)))
+    face = round(deck.height * 0.16)                          # the deck's south face (3/4 view) hangs below it over the water
+    rail = deck.crop((0, deck.height - face, deck.width, deck.height))
+    shade_rows = np.linspace(0.62, 0.42, face)[None, :, None]
+    fa = np.asarray(rail).astype(np.float32); fa[..., :3] *= shade_rows.transpose(1, 0, 2)
+    deck3 = Image.new('RGBA', (deck.width, deck.height + face)); deck3.alpha_composite(deck)
+    deck3.alpha_composite(Image.fromarray(np.clip(fa, 0, 255).astype(np.uint8)), (0, deck.height))
+    deck3.alpha_composite(deck.crop((0, deck.height - 3, deck.width, deck.height)), (0, deck.height - 3))
+    bc = lay['bridge']['center']
+    flat(deck3, bc[0], bc[1] + face / 2 / S, 'bridge_deck')
+    land = lay['bridge'].get('landingTo')
+    if land:                                                  # floor slabs (deck middle, rails cut away) from bridge to seal
+        x_end = round(bc[0] * S + deck.width / 2); x_to = round(land * S)
+        top_r, bot_r = round(deck.height * 0.22), round(deck.height * 0.78)
+        mid = deck.width // 2
+        slab = deck.crop((mid - (x_to - x_end) // 2, top_r, mid - (x_to - x_end) // 2 + (x_to - x_end), bot_r))
+        flats.append((slab, x_end - 2, round(bc[1] * S - deck.height / 2) + top_r))
+    for cx in (bc[0] * S - deck.width / 2 + post.width * 0.45, bc[0] * S + deck.width / 2 - post.width * 0.45):
+        stand(post, cx / S, bc[1] - deck.height / 2 / S + 4, 'newel_post')
+        stand(post, cx / S, bc[1] + deck.height / 2 / S + face / S, 'newel_post')
     flat(plinth, *lay['seal']['at'], 'seal_plinth')
 
     # shadows first, then flat pieces, then standing pieces back to front
     shade = Image.new('L', (W, H), 0)
     for sp, x, y in flats:
         sh, dx, dy = cast_shadow(sp, flat=True)
-        shade.paste(Image.eval(sh, lambda v: int(v * 0.55)), (x + dx, y + dy), Image.eval(sh, lambda v: int(v * 0.55)))
+        shade.paste(Image.eval(sh, lambda v: int(v * 0.9)), (x + dx, y + dy), Image.eval(sh, lambda v: int(v * 0.9)))
     for _, sp, x, y in stands:
         sh, dx, dy = cast_shadow(sp)
         layer = Image.new('L', (W, H), 0); layer.paste(sh, (x + dx, y + dy))
         shade = Image.fromarray(np.maximum(np.asarray(shade), np.asarray(layer)))
-    sa = np.asarray(shade).astype(np.float32)[..., None] / 255 * 0.42
+    sa = np.asarray(shade).astype(np.float32)[..., None] / 255 * lay.get('shadow', 0.5)
     base = np.asarray(canvas.convert('RGB')).astype(np.float32)
     base = base * (1 - sa) + np.array([30, 28, 20], np.float32) * sa
     canvas = Image.fromarray(np.clip(base, 0, 255).astype(np.uint8)).convert('RGBA')

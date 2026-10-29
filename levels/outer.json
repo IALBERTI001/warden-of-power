@@ -32,6 +32,18 @@
     "feather": 8,
     "why": "cover the painted entry earth that showed as a strip below the road (road moved to y395)"
    }
+  ],
+  "sharpen": [
+   2,
+   70
+  ],
+  "flattenLight": [
+   [
+    1398,
+    0,
+    1620,
+    971
+   ]
   ]
  },
  "kit": {
@@ -76,11 +88,12 @@
    ]
   ],
   "stopX": 760,
-  "strips": "art/kits/outer/road_strips.png"
+  "strips": "art/kits/outer/road_strips.png",
+  "saturation": 0.72
  },
  "walls": [
   {
-   "y": 96,
+   "y": 110,
    "x0": 110,
    "x1": 730,
    "mid": [
@@ -101,7 +114,8 @@
   "center": [
    807,
    270
-  ]
+  ],
+  "landingTo": 888
  },
  "seal": {
   "at": [
@@ -111,20 +125,21 @@
  },
  "plazaPillars": [
   [
-   890,
-   222
+   897,
+   224
   ],
   [
-   975,
-   222
+   967,
+   224
   ],
   [
-   890,
-   398
+   897,
+   392
   ],
   [
-   975,
-   398
+   967,
+   392
   ]
- ]
+ ],
+ "shadow": 0.5
 }
