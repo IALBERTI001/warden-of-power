@@ -89,7 +89,7 @@
   ],
   "stopX": 760,
   "strips": "art/kits/outer/road_strips.png",
-  "saturation": 0.72
+  "saturation": 0.6
  },
  "walls": [
   {
@@ -115,7 +115,12 @@
    807,
    270
   ],
-  "landingTo": 888
+  "extendTo": 892,
+  "matchRoad": [
+   205,
+   170,
+   118
+  ]
  },
  "seal": {
   "at": [

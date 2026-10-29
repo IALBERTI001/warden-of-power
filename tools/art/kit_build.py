@@ -67,9 +67,9 @@ def cast_shadow(sprite, flat=False):
         sh = al.filter(ImageFilter.GaussianBlur(5))
         return sh, 7, 10
     w, h = sprite.size
-    k = 0.42
+    k = 0.26
     flip = al.transpose(Image.FLIP_TOP_BOTTOM).resize((w, max(1, round(h * k))), Image.LANCZOS)
-    shear = round(h * k * 0.9)
+    shear = round(h * k * 1.5)
     sh = flip.transform((w + shear, flip.height), Image.AFFINE, (1, -shear / flip.height, 0, 0, 1, 0), Image.BICUBIC)
     sh = sh.filter(ImageFilter.GaussianBlur(3))
     return sh, 0, h - 6                                     # starts at the base line
@@ -151,29 +151,27 @@ def main():
         stand(pillar, bx, by, 'pillar')
     for bx, by in lay.get('plazaPillars', []):
         stand(pillar, bx, by, 'pillar')
-        bed = Image.new('RGBA', (round(pillar.width * 1.25), round(pillar.width * 0.45)))
-        ImageDraw.Draw(bed).ellipse((0, 0, bed.width - 1, bed.height - 1), fill=(58, 84, 36, 210))
-        bed = bed.filter(ImageFilter.GaussianBlur(3))
-        flats.append((bed, round(bx * S - bed.width / 2), round(by * S - bed.height * 0.75)))
+    bc = lay['bridge']['center']; br = lay['bridge']
+    if br.get('extendTo'):                                    # modular: repeat the deck's middle section to reach the seal
+        x_left = bc[0] * S - deck.width / 2; need = round(br['extendTo'] * S - x_left)
+        cap = round(deck.width * 0.2); midsec = deck.crop((cap, 0, deck.width - cap, deck.height))
+        longd = Image.new('RGBA', (need, deck.height)); x = cap
+        longd.alpha_composite(deck.crop((0, 0, cap, deck.height)), (0, 0))
+        while x < need - cap:
+            longd.alpha_composite(midsec.crop((0, 0, min(midsec.width, need - cap - x), deck.height)), (x, 0)); x += midsec.width
+        longd.alpha_composite(deck.crop((deck.width - cap, 0, deck.width, deck.height)), (need - cap, 0))
+        deck = longd; bc = [(x_left + need / 2) / S, bc[1]]
+    if br.get('matchRoad'):                                   # grade the deck toward the road's sandstone
+        a = np.asarray(deck).astype(np.float32); m = a[..., 3] > 128
+        a[..., :3] = a[..., :3] + (np.array(br['matchRoad'], np.float32) - a[..., :3][m].mean(0)) * 0.6 * (a[..., 3:4] > 0)
+        deck = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
     face = round(deck.height * 0.16)                          # the deck's south face (3/4 view) hangs below it over the water
     rail = deck.crop((0, deck.height - face, deck.width, deck.height))
-    shade_rows = np.linspace(0.62, 0.42, face)[None, :, None]
-    fa = np.asarray(rail).astype(np.float32); fa[..., :3] *= shade_rows.transpose(1, 0, 2)
-    deck3 = Image.new('RGBA', (deck.width, deck.height + face)); deck3.alpha_composite(deck)
-    deck3.alpha_composite(Image.fromarray(np.clip(fa, 0, 255).astype(np.uint8)), (0, deck.height))
-    deck3.alpha_composite(deck.crop((0, deck.height - 3, deck.width, deck.height)), (0, deck.height - 3))
-    bc = lay['bridge']['center']
+    fa = np.asarray(rail).astype(np.float32); fa[..., :3] *= np.linspace(0.62, 0.42, face)[:, None, None]
+    deck3 = Image.new('RGBA', (deck.width, deck.height + face))
+    deck3.alpha_composite(Image.fromarray(np.clip(fa, 0, 255).astype(np.uint8)), (0, deck.height - 4))   # overlaps: no seam
+    deck3.alpha_composite(deck)
     flat(deck3, bc[0], bc[1] + face / 2 / S, 'bridge_deck')
-    land = lay['bridge'].get('landingTo')
-    if land:                                                  # floor slabs (deck middle, rails cut away) from bridge to seal
-        x_end = round(bc[0] * S + deck.width / 2); x_to = round(land * S)
-        top_r, bot_r = round(deck.height * 0.22), round(deck.height * 0.78)
-        mid = deck.width // 2
-        slab = deck.crop((mid - (x_to - x_end) // 2, top_r, mid - (x_to - x_end) // 2 + (x_to - x_end), bot_r))
-        flats.append((slab, x_end - 2, round(bc[1] * S - deck.height / 2) + top_r))
-    for cx in (bc[0] * S - deck.width / 2 + post.width * 0.45, bc[0] * S + deck.width / 2 - post.width * 0.45):
-        stand(post, cx / S, bc[1] - deck.height / 2 / S + 4, 'newel_post')
-        stand(post, cx / S, bc[1] + deck.height / 2 / S + face / S, 'newel_post')
     flat(plinth, *lay['seal']['at'], 'seal_plinth')
 
     # shadows first, then flat pieces, then standing pieces back to front
