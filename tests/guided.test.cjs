@@ -30,10 +30,11 @@ console.log('PASS: guided campaign goes tutorial -> gate -> 13 missions with aut
  const q={seals:{tutorial:{cleared:true}},missions:{'emberheart-2':{cleared:true}}};assert.ok(!G.tier3Locked(q,'outer').includes('fire'));
  const done={seals:{tutorial:{cleared:true}},missions:{'aetherheart-1':{cleared:true}}};assert.deepStrictEqual(G.tier3Locked(done,'moonwell-1'),[]);
  assert.strictEqual(G.missionNews('moonwell-1').eyebrow,'NEW ENEMY');
- assert.strictEqual(G.missionNews('moonwell-2',el=>E.TYPES[el].paths).title,'Water Tier III: Deluge or Pressure Lance');
+ assert.strictEqual(G.missionNews('moonwell-2',el=>E.TYPES[el].paths).title,'Water: Pressure Lance unlocked');
  assert.ok(/Two entrances/.test(G.missionNews('rimeglass-3').title));
  assert.ok(G.missionNews('aetherheart-1'));
  const g=new E.Game({},{mission:'outer',level:1});g.tier3Lock=['fire'];g.charge=9999;const r=g.build('fire',(()=>{for(let y=100;y<560;y+=10)for(let x=60;x<940;x+=10)if(g.placement(x,y).ok)return{x,y}})());
- const t=g.towers[0];assert.ok(t,'built');assert.ok(g.upgrade(t.id).ok);const u=g.upgrade(t.id,0);assert.strictEqual(u.ok,false);assert.ok(u.locked);
- g.tier3Lock=[];assert.ok(g.upgrade(t.id,0).ok);
- console.log('guided tier III locks and mission news ok')}
+ const t=g.towers[0];assert.ok(t,'built');assert.ok(g.upgrade(t.id).ok);const u=g.upgrade(t.id,1);assert.strictEqual(u.ok,false,'second path locked');assert.ok(u.locked);
+ assert.ok(g.upgrade(t.id,0).ok,'first path open');
+ {const h=new E.Game({},{mission:'outer',level:1});h.tier3Lock=[];h.charge=9999;h.build('fire',{x:t.x,y:t.y});const v=h.towers[0];h.upgrade(v.id);assert.ok(h.upgrade(v.id,1).ok,'unlocked: second path open')}
+ console.log('guided Tier III second-path locks and mission news ok')}

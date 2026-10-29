@@ -26,7 +26,9 @@ function next(p,P,C){
  return{type:'outer'}}
 // One new thing every mission (Oct 28 2026, approved): mission 1 of a sector brings its enemy role, mission 2 unlocks
 // that sector's element at Tier III (a fork between two specialisations), mission 3 opens a second entrance and ends
-// on the Guardian. While guided, a Tier III path stays locked until its mission is reached; after the finale all are open.
+// on the Guardian. While guided, the element's SECOND Tier III path (Fracture furnace, Pressure Lance, Crystal focus,
+// Focused current) stays locked until that mission; the first path is open from the start (user's option 1, Oct 28 2026:
+// a full lock cost upgrade-focused players wins in Moonwell 3 and the Emberheart missions). After the finale all are open.
 const TIER3_AT={water:'moonwell-2',fire:'emberheart-2',ice:'rimeglass-2',lightning:'stormcrown-2'};
 function tier3Locked(p,missionId){if(!active(p))return[];const at=ORDER.indexOf(missionId);return Object.keys(TIER3_AT).filter(el=>!cleared(p,TIER3_AT[el])&&!(at>=0&&at>=ORDER.indexOf(TIER3_AT[el])))}
 function tier3UnlockMission(el){return TIER3_AT[el]||null}
@@ -36,7 +38,7 @@ const ELEMENT={moonwell:'water',emberheart:'fire',rimeglass:'ice',stormcrown:'li
 function missionNews(missionId,pathsOf){if(missionId===FINALE)return{eyebrow:'NEW THIS MISSION',title:'Every foe returns, with the Regulator Guardian'};
  const [sector,n]=String(missionId).split('-');if(!ROLE_NEWS[sector])return null;
  if(n==='1')return{eyebrow:'NEW ENEMY',title:ROLE_NEWS[sector]};
- if(n==='2'){const el=ELEMENT[sector],names=pathsOf?pathsOf(el):null;return{eyebrow:'NEW: TIER III',title:`${el[0].toUpperCase()+el.slice(1)} Tier III${names?': '+names.join(' or '):''}`,element:el}}
+ if(n==='2'){const el=ELEMENT[sector],names=pathsOf?pathsOf(el):null;return{eyebrow:'NEW TIER III PATH',title:`${el[0].toUpperCase()+el.slice(1)}${names?': '+names[1]:' Tier III'} unlocked`,element:el}}
  if(n==='3')return{eyebrow:'NEW THIS MISSION',title:'Two entrances, and the Guardian at the end'};return null}
 return{SECTORS,ORDER,FINALE,active,next,nextMission,tier3Locked,tier3UnlockMission,missionNews};
 });
