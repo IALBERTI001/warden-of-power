@@ -1,0 +1,124 @@
+{
+ "id": "outer",
+ "world": [
+  1000,
+  600
+ ],
+ "note": "Outer Seal, Oct 29 2026 kit layout. Road: straights + 90-degree arcs of one radius; straight approach over the bridge into the seal plaza. World units; the map image is 1620x971 (x1.62).",
+ "road": {
+  "width": 54,
+  "radius": 60,
+  "points": [
+   [
+    -40,
+    420
+   ],
+   [
+    180,
+    420
+   ],
+   [
+    180,
+    170
+   ],
+   [
+    420,
+    170
+   ],
+   [
+    420,
+    420
+   ],
+   [
+    600,
+    420
+   ],
+   [
+    600,
+    290
+   ],
+   [
+    900,
+    290
+   ]
+  ]
+ },
+ "walls": {
+  "top": {
+   "from": [
+    52,
+    92
+   ],
+   "to": [
+    728,
+    92
+   ]
+  },
+  "bottom": {
+   "from": [
+    52,
+    486
+   ],
+   "to": [
+    728,
+    486
+   ]
+  },
+  "left": {
+   "from": [
+    52,
+    92
+   ],
+   "to": [
+    52,
+    486
+   ],
+   "openings": [
+    [
+     420,
+     74
+    ]
+   ]
+  },
+  "right": {
+   "from": [
+    728,
+    92
+   ],
+   "to": [
+    728,
+    486
+   ],
+   "openings": [
+    [
+     290,
+     74
+    ]
+   ]
+  },
+  "pillarEvery": 112
+ },
+ "moat": {
+  "x0": 748,
+  "x1": 812
+ },
+ "bridge": {
+  "from": [
+   736,
+   290
+  ],
+  "to": [
+   824,
+   290
+  ]
+ },
+ "plaza": {
+  "center": [
+   900,
+   290
+  ],
+  "size": 132,
+  "pillars": 4
+ },
+ "sealLabelSlot": "auto"
+}
