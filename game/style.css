@@ -233,3 +233,6 @@ html{font-synthesis-weight:none}
 .caption-top:has(.speed-hint.top-slot:not([hidden])) .feedback{visibility:hidden}
 .caption-top:has(#speedHint:not([hidden])) .speed-cluster{box-shadow:0 0 0 2px #ffd36b,0 0 18px #ffd36b88;border-radius:12px}
 .feedback{transition:opacity .4s}.feedback:not(.show){opacity:0}
+
+/* Overcharge +5 / +10 (Nov 2 2026) */
+.oc-steps{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 2px}.oc-steps button{min-height:34px;padding:4px 6px;font-size:13px}.oc-steps button:disabled{opacity:.45}
