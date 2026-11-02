@@ -79,7 +79,25 @@ def main():
     lay = json.load(open(sys.argv[1])); out_dir = sys.argv[2]; os.makedirs(out_dir, exist_ok=True)
     W, H = lay['image']; S = W / lay['world'][0]
     g = lay['ground']
-    ground = Image.open(g['src']).convert('RGB').crop(tuple(g['crop'])).resize((W, H), Image.LANCZOS)
+    if g.get('tile'):
+        # layer model: one seamless ground material, then out-of-bounds pieces (forest edges, water, floors) on top
+        ground = Image.open(g['tile']).convert('RGB').resize((W, H), Image.LANCZOS)
+        if g.get('tone'):                                    # gentle large-scale light variation so the field is not flat
+            from scipy.ndimage import gaussian_filter
+            n = gaussian_filter(np.random.default_rng(g.get('seed', 1)).normal(0, 1, (H, W)), 90)
+            n = n / np.abs(n).max() * g['tone']
+            ground = Image.fromarray(np.clip(np.asarray(ground).astype(np.float32) * (1 + n[..., None]), 0, 255).astype(np.uint8))
+        gr = ground.convert('RGBA')
+        for pc in g.get('pieces', []):
+            im = Image.open(pc['src']).convert('RGBA'); x, y = pc['at']
+            if pc.get('shadow'):                              # soft shade on the ground beside the piece, lower right
+                al = im.getchannel('A').filter(ImageFilter.GaussianBlur(9))
+                sh = Image.new('RGBA', im.size, (24, 30, 14, 0)); sh.putalpha(al.point(lambda v: int(v * pc['shadow'])))
+                gr.alpha_composite(sh, (x + 6, y + 7))
+            gr.alpha_composite(im, (x, y))
+        ground = gr.convert('RGB')
+    else:
+        ground = Image.open(g['src']).convert('RGB').crop(tuple(g['crop'])).resize((W, H), Image.LANCZOS)
     # retouch: clone painted ground over a spot the layout no longer wants (map px, feathered edges, logged in the layout)
     for c in g.get('clones', []):
         sx, sy, w, h = c['from']; dx, dy = c['to']; f = c.get('feather', 8)

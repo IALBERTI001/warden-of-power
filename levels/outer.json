@@ -8,42 +8,49 @@
   1620,
   971
  ],
- "note": "Outer Seal, kit build (Oct 29 2026). The layout is fitted to the painted ground: meadow x100-748 y70-500, moat banks 753-772 and 843-861 (water between), courtyard from 864, entry earth at the left edge around y416. World units; image = world x1.62. Positions of standing pieces are their BASE points (bottom centre).",
+ "note": "Outer Seal, layer build (Nov 2 2026): seamless meadow ground (quilted from the approved painting's grass), thin forest edges top/left/bottom, a narrowed moat channel and the courtyard floor as separate out-of-bounds pieces, then road, bridge, top wall and seal plaza. World units; image = world x1.62. Standing pieces are placed by their BASE point.",
  "ground": {
-  "src": "art/incoming/outer-seal-ground_v1_20261029.png",
-  "crop": [
-   0,
-   49,
-   1536,
-   970
-  ],
-  "clones": [
+  "tile": "art/ground/outer/meadow_v1.png",
+  "tone": 0.06,
+  "seed": 4,
+  "pieces": [
    {
-    "from": [
+    "src": "art/kits/outer/forest_edge_top.png",
+    "at": [
      0,
-     738,
-     130,
-     52
+     0
     ],
-    "to": [
+    "shadow": 0.5
+   },
+   {
+    "src": "art/kits/outer/forest_edge_bottom.png",
+    "at": [
      0,
-     682
+     866
+    ]
+   },
+   {
+    "src": "art/kits/outer/forest_edge_left.png",
+    "at": [
+     0,
+     0
     ],
-    "feather": 8,
-    "why": "cover the painted entry earth that showed as a strip below the road (road moved to y395)"
+    "shadow": 0.5
+   },
+   {
+    "src": "art/kits/outer/moat_channel.png",
+    "at": [
+     1254,
+     0
+    ]
+   },
+   {
+    "src": "art/kits/outer/courtyard_floor.png",
+    "at": [
+     1400,
+     0
+    ]
    }
-  ],
-  "sharpen": [
-   2,
-   70
-  ],
-  "flattenLight": [
-   [
-    1398,
-    0,
-    1620,
-    971
-   ]
   ]
  },
  "kit": {
@@ -87,23 +94,15 @@
     270
    ]
   ],
-  "stopX": 760,
+  "stopX": 790,
   "strips": "art/kits/outer/road_strips.png",
   "saturation": 0.6
  },
  "walls": [
   {
-   "y": 110,
-   "x0": 110,
-   "x1": 730,
-   "mid": [
-    420
-   ]
-  },
-  {
-   "y": 506,
-   "x0": 110,
-   "x1": 730,
+   "y": 92,
+   "x0": 95,
+   "x1": 748,
    "mid": [
     420
    ]
@@ -112,7 +111,7 @@
  "pillars": [],
  "bridge": {
   "center": [
-   807,
+   819,
    270
   ],
   "extendTo": 892,
