@@ -18,7 +18,7 @@ const LATER=new Set([]);
 // Cumulative counters shown as progress while locked.
 const PROGRESS={freeze_twenty_five:['freeze',25],conduction_twenty_five:['conduction',25],shatter_twenty_five:['shatter',25],early_wave_five:['early',5]};
 function tier(id){return TIERS[id]||'bronze'}
-function image(id,size=256){return `assets/badges/${id}-${size}.png`}
+function image(id,size=256){return `assets/badges/${id}-${size}.webp`}
 function progress(id,profile){const p=PROGRESS[id];if(!p)return null;const value=Math.min(p[1],Math.floor(profile?.counters?.[p[0]]||0));return{value,goal:p[1]}}
 function available(id){return !LATER.has(id)}
 function visible(id,profile){return !HIDDEN.has(id)||!!profile?.earned?.[id]}
