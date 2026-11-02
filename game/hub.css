@@ -290,3 +290,4 @@ body.guided #playNext,body.guided #openSkills{visibility:hidden}
 
 /* review Nov 2 2026: captions step aside for overlays and panels */
 body:has(.overlay:not([hidden])) .guided-card.caption,body:has(#panel:not([hidden])) .guided-card.caption{display:none}
+body:has(.overlay:not([hidden])) .guided-card{display:none}

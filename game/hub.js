@@ -304,7 +304,9 @@ function campaignRevealDue(){const g=globalThis.WardenGuided;return !!g&&!!profi
 const ALARM={moonwell:'The Moonwell Cisterns are under attack!',emberheart:'The Emberheart Forge is under attack!',rimeglass:'The Rimeglass Vaults are under attack!',stormcrown:'The Stormcrown Spire is under attack!',aetherheart:'The Aetherheart Engine is under siege!',outer:'Monsters are hammering the Outer Seal!'};
 let directing=false;
 function guidedCard(html,cls=''){const c=$('guidedCard');c.className='guided-card '+cls;c.innerHTML=html;c.hidden=false;return c}
-const gwait=ms=>new Promise(r=>setTimeout(r,ms));
+/* review Nov 2 2026: the guided flow waits while the player has a menu open (skills, badges, settings), so a countdown never runs out behind it */
+const menuOpen=()=>!!document.querySelector('.overlay:not([hidden])');
+const gwait=ms=>new Promise(r=>{let left=ms;const tick=()=>{if(!menuOpen())left-=100;if(left<=0)r();else setTimeout(tick,100)};setTimeout(tick,100)});
 const momentDone=()=>new Promise(r=>{const t=setInterval(()=>{if(!document.body.classList.contains('moment')){clearInterval(t);r()}},200)});
 async function guidedCaption(eyebrow,title,text,ms){guidedCard(`<span class="eyebrow">${eyebrow}</span><h2>${title}</h2><p>${text}</p>`,'caption');await gwait(ms);$('guidedCard').hidden=true}
 async function guidedAlarm(a){const key=a.type==='outer'?'outer':a.sector;const pin=document.querySelector(`[data-place="${key==='outer'?'outer':key}"]`);pin?.classList.add('under-attack');
@@ -339,3 +341,13 @@ function campaignReveal(){profile.campaignRevealSeen=true;profile.hubIntroSeen=t
  let hov=null;map.addEventListener('mousemove',e=>{const id=hit(e);if(id===hov)return;hov=id;map.style.cursor=id?'pointer':'';document.querySelectorAll('.pin').forEach(b=>b.classList.toggle('hover',b.dataset.place===id))});
  map.addEventListener('mouseleave',()=>{hov=null;map.style.cursor='';document.querySelectorAll('.pin.hover').forEach(b=>b.classList.remove('hover'))});
  map.addEventListener('click',e=>{if(document.body.classList.contains('moment'))return;const id=hit(e);if(id)openPanel(id,document.querySelector(`[data-place="${id}"]`))})})();
+
+// ---------- Readable at the smallest window (review, Nov 2 2026) ---------------------------------------
+// The hub is designed at 1366x768 and scaled down to fit; at 821x462 that turns 13 px labels into 7.8 px. Any text that
+// would render under 10.5 px is enlarged just enough to reach it. Re-run after every render (the DOM is rebuilt).
+(function readableFloor(){const MIN=10.5;let pending=false;
+ const run=()=>{pending=false;const s=HUBFIT.s;const hub=document.getElementById('hub');if(!hub)return;
+  for(const el of hub.querySelectorAll('[data-floor]')){el.style.fontSize='';el.removeAttribute('data-floor')}if(s>=1)return;
+  for(const el of hub.querySelectorAll('*')){if(!el.childNodes.length||![...el.childNodes].some(c=>c.nodeType===3&&c.textContent.trim()))continue;const px=parseFloat(getComputedStyle(el).fontSize);if(px*s<MIN){el.style.fontSize=(MIN/s).toFixed(2)+'px';el.setAttribute('data-floor','')}}};
+ const later=()=>{if(!pending){pending=true;requestAnimationFrame(run)}};
+ try{new MutationObserver(later).observe(document.getElementById('hub'),{childList:true,subtree:true})}catch(e){}addEventListener('resize',later);later()})();
