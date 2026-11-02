@@ -194,8 +194,8 @@ function crop(c,image,rect,x,y,w,h,flip=false,alpha=1){if(!image)return;c.save()
 /* Nov 2 2026: towers sit IN the ground. A soft contact shadow toward the lower right (light from the upper left), so a tower never seems to hover */
 /* Wave callout (Nov 2 2026): "WAVE 952!" with a short cheer, drawn like the damage numbers; milestones get a bigger cheer */
 const CHEERS=['Keep it up!','Great job!','WOOOAHH!','Unstoppable!','Hold the line!','Nice work!','You got this!','Crushing it!','On fire!','Legendary!'];
-let wavePop=null;function showWavePop(w){const n=+w||0;const milestone=n>0&&(n%100===0?'CENTURY!':n%50===0?'HALFWAY TO GLORY!':n%10===0?'MILESTONE!':null);
- wavePop={n,cheer:milestone||CHEERS[(n*7+3)%CHEERS.length],big:!!milestone,at:realTime}}
+let wavePop=null;function showWavePop(w){const n=+w||0;const first=n===1?['Good luck!','How far will you go?'][Math.floor(Math.random()*2)]:null;const milestone=n>0&&(n%100===0?'CENTURY!':n%50===0?'HALFWAY TO GLORY!':n%10===0?'MILESTONE!':null);
+ wavePop={n,cheer:first||milestone||CHEERS[(n*7+3)%CHEERS.length],big:!!milestone,at:realTime}}
 function drawWavePop(){if(!wavePop)return;const age=realTime-wavePop.at,L=2.4;if(age>L){wavePop=null;return}const calm=settings.reduced;
  const k=age<.22?age/.22:1,pop=calm?1:(age<.22?.55+.6*k:age<.36?1.15-(age-.22)/.14*.15:1),fade=age>L-.5?Math.max(0,(L-age)/.5):1;
  ctx.save();ctx.globalAlpha=fade;ctx.translate(500,(game.map.wavePopY||(game.map.sealLabel?200:395))-(calm?0:age*6));ctx.scale(pop,pop);ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
