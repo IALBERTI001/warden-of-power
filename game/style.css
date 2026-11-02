@@ -219,7 +219,8 @@ html{font-synthesis-weight:none}
 .loss-why p{margin:2px 0;font-size:15px}.loss-why .tip{color:#ffe08a}
 
 /* Oct 28 2026 (rules check item 3): during tutorial wave 1 only the callout speaks */
-.opening-quiet .wave-bar,.opening-quiet #feedback{visibility:hidden}
+/* Nov 2 2026 (user): the Send-next-wave button is always visible; only the feedback line stays quiet in wave 1 */
+.opening-quiet #feedback{visibility:hidden}
 /* Oct 28 2026 (rules check item 4): at the smallest window (stage scale 0.72) every label renders at 10 px or more */
 #gameStage.fit-compact .eyebrow,#gameStage.fit-compact .sector-caption,#gameStage.fit-compact .coach-eyebrow,#gameStage.fit-compact .speed-cluster small,#gameStage.fit-compact .wave-bar small,#gameStage.fit-compact .toast small,#gameStage.fit-compact kbd,#gameStage.fit-compact .coach-key,#gameStage.fit-compact .auto-wave,#gameStage.fit-compact .speed-hint button{font-size:14px!important}
 #gameStage.fit-compact .resources small,#gameStage.fit-compact .dock-label,#gameStage.fit-compact [data-type] small,#gameStage.fit-compact .speed-hint span,#gameStage.fit-compact .speed-hint{font-size:14px!important}
