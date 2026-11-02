@@ -16,7 +16,7 @@ function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));$(
 let settings={master:.65,effects:.7,music:.2,ambience:.35,masterMute:false,effectsMute:false,musicMute:false,ambienceMute:false,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,guide:true,...read('warden.settings.v1',{})};
 /* Oct 28 2026 (user): battle music plays by default at a low volume */if(settings.musicVersion!==1){if(settings.musicMute!==false){settings.musicMute=false;settings.music=.2}settings.musicVersion=1;store('warden.settings.v1',settings)}
 if(settings.teachingVersion!==3){settings.guide=true;settings.teachingVersion=3;store('warden.settings.v1',settings);}
-let keys={...DEFAULT_KEYS,...read('warden.keys.v1',{})},game=new E.Game(read('warden.profile.v1',{}),MISSION);
+let keys={...DEFAULT_KEYS,...read('warden.keys.v1',{})},game=new E.Game(read('warden.profile.v1',{}),MISSION);const BACKPAY=window.WardenBadges?.payEarned?.(game.profile);if(BACKPAY?.count){store('warden.profile.v1',game.profile);setTimeout(()=>toast('Badge rewards arrived',`+${wfmt(BACKPAY.parts)} ⚙${BACKPAY.resonance?' · +'+wfmt(BACKPAY.resonance)+' ✦':''} for ${BACKPAY.count} badge${BACKPAY.count>1?'s':''}`),1500)}
 const teach=()=>TUT&&settings.guide&&!coach();/* Oct 24 2026: the old tutorial book stays off while the Warden coach runs the tutorial */
 let speed=1,paused=false,modalPaused=false,buildType=TUT?'fire':null/* Nov 2 2026: outside the tutorial nothing is armed for building at the start */,selected=null,enemySelected=null,hover=null,last=0,accumulator=0,realTime=0,lastSave=0,uiTimer=0,pendingAction=null,fx=[],ready=false,soundUnlocked=false;
 let guide=new WardenTutorial.Guide();let runBadges=[];
@@ -82,7 +82,15 @@ if($('autoWaveWrap')){$('autoWaveWrap').hidden=!ENGINE_RUN;$('autoWave').checked
 window.WardenFeedbackGame=()=>game;
 if($('feedbackButton')&&window.WardenFeedback){$('feedbackButton').onclick=()=>{const wasPaused=paused;WardenFeedback.open({onOpen(){modalPaused=true;syncAudio()},onClose(){modalPaused=!!document.querySelector('dialog[open]');syncAudio()}})}}
 if($('skillsButton')){$('skillsButton').hidden=TUT;$('skillsButton').onclick=openBattleSkills}
-function showThousandth(){const d=$('ascension');if(!d)return;d.dataset.rank='mythic';d.querySelector('.eyebrow').textContent='THE THOUSANDTH WAVE';$('ascRoman').textContent='∞';$('ascTitle').textContent='Warden Eternal';$('ascBadge').src=WardenBadges.image('eternal_thousand',256);$('ascBanner').textContent='No Warden was ever meant to stand here.';$('ascPower').innerHTML='<b>A secret badge</b><span>You found something no list ever showed. The crown above the Aetherheart Engine will remember.</span>';
+/* Wave 1000 (Nov 2 2026, user: "I worked so hard to reach wave 1000 ... lets have the player get rewarded for real"):
+   a full celebration with the rewards counted up in front of the player. */
+function showThousandth(){const d=$('ascension');if(!d)return;const R=WardenBadges.reward('eternal_thousand');d.dataset.rank='mythic';d.classList.add('thousandth');
+ d.querySelector('.eyebrow').textContent='THE THOUSANDTH WAVE';$('ascRoman').textContent='∞';$('ascTitle').textContent='WARDEN ETERNAL';$('ascBadge').src=WardenBadges.image('eternal_thousand',256);
+ $('ascBanner').textContent='1,000 waves held. No Warden has ever stood here before you.';
+ $('ascPower').innerHTML=`<b class="eternal-head">Your rewards</b><div class="eternal-rewards"><div><i>⚙</i><strong data-count="${R.parts}">0</strong><small>Restoration Parts</small></div><div><i>✦</i><strong data-count="${R.resonance}">0</strong><small>Resonance</small></div><div class="crown"><i>♛</i><strong>+10%</strong><small>Eternal Crown: damage for every tower, forever</small></div></div><span class="eternal-foot">The title <b>Warden Eternal</b> is yours, and the crown now rests above the Aetherheart Engine.</span>`;
+ const conf=document.createElement('div');conf.className='eternal-confetti';conf.setAttribute('aria-hidden','true');if(!settings.reduced)for(let k=0;k<70;k++){const p=document.createElement('i');p.style.cssText=`left:${Math.random()*100}%;animation-delay:${(Math.random()*1.6).toFixed(2)}s;animation-duration:${(2.4+Math.random()*2).toFixed(2)}s;background:${['#ffd36b','#fff3d1','#ffb347','#bff3ff','#e0b3ff'][k%5]};transform:rotate(${Math.random()*360}deg)`;conf.append(p)}d.querySelector('.eternal-confetti')?.remove();d.prepend(conf);
+ const t0=performance.now();const tick=now=>{const k=Math.min(1,(now-t0)/1800),e=1-Math.pow(1-k,3);d.querySelectorAll('[data-count]').forEach(el=>el.textContent='+'+wfmt(Math.round(+el.dataset.count*e)));if(k<1&&d.open)requestAnimationFrame(tick)};requestAnimationFrame(tick);
+ window.WardenAds?.happytime?.();
  try{if(!(settings.masterMute||settings.effectsMute)){const a=new Audio('assets/audio/ascension.wav');a.playbackRate=.8;a.volume=Math.min(1,settings.master*Math.max(.35,settings.effects||0));a.play().catch(()=>{})}}catch{}openModal('ascension')}
 // Optional rewarded ads (approved Oct 24 2026): offered only on the rest card and results screens, never during play.
 // The offer shows exactly what the doubled amount buys; "No thanks" is as large as the offer.
@@ -199,7 +207,7 @@ let wavePop=null;function showWavePop(w){const n=+w||0;const first=n===1?['Good 
 function drawWavePop(){if(!wavePop)return;const age=realTime-wavePop.at,L=2.4;if(age>L){wavePop=null;return}const calm=settings.reduced;
  const k=age<.22?age/.22:1,pop=calm?1:(age<.22?.55+.6*k:age<.36?1.15-(age-.22)/.14*.15:1),fade=age>L-.5?Math.max(0,(L-age)/.5):1;
  ctx.save();ctx.globalAlpha=fade;ctx.translate(500,(game.map.wavePopY||(game.map.sealLabel?200:395))-(calm?0:age*6));ctx.scale(pop,pop);ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
- const title='WAVE '+wfmt(wavePop.n)+'!';ctx.font=(wavePop.big?'60px':'50px')+' "Warden Quill", Georgia';ctx.lineWidth=10;ctx.strokeStyle='#24162c';ctx.strokeText(title,0,0);
+ const title='WAVE '+wavePop.n.toLocaleString('en-US')+'!';ctx.font=(wavePop.big?'60px':'50px')+' "Warden Quill", Georgia';ctx.lineWidth=10;ctx.strokeStyle='#24162c';ctx.strokeText(title,0,0);
  const g=ctx.createLinearGradient?.(0,-26,0,26);if(g?.addColorStop){g.addColorStop(0,'#fff3c2');g.addColorStop(.55,'#ffd36b');g.addColorStop(1,'#f08a2c');ctx.fillStyle=g}else ctx.fillStyle='#ffd36b';ctx.fillText(title,0,0);
  const ca=Math.max(0,Math.min(1,(age-.18)/.2));ctx.globalAlpha=fade*ca;ctx.font=(wavePop.big?'30px':'26px')+' "Warden Quill", Georgia';ctx.lineWidth=7;ctx.strokeText(wavePop.cheer,0,40);ctx.fillStyle=wavePop.big?'#ffb3f0':'#bff3ff';ctx.fillText(wavePop.cheer,0,40);ctx.restore()}
 function towerShadow(c,x,y,width=75){const k=width/75,g=c.createRadialGradient?.(x+7*k,y+5*k,2,x+7*k,y+5*k,34*k);c.save();if(g?.addColorStop){g.addColorStop(0,'rgba(18,22,8,.46)');g.addColorStop(.6,'rgba(18,22,8,.26)');g.addColorStop(1,'rgba(18,22,8,0)');c.fillStyle=g}else c.fillStyle='rgba(18,22,8,.3)';c.beginPath();c.ellipse(x+7*k,y+5*k,36*k,13*k,0,0,Math.PI*2);c.fill();c.restore()}
@@ -267,7 +275,7 @@ function events(){for(const ev of game.drain()){coach()?.event?.(ev);
  if(ev.type==='death'&&(ev.enemy.kind==='golem'||ev.enemy.kind==='boss'||ev.enemy.kind==='shield'))sound('golem_death',true);if(ev.type==='split')fx.push({kind:'label',text:'SPLIT',x:ev.enemy.x,y:ev.enemy.y-50,color:'#e2c8ff',at:game.time});
  if(ev.type==='arc'){sound('conduction_combo',true);fx.push({kind:'arc',points:ev.points,at:game.time})}
  if(ev.type==='shatter'){sound('shatter_combo',true);fx.push({kind:'shatter',x:ev.enemy.x,y:ev.enemy.y-25,at:game.time})}
- if(ev.type==='achievement'){toast(ev.name,`BADGE ${Object.keys(game.profile.earned||{}).length} OF ${E.ACHIEVEMENTS.length}`);const last=$('toasts').lastElementChild;if(last&&last.insertAdjacentHTML){last.classList.toggle('badge-toast',true);last.insertAdjacentHTML('afterbegin',badgeImg(ev.id,128,'toast-badge'))}runBadges.push(ev.id);store('warden.profile.v1',game.profile)}
+ if(ev.type==='achievement'){const rw=ev.reward,rwText=rw?` · +${wfmt(rw.parts)} ⚙${rw.resonance?' +'+wfmt(rw.resonance)+' ✦':''}`:'';toast(ev.name,`BADGE ${Object.keys(game.profile.earned||{}).length} OF ${E.ACHIEVEMENTS.length}${rwText}`);const last=$('toasts').lastElementChild;if(last&&last.insertAdjacentHTML){last.classList.toggle('badge-toast',true);last.insertAdjacentHTML('afterbegin',badgeImg(ev.id,128,'toast-badge'))}runBadges.push(ev.id);store('warden.profile.v1',game.profile)}
  if(ev.type==='ascension'){showAscension(ev);save()}
  if(ev.type==='thousandth'){showThousandth();save()}
  if(ev.type==='restPoint'){save();showRest(ev)}

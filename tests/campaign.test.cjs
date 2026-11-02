@@ -1,4 +1,6 @@
 // Campaign (approved plan; built Oct 22 2026): 13 missions on painted, traced maps; unlock chain; rewards; roles; RNG.
+// Mission payouts are measured without badge rewards (badge-rewards.test.cjs covers those).
+require('../game/badges.js').pay=()=>null;
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),E=require('../game/engine.js'),C=require('../game/campaign.js'),P=require('../game/progression.js');
 assert.equal(C.MISSIONS.length,13);
 for(const m of C.MISSIONS){const map=E.MAPS[m.id];assert(map&&map.painted,`${m.id} painted`);assert(fs.existsSync(path.join(__dirname,'..','game',map.art)),map.art);assert(map.grid&&map.grid.length===30,'build grid');

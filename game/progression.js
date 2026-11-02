@@ -100,7 +100,7 @@ function depthForHp(h){let lo=1,hi=20000;for(let i=0;i<60;i++){const m=(lo+hi)/2
 const BRANCH_COST={};for(const s of SKILLS)BRANCH_COST[s.branch]=(BRANCH_COST[s.branch]||0)+s.costs.reduce((a,c)=>a+c,0);
 function eternalRanks(p){return Math.max(0,Math.min(ETERNAL.cap,Math.floor(p?.eternal||0)))}
 function eternalFactor(p){return Math.pow(1+ETERNAL.per,eternalRanks(p))}
-function powerMultiplier(profile){const p=migrate(profile||{});let m=1;
+function powerMultiplier(profile){const p=migrate(profile||{});let m=p.eternalCrown?1.10:1;/* Eternal Crown (wave 1000 badge): +10% forever */
  for(const f of FACILITIES)m*=Math.pow(POWER.fac[f.id]||1,Math.min(3,p.restorations[f.id]||0)/3);
  const spent={};for(const s of SKILLS){const r=rank(p,s.id);for(let i=0;i<r;i++)spent[s.branch]=(spent[s.branch]||0)+s.costs[i]}
  for(const b of BRANCHES)m*=Math.pow(POWER.branch[b]||1,(spent[b]||0)/BRANCH_COST[b]);

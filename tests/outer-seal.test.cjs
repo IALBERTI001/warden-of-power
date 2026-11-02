@@ -1,4 +1,6 @@
 // Hold the Outer Seal (approved Oct 22 2026): its own map, levelled defense, incremental strength, Parts rewards.
+// Mission payouts are measured without badge rewards (badge-rewards.test.cjs covers those).
+require('../game/badges.js').pay=()=>null;
 const assert=require('node:assert/strict'),E=require('../game/engine.js');
 const t=new E.Game({});assert.equal(t.mission,'tutorial');assert.equal(t.route.total,E.TOTAL,'tutorial route unchanged');assert.equal(t.waves,E.WAVES);assert(!t.unlocked('ice'),'tutorial still unlocks elements by lesson');
 const g=new E.Game({},{mission:'outer',level:1});assert.equal(g.map.id,'outer');assert.notDeepEqual(g.map.path,E.PATH,'not the tutorial map');assert.equal(g.waves.length,8);assert(['fire','water','ice','lightning'].every(x=>g.unlocked(x)),'all elements open');

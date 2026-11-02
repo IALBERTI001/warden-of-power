@@ -240,3 +240,20 @@ html{font-synthesis-weight:none}
 
 /* review Nov 2 2026: result buttons keep a gap */
 #result>button{margin:4px 6px 0 0}
+
+/* Wave 1000 celebration (Nov 2 2026) */
+dialog.ascension-card.thousandth{overflow:hidden}
+dialog.ascension-card.thousandth h2{font-size:38px;letter-spacing:1px}
+.eternal-head{display:block;text-align:center;font-size:15px;letter-spacing:2px;text-transform:uppercase}
+.eternal-rewards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:6px 0}
+.eternal-rewards div{display:grid;justify-items:center;gap:2px;padding:10px 6px;border-radius:10px;background:#ffffff0f;border:1px solid #fff3d155;text-align:center}
+.eternal-rewards i{font-style:normal;font-size:24px;color:#ffd36b}
+.eternal-rewards strong{font-family:var(--number-font,inherit);font-size:24px;color:#fff3d1;text-shadow:0 0 12px #ffd36b99}
+.eternal-rewards small{font-size:12px;color:#e6d6ae;line-height:1.3}
+.eternal-rewards .crown{background:linear-gradient(#ffd36b22,#ffb34711);border-color:#ffd36b}
+.eternal-foot{display:block;text-align:center;font-size:13px;color:#e6d6ae;margin-top:4px}
+.eternal-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:-1}
+.eternal-confetti i{position:absolute;top:-12px;width:7px;height:12px;border-radius:2px;opacity:.9;animation:eternal-fall linear 1 forwards}
+@keyframes eternal-fall{to{transform:translateY(560px) rotate(540deg);opacity:0}}
+dialog.ascension-card.thousandth{isolation:isolate}
+@media (max-height:560px){dialog.ascension-card.thousandth{padding:12px 18px}dialog.ascension-card.thousandth .asc-medal{transform:scale(.62);margin:-26px auto -22px}dialog.ascension-card.thousandth h2{font-size:28px;margin:2px 0}dialog.ascension-card.thousandth .asc-banner{font-size:13px;margin:0 0 6px}.eternal-rewards div{padding:6px 4px}.eternal-rewards strong{font-size:19px}.eternal-rewards i{font-size:18px}.eternal-foot{font-size:12px}}
