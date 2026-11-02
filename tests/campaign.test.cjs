@@ -1,7 +1,7 @@
 // Campaign (approved plan; built Oct 22 2026): 13 missions on painted, traced maps; unlock chain; rewards; roles; RNG.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),E=require('../game/engine.js'),C=require('../game/campaign.js'),P=require('../game/progression.js');
 assert.equal(C.MISSIONS.length,13);
-for(const m of C.MISSIONS){const map=E.MAPS[m.id];assert(map&&map.painted,`${m.id} painted`);assert(fs.existsSync(path.join(__dirname,'..','game',map.art)),map.art);assert(map.grid&&map.grid.length===30,'build grid');
+for(const m of C.MISSIONS){const map=E.MAPS[m.id];assert(map&&map.painted,`${m.id} painted`);assert(fs.existsSync(path.join(__dirname,'..','game',map.art)),map.art);assert((map.grid&&map.grid.length===30)||(map.id==='aetherheart-1'&&map.grid===null&&map.blocked.length),'build grid (or exact edges on the layered Engine map)');
  const g=new E.Game({},{mission:m.id,seed:1});assert.equal(g.waves.length,m.waves);for(const w of g.waves)assert(w.attunes.length<=2,'at most two attunement kinds per wave');
  for(const R of g.routes)assert(R.total>600,`${m.id} route length`)}
 assert.notDeepEqual(E.MAPS['moonwell-1'].path,E.MAPS['moonwell-2'].path,'every map has its own route');
