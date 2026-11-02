@@ -287,3 +287,6 @@ body.guided #playNext,body.guided #openSkills{visibility:hidden}
 .daily-days li.today{background:#ffd36b26;border:2px solid var(--brass-hi);box-shadow:0 0 18px #ffd36b55}
 .daily-today{font-size:17px}
 @container (max-width:600px){.daily-days{grid-template-columns:repeat(4,1fr)}}
+
+/* review Nov 2 2026: captions step aside for overlays and panels */
+body:has(.overlay:not([hidden])) .guided-card.caption,body:has(#panel:not([hidden])) .guided-card.caption{display:none}

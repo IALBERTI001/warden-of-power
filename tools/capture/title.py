@@ -11,7 +11,8 @@ im=ImageEnhance.Contrast(ImageEnhance.Color(im).enhance(1.12)).enhance(1.05)
 # top darkening band for the title + soft edge vignette
 ov=Image.new('L',(W,H),0); d=ImageDraw.Draw(ov)
 band=int(H*(.42 if W>H*1.2 else .36 if W>=H else .3))
-for i in range(band): d.line([(0,i),(W,i)],fill=int(225*(1-i/band)**1.3))
+BOTTOM=len(sys.argv)>7 and sys.argv[7]=='bottom'  # title at the bottom, over calm ground, so the action at the top stays clear
+for i in range(band): d.line([(0,H-1-i if BOTTOM else i),(W,H-1-i if BOTTOM else i)],fill=int(225*(1-i/band)**1.3))
 vig=Image.new('L',(W,H),0); dv=ImageDraw.Draw(vig); dv.ellipse((-W*.25,-H*.25,W*1.25,H*1.25),fill=255); vig=vig.filter(ImageFilter.GaussianBlur(min(W,H)*.12))
 dark=Image.new('RGB',(W,H),(14,9,20))
 im=Image.composite(dark,im,ov); im=Image.composite(im,dark,vig.point(lambda v:int(70+v*185/255)))
@@ -22,6 +23,7 @@ f=ImageFont.truetype(FONT,size); f2=ImageFont.truetype(FONT,int(size*.5))
 fonts=[f,f2] if len(lines)==2 else [f]
 d=ImageDraw.Draw(im)
 ty=int(H*.035)
+if BOTTOM: ty=int(H-H*.035-sum(int(ft.size*1.02) for ft in fonts)-size*.12)
 layers=[]
 for ln,ft in zip(lines,fonts):
     w=d.textlength(ln,font=ft); layers.append((ln,ft,(W-w)/2,ty)); ty+=int(ft.size*1.02)
