@@ -293,3 +293,4 @@ body:has(.overlay:not([hidden])) .guided-card.caption,body:has(#panel:not([hidde
 body:has(.overlay:not([hidden])) .guided-card{display:none}
 
 .badge-reward{display:block;font-size:12px;color:#ffd36b;margin-top:2px}
+.checkpoints .cp-top{border-color:#ffd36b;box-shadow:0 0 10px #ffd36b55}

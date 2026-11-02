@@ -26,5 +26,11 @@ assert(/Warden Trial V/.test(E.engineWave(500,rng,1).name));assert(!E.engineWave
 {const p={unboundOpen:true,ascension:2,engineBest:240,bestEndlessWave:240};assert.deepEqual(A.checkpoints(p),[100,200]);
  const g=new E.Game(p,{mission:'engine',seed:1,start:200});assert.equal(g.start,200);assert.equal(g.wave,200);assert.equal(g.completed,200);assert(g.charge>=A.bank(200));assert(g.waveAt(200)&&g.waves[200].name==='Wave 201');
  const bad=new E.Game(p,{mission:'engine',seed:1,start:300});assert.equal(bad.start,0,'cannot start past your rank');assert.equal(bad.wave,0);
- assert.deepEqual(A.checkpoints({ascension:5}),[100,200,300,400],'no checkpoint at 500')}
+ assert.deepEqual(A.checkpoints({ascension:5}),[100,200,300,400,500],'crowned: checkpoint at 500 (user, Nov 2 2026)');assert.deepEqual(A.checkpoints({ascension:5,earned:{eternal_thousand:'x'}}),[100,200,300,400,500,1000],'Warden Eternal: checkpoint at 1000')}
 console.log('PASS: Warden Trials at 100-500, ranks granted once in order, powers only in the Engine, Reserve, Concord, checkpoints.');
+// Nov 2 2026: a run can actually start at 500 / 1000 and the secret depth badges pay on the way
+{const E2=require('../game/engine.js');const p={ascension:5,ascensionSeen:5,unboundOpen:true,engineBest:1000,bestEndlessWave:1000,earned:{eternal_thousand:'x'}};
+ const a=new E2.Game(JSON.parse(JSON.stringify(p)),{mission:'engine',start:500});assert.equal(a.start,500);assert.equal(a.wave,500);
+ const b=new E2.Game(JSON.parse(JSON.stringify(p)),{mission:'engine',start:1000});assert.equal(b.start,1000);
+ const c=new E2.Game({ascension:5,unboundOpen:true},{mission:'engine',start:1000});assert.equal(c.start,0,'no 1000 start without Warden Eternal');
+ console.log('PASS checkpoints 500 and 1000')}

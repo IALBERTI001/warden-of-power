@@ -6,12 +6,14 @@ const TIERS={
  all_combos_one_run:'silver',one_chain_four:'silver',one_shatter_three:'silver',perfect_campaign_mission:'silver',close_call:'silver',early_wave_five:'silver',two_elements_only:'silver',three_maps_clear:'silver',first_endless_twenty:'silver',
  restore_water:'silver',restore_fire:'silver',restore_ice:'silver',restore_lightning:'silver',endless_fifty:'silver',
  freeze_twenty_five:'gold',conduction_twenty_five:'gold',shatter_twenty_five:'gold',ten_mission_wins:'gold',engine_reborn:'gold',endless_hundred:'gold',endless_200:'gold',endless_300:'gold',endless_400:'prismatic',
- endless_500:'prismatic',
+ endless_500:'prismatic',endless_600:'prismatic',endless_700:'prismatic',endless_800:'prismatic',endless_900:'prismatic',
  tactician_master:'silver',tactician_grandmaster:'gold',tactician_legend:'prismatic',power_rising:'silver',power_towering:'gold',power_overwhelming:'prismatic',
  eternal_thousand:'mythic'
 };
 // Hidden badges are not listed and not counted until earned (the wave 1000 secret).
-const HIDDEN=new Set(['eternal_thousand']);
+const HIDDEN=new Set(['eternal_thousand','endless_600','endless_700','endless_800','endless_900']);
+// The secret depth badges share the Crown medal until their own art is made.
+const ART={endless_600:'endless_500',endless_700:'endless_500',endless_800:'endless_500',endless_900:'endless_500'};
 const TIER_LABEL={bronze:'Bronze',silver:'Silver',gold:'Gold',prismatic:'Prismatic',mythic:'Mythic'};
 // Achievements that need campaign maps, restorations or endless mode, which are not playable yet.
 const LATER=new Set([]);
@@ -26,7 +28,7 @@ function pay(profile,id){if(!profile||!profile.earned||!profile.earned[id])retur
  profile.parts=(profile.parts||0)+r.parts;profile.resonance=(profile.resonance||0)+r.resonance;if(r.crown)profile.eternalCrown=true;profile.badgePaid[id]=new Date().toISOString();return r}
 // Badges earned before rewards existed pay out once, the next time the game opens.
 function payEarned(profile){const out={parts:0,resonance:0,count:0,crown:false};for(const id of Object.keys(profile?.earned||{})){const r=pay(profile,id);if(r){out.parts+=r.parts;out.resonance+=r.resonance;out.count++;out.crown=out.crown||!!r.crown}}return out}
-function image(id,size=256){return `assets/badges/${id}-${size}.webp`}
+function image(id,size=256){return `assets/badges/${ART[id]||id}-${size}.webp`}
 function progress(id,profile){const p=PROGRESS[id];if(!p)return null;const value=Math.min(p[1],Math.floor(profile?.counters?.[p[0]]||0));return{value,goal:p[1]}}
 function available(id){return !LATER.has(id)}
 function visible(id,profile){return !HIDDEN.has(id)||!!profile?.earned?.[id]}

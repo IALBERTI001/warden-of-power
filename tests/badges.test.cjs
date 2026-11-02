@@ -1,6 +1,6 @@
 // Badge catalogue: every achievement has a tier and artwork; progress and equip rules.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),E=require('../game/engine.js'),B=require('../game/badges.js');
-assert.equal(E.ACHIEVEMENTS.length,38);assert.equal(B.publicTotal(E.ACHIEVEMENTS),37);
+assert.equal(E.ACHIEVEMENTS.length,42);assert.equal(B.publicTotal(E.ACHIEVEMENTS),37);
 const ids=new Set();for(const [id,name,desc] of E.ACHIEVEMENTS){assert(!ids.has(id),'unique id '+id);ids.add(id);assert(B.TIERS[id],'tier for '+id);assert(name&&desc);
  const art=path.join(__dirname,'..','game',B.image(id,256));assert(fs.existsSync(art),'badge art missing: '+art);assert(fs.existsSync(path.join(__dirname,'..','game',B.image(id,128))));}
 for(const id of Object.keys(B.TIERS))assert(ids.has(id),'tier entry without achievement: '+id);
