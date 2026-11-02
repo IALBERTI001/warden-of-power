@@ -148,5 +148,16 @@ function damageBonus(b,type){const e=b.el[type];return e.damagePct+(type==='fire
 // Warden Power: the total of every percentage bonus your towers carry (damage, burn, shatter, range, speed, soak, slow...).
 const PCT_KEYS=['damagePct','impactPct','burnPct','shatterPct','shatterRadiusPct','soakPct','rangePct','speedPct','slowPts','vsFrozenPct','vsBossPct','conductPct','secondaryPct'];
 function powerSummary(profile){const b=bonuses(profile);let t=b.allDamagePct*ELEMENTS.length+b.eng.upgradeDiscount+b.eng.refundPts;for(const e of ELEMENTS)for(const k of PCT_KEYS)t+=b.el[e][k]||0;return Math.round(t*100)}
-return{fmt,sanitize,sanitizeProfile,WORKSHOP,workshopRank,workshopOffer,buyWorkshop,workshopEffects,legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
+// ---------- Daily reward (Nov 2 2026, user request) -----------------------------------------------------------------
+// Opens once the campaign is complete (the Aetherheart finale is won). The first screen of each new day offers it:
+// Parts every day, growing with the streak up to day 7; on Fridays Resonance as well. A missed day pauses the streak
+// (the same day repeats) instead of resetting it. Days use the player's local calendar; a clock set backwards pays nothing.
+const DAILY={parts:[20,30,40,50,60,70,80],fridayResonance:50,finale:'aetherheart-1'};
+const dayKey=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
+function dailyOffer(p,now=Date.now()){if(!p?.missions?.[DAILY.finale]?.cleared)return{ok:false,reason:'locked'};const today=dayKey(now),last=p.daily?.last||null;
+ if(last&&last>=today)return{ok:false,reason:'claimed',today};const y=new Date(now);y.setDate(y.getDate()-1);const prev=Math.max(0,Math.floor(p.daily?.streak||0));
+ const streak=!last?1:last===dayKey(y)?prev+1:Math.max(1,prev);const day=Math.min(streak,DAILY.parts.length),friday=new Date(now).getDay()===5;
+ return{ok:true,today,streak,day,missed:!!last&&last!==dayKey(y),parts:DAILY.parts[day-1],resonance:friday?DAILY.fridayResonance:0,friday}}
+function claimDaily(p,now=Date.now()){const o=dailyOffer(p,now);if(!o.ok)return o;p.parts=(p.parts||0)+o.parts;p.resonance=(p.resonance||0)+o.resonance;p.daily={last:o.today,streak:o.streak,claims:(p.daily?.claims||0)+1};return{...o,ok:true}}
+return{DAILY,dayKey,dailyOffer,claimDaily,fmt,sanitize,sanitizeProfile,WORKSHOP,workshopRank,workshopOffer,buyWorkshop,workshopEffects,legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
 });

@@ -276,3 +276,14 @@ body.guided #playNext,body.guided #openSkills{visibility:hidden}
 @keyframes pinAlarm{to{box-shadow:0 0 0 8px #ff6b4a66}}
 @media(prefers-reduced-motion:reduce){.guided-card,.guided-card.alarm,.guided-card .count.tick,.pin.under-attack{animation:none}}
 .pin.hover{transform:translate(-50%,-100%) scale(1.06);filter:brightness(1.12)}
+
+/* Daily reward (Nov 2 2026) */
+.daily-card{width:min(640px,100%)}
+.daily-days{list-style:none;display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:14px 0 10px;padding:0}
+.daily-days li{position:relative;display:grid;gap:2px;padding:10px 4px;border-radius:12px;background:#ffffff0d;border:1px solid #ffffff1f}
+.daily-days small{font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.daily-days b{font-family:var(--game-font);font-weight:normal;font-size:16px;color:var(--brass-hi)}
+.daily-days li.got{opacity:.55}.daily-days li.got em{position:absolute;top:4px;right:6px;font-style:normal;color:#8fd486}
+.daily-days li.today{background:#ffd36b26;border:2px solid var(--brass-hi);box-shadow:0 0 18px #ffd36b55}
+.daily-today{font-size:17px}
+@container (max-width:600px){.daily-days{grid-template-columns:repeat(4,1fr)}}

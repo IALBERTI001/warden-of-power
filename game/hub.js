@@ -246,7 +246,12 @@ function tickGuide(){const box=$('guideCallout');if(guidedOn()||!$('guidedCard')
 $('openHandbook')&&($('openHandbook').onclick=()=>WardenGuide.open());
 $('openGuide').onclick=()=>{profile.hubGuide=0;profile.hubIntroSeen=false;persist();showIntro()};
 setInterval(tickGuide,250);addEventListener('resize',tickGuide);
-if(seals().cleared&&!profile.hubIntroSeen&&!guidedOn()&&!campaignRevealDue())setTimeout(showIntro,500);
+/* Nov 2 2026: daily reward. After the campaign is complete, the first thing a returning player sees each day */
+function showDaily(){const o=P.dailyOffer(profile);if(!o.ok)return false;const el=$('guideIntro'),n=P.DAILY.parts.length,done=(o.missed?o.day-1:o.day-1);
+ const tiles=P.DAILY.parts.map((v,i)=>`<li class="${i<done?'got':i===o.day-1?'today':''}"><small>DAY ${i+1}</small><b>⚙ ${v}</b>${i<done?'<em>✓</em>':''}</li>`).join('');
+ el.innerHTML=`<div class="overlay-card intro-card daily-card"><span class="eyebrow">DAILY REWARD${o.day>1?' · '+o.streak+'-DAY STREAK':''}</span><h2 id="guideTitle">Welcome back, Warden</h2><ol class="daily-days">${tiles}</ol><p class="daily-today">Today: <b>⚙ ${o.parts} Parts</b>${o.resonance?` and <b>✦ ${o.resonance} Resonance</b> (Friday bonus)`:''}</p>${o.missed?'<p class="muted">You missed a day, so your streak paused. Come back tomorrow to keep climbing.</p>':`<p class="muted">${o.day<n?'Tomorrow: ⚙ '+P.DAILY.parts[o.day]+' Parts.':'Every day from now: ⚙ '+P.DAILY.parts[n-1]+' Parts.'} Fridays add ✦ ${P.DAILY.fridayResonance} Resonance.</p>`}<div class="intro-actions"><button class="primary-btn" id="dailyClaim">Claim</button></div></div>`;
+ el.hidden=false;$('dailyClaim').onclick=()=>{const r=P.claimDaily(profile);el.hidden=true;if(r.ok){persist();render();toast('Daily reward claimed','+'+r.parts+' Parts'+(r.resonance?' · +'+r.resonance+' Resonance':''))}tickGuide?.()};setTimeout(()=>$('dailyClaim').focus(),30);return true}
+if(!(P.dailyOffer(profile).ok&&!campaignRevealDue()&&setTimeout(showDaily,450)))if(seals().cleared&&!profile.hubIntroSeen&&!guidedOn()&&!campaignRevealDue())setTimeout(showIntro,500);
 
 // ---------- area sound: a short cue when you open an area -----------------------------------------
 // User feedback (Oct 22): looping area sound was overbearing even one area at a time. Now opening an area plays
@@ -322,7 +327,7 @@ async function runDirector(){
  directing=false;document.body.classList.remove('guided')}
 function campaignReveal(){profile.campaignRevealSeen=true;profile.hubIntroSeen=true;const pi=GUIDE.findIndex(g=>g.id==='power');if(pi>=0&&(profile.hubGuide||0)<pi)profile.hubGuide=pi;persist();render();
  const c=guidedCard(`<span class="eyebrow">CAMPAIGN COMPLETE</span><h2>The Aetherheart Engine awakens</h2><p>You reawakened the whole complex. Now the real climb begins:</p><ul><li><b>Engine Trials</b> · endless waves, how deep can you go?</li><li><b>Skills</b> · spend Resonance from the Engine on every element</li><li><b>Cogwright's Workshop</b> · spend spare Parts on engineering upgrades</li></ul><button class="primary" id="guidedGo">Explore the complex</button>`,'reveal');
- $('guidedGo').onclick=()=>{c.hidden=true;tickGuide()};setTimeout(()=>$('guidedGo')?.focus(),50)}
+ $('guidedGo').onclick=()=>{c.hidden=true;if(!showDaily())tickGuide()};setTimeout(()=>$('guidedGo')?.focus(),50)}
 
 // ---------- Click a building to open it (Oct 28 2026) ------------------------------------------------
 // The painted buildings are clickable, not just their name pins: click the Aetherheart Engine, a facility or the
