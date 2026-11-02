@@ -204,3 +204,84 @@ def draw_road(ground, pts, half, sheet, stop_mask=None, seed=11, cob_sat=1.0):
             place_stone(out, kerb, st, cx, cy, ang, scale)
             s += L - 0.6                                      # stones butt; the painted joint lines do the rest
     return out, dist
+
+
+def draw_roads(ground, lines, half, sheet, stop_mask=None, seed=11, cob_sat=1.0, recolor=None, cob_patches=None):
+    """Several routes (forks, two entrances) as ONE road network: cobbles over the union of all roads, kerbs along each
+    edge except where that edge lies inside another road (so junctions open cleanly). recolor(rgb array) -> rgb array
+    grades the kit's stone to the map's own palette before anything is drawn."""
+    H, W = ground.shape[:2]
+    bands = strip_bands(sheet)
+    if recolor is not None:
+        bands = [recolor(b) for b in bands]
+    band_h = bands[0].shape[0]
+    rows0 = kerb_rows(bands[0]); kerb_h_src = rows0[0][1] - rows0[0][0]
+    scale = (2 * half) / band_h; kerb_w = kerb_h_src * scale
+    cob_src = []
+    for b in bands:
+        r = kerb_rows(b)[1]; c = b[r[0]:r[1]]
+        c = np.asarray(Image.fromarray(np.clip(c, 0, 255).astype(np.uint8)).resize(
+            (round(c.shape[1] * scale), round(c.shape[0] * scale)), Image.LANCZOS)).astype(np.float32)
+        cob_src.append(c)
+    if cob_patches:                       # the map's own painted road surface, so each sector keeps its material
+        cob = quilt(cob_patches, W, H, patch=min(c.shape[0] for c in cob_patches) - 4, overlap=12, seed=seed)
+    else:
+        cob = quilt(cob_src, W, H, patch=max(24, int(min(c.shape[0] for c in cob_src)) - 2), overlap=8, seed=seed)
+    if cob_sat != 1.0:
+        lum = cob.mean(axis=2, keepdims=True); cob = lum + (cob - lum) * cob_sat
+    stones = []
+    for b in bands:
+        r = kerb_rows(b); stones += cut_stones(b, r[0]) + [s_[::-1, ::-1] for s_ in cut_stones(b, r[2])]
+    rng = np.random.default_rng(seed)
+    from scipy.spatial import cKDTree
+    yy, xx = np.mgrid[0:H, 0:W]; pix = np.c_[xx.ravel(), yy.ravel()]
+    trees = [cKDTree(np.array(l, float)) for l in lines]
+    dists = [t.query(pix, distance_upper_bound=half + 24)[0].reshape(H, W) for t in trees]
+    dist = np.minimum.reduce(dists)
+    out = ground.copy()
+    sh = np.clip(1 - (dist - half) / 9.0, 0, 1) * (dist >= half)
+    shifted = np.zeros_like(sh); shifted[3:, 3:] = sh[:-3, :-3]
+    shade = np.clip(np.maximum(sh * 0.22, shifted * 0.38), 0, 0.4)
+    if stop_mask is not None: shade[stop_mask] = 0
+    out = out * (1 - shade[..., None]) + np.array([34, 30, 18], np.float32) * shade[..., None]
+    inner = np.clip((half - kerb_w * 0.6 - dist) + 0.5, 0, 1)
+    if stop_mask is not None: inner[stop_mask] = 0
+    out = out * (1 - inner[..., None]) + cob * inner[..., None]
+    # mortar bed only where no other road's surface continues
+    bed = np.clip(np.minimum(dist - (half - kerb_w) + 0.5, half - dist + 0.5), 0, 1)
+    for i, d in enumerate(dists):
+        pass
+    if stop_mask is not None: bed[stop_mask] = 0
+    bed_col = cob.mean(axis=(0, 1)) * 0.55
+    out = out * (1 - bed[..., None]) + bed_col * bed[..., None]
+    kerb = np.zeros((H, W), np.float32)
+    for li, l in enumerate(lines):
+        for side in (+1, -1):
+            E, T = edge_polyline(l, side * (half - kerb_w / 2))
+            seg = np.r_[0, np.cumsum(np.linalg.norm(np.diff(E, axis=0), axis=1))]
+            s = 0.0
+            while s < seg[-1]:
+                st = stones[rng.integers(len(stones))]
+                L = st.shape[1] * scale
+                def turn_over(a, b):
+                    ia = min(len(E) - 1, int(np.searchsorted(seg, a))); ib = min(len(E) - 1, int(np.searchsorted(seg, b)))
+                    d = abs(math.atan2(T[ib][1], T[ib][0]) - math.atan2(T[ia][1], T[ia][0]))
+                    return min(d, 2 * math.pi - d)
+                while L > kerb_w * 1.1 and turn_over(s, s + L) > math.radians(12):
+                    L *= 0.85
+                if L < st.shape[1] * scale - 0.5:
+                    cut = max(2, int(round(L / scale))); off = int(rng.integers(0, st.shape[1] - cut + 1))
+                    st = st[:, off:off + cut].copy(); L = st.shape[1] * scale
+                    st[:, :3] *= 0.45; st[:, -3:] *= 0.45
+                mid = s + L / 2
+                k = min(len(E) - 1, int(np.searchsorted(seg, mid)))
+                cx, cy = E[k]; ix, iy = int(min(W - 1, max(0, cx))), int(min(H - 1, max(0, cy)))
+                inside_other = any(j != li and dists[j][iy, ix] < half - kerb_w * 0.4 for j in range(len(lines)))
+                if (stop_mask is not None and stop_mask[iy, ix]) or inside_other or not (0 <= cx < W and 0 <= cy < H):
+                    s += L; continue
+                ang = math.atan2(T[k][1], T[k][0])
+                normal = np.array([math.sin(ang), -math.cos(ang)])
+                if normal @ LIGHT < 0: ang += math.pi
+                place_stone(out, kerb, st, cx, cy, ang, scale)
+                s += L - 0.6
+    return out, dist
