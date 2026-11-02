@@ -152,12 +152,15 @@ function powerSummary(profile){const b=bonuses(profile);let t=b.allDamagePct*ELE
 // Opens once the campaign is complete (the Aetherheart finale is won). The first screen of each new day offers it:
 // Parts every day, growing with the streak up to day 7; on Fridays Resonance as well. A missed day pauses the streak
 // (the same day repeats) instead of resetting it. Days use the player's local calendar; a clock set backwards pays nothing.
-const DAILY={parts:[20,30,40,50,60,70,80],fridayResonance:50,finale:'aetherheart-1'};
+const DAILY={parts:[20,30,40,50,60,70,80],fridayResonance:50,finale:'aetherheart-1',supply:15};
+// While the campaign is still running (audit, Nov 2 2026): from the player's second day, a small daily supply of Parts so
+// day two has a reason to return; the full streak above still starts at day 1 once the finale is won.
 const dayKey=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
-function dailyOffer(p,now=Date.now()){if(!p?.missions?.[DAILY.finale]?.cleared)return{ok:false,reason:'locked'};const today=dayKey(now),last=p.daily?.last||null;
+function dailyOffer(p,now=Date.now()){if(!p?.missions?.[DAILY.finale]?.cleared){const today=dayKey(now);if(!p?.seals?.tutorial?.cleared||!p.firstDay||p.firstDay>=today)return{ok:false,reason:'locked'};if(p.supplyLast&&p.supplyLast>=today)return{ok:false,reason:'claimed',today};return{ok:true,supply:true,today,day:0,streak:0,parts:DAILY.supply,resonance:0,friday:false,missed:false}}const today=dayKey(now),last=p.daily?.last||null;
  if(last&&last>=today)return{ok:false,reason:'claimed',today};const y=new Date(now);y.setDate(y.getDate()-1);const prev=Math.max(0,Math.floor(p.daily?.streak||0));
  const streak=!last?1:last===dayKey(y)?prev+1:Math.max(1,prev);const day=Math.min(streak,DAILY.parts.length),friday=new Date(now).getDay()===5;
  return{ok:true,today,streak,day,missed:!!last&&last!==dayKey(y),parts:DAILY.parts[day-1],resonance:friday?DAILY.fridayResonance:0,friday}}
-function claimDaily(p,now=Date.now()){const o=dailyOffer(p,now);if(!o.ok)return o;p.parts=(p.parts||0)+o.parts;p.resonance=(p.resonance||0)+o.resonance;p.daily={last:o.today,streak:o.streak,claims:(p.daily?.claims||0)+1};return{...o,ok:true}}
-return{DAILY,dayKey,dailyOffer,claimDaily,fmt,sanitize,sanitizeProfile,WORKSHOP,workshopRank,workshopOffer,buyWorkshop,workshopEffects,legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
+function claimDaily(p,now=Date.now()){const o=dailyOffer(p,now);if(!o.ok)return o;if(o.supply){p.parts=(p.parts||0)+o.parts;p.supplyLast=o.today;return{...o,ok:true}}p.parts=(p.parts||0)+o.parts;p.resonance=(p.resonance||0)+o.resonance;p.daily={last:o.today,streak:o.streak,claims:(p.daily?.claims||0)+1};return{...o,ok:true}}
+function markFirstDay(p,now=Date.now()){if(p&&!p.firstDay)p.firstDay=dayKey(now);return p}
+return{markFirstDay,DAILY,dayKey,dailyOffer,claimDaily,fmt,sanitize,sanitizeProfile,WORKSHOP,workshopRank,workshopOffer,buyWorkshop,workshopEffects,legacyToRating,POWER_BADGES,POWER,ETERNAL,hpAt,depthForHp,powerMultiplier,powerRating,projectedDepth,powerForDepth,TACTICIAN,tacticianFactor,tacticianRank,eternalRanks,eternalFactor,eternalOffer,buyEternal,ELEMENTS,BRANCHES,SKILLS,FACILITIES,GATE,gateOffer,openGate,MASTERY,blankProfile,migrate,rank,branchUnlocked,skillOffer,buySkill,resetSkills,restorationOffer,restore,masteryOffer,buyMastery,masteryTierOpen,bonuses,damageBonus,powerSummary};
 });

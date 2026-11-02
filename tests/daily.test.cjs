@@ -12,3 +12,8 @@ assert.equal(P.dailyOffer(p,at(2026,11,8)).ok,false,'clock set back pays nothing
 for(let d=10;d<=20;d++)P.claimDaily(p,at(2026,11,d));assert.equal(P.dailyOffer(p,at(2026,11,21)).parts,80,'capped at day 7');
 const m=P.migrate(JSON.parse(JSON.stringify(p)));assert.equal(m.daily.streak,p.daily.streak,'survives save/load');
 console.log('PASS daily reward');
+// in-campaign daily supply (audit Nov 2 2026): from the second day after the tutorial, 15 Parts a day, no streak
+{const q=P.migrate({seals:{tutorial:{cleared:true}}});P.markFirstDay(q,at(2026,11,2));assert.equal(P.dailyOffer(q,at(2026,11,2)).ok,false,'not on day one');
+ const s=P.claimDaily(q,at(2026,11,3));assert(s.ok&&s.supply);assert.equal(q.parts,15);assert.equal(P.dailyOffer(q,at(2026,11,3)).ok,false,'once a day');
+ q.missions={'aetherheart-1':{cleared:true}};const f=P.dailyOffer(q,at(2026,11,4));assert.equal(f.day,1,'full streak starts at day 1 after the finale');
+ assert.equal(P.dailyOffer(P.migrate({}),at(2026,11,4)).ok,false,'no tutorial, no supply');console.log('PASS daily supply')}

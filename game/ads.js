@@ -27,6 +27,7 @@ const Ads={/* Oct 28 2026: rewarded ads stay OFF during Basic Launch (CrazyGames
   this.mirror=true;
   if(changed){try{if(!sessionStorage.getItem('warden.cloudReload')){sessionStorage.setItem('warden.cloudReload','1');root.location.reload();return}}catch(e){}}},
  // Gameplay start/stop: called whenever a battle becomes playable or is paused, finished or left.
+ /* Nov 2 2026 audit: CrazyGames celebration for big moments (boss down, new best wave, finale), at most once a minute */happytime(){if(!this.ready||this._happyAt&&Date.now()-this._happyAt<60000)return;this._happyAt=Date.now();try{this.sdk.game.happytime()}catch(e){}},
  gameplay(on){on=!!on;if(!this.ready){this._playing=on;return}if(this._playing===on)return;this._playing=on;try{on?this.sdk.game.gameplayStart():this.sdk.game.gameplayStop()}catch(e){}},
  loadingStart(){this._loading=true;if(this.ready)try{this.sdk.game.loadingStart()}catch(e){}},
  loadingStop(force){if(!this._loading&&!force)return;this._loading=false;if(this.ready)try{this.sdk.game.loadingStop()}catch(e){}},

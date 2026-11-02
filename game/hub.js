@@ -247,10 +247,11 @@ $('openHandbook')&&($('openHandbook').onclick=()=>WardenGuide.open());
 $('openGuide').onclick=()=>{profile.hubGuide=0;profile.hubIntroSeen=false;persist();showIntro()};
 setInterval(tickGuide,250);addEventListener('resize',tickGuide);
 /* Nov 2 2026: daily reward. After the campaign is complete, the first thing a returning player sees each day */
-function showDaily(){const o=P.dailyOffer(profile);if(!o.ok)return false;const el=$('guideIntro'),n=P.DAILY.parts.length,done=(o.missed?o.day-1:o.day-1);
+function showDaily(){const o=P.dailyOffer(profile);if(!o.ok)return false;if(o.supply){const el=$('guideIntro');el.innerHTML=`<div class="overlay-card intro-card daily-card"><span class="eyebrow">DAILY SUPPLY</span><h2 id="guideTitle">Welcome back, Warden</h2><p class="daily-today">The complex sent you <b>⚙ ${o.parts} Parts</b> for today.</p><p class="muted">Come back each day for more. Finish the campaign to start the full daily reward: up to ⚙ ${P.DAILY.parts.at(-1)} a day, and ✦ ${P.DAILY.fridayResonance} Resonance on Fridays.</p><div class="intro-actions"><button class="primary-btn" id="dailyClaim">Claim</button></div></div>`;el.hidden=false;$('dailyClaim').onclick=()=>{const r=P.claimDaily(profile);el.hidden=true;if(r.ok){persist();render();toast('Daily supply claimed','+'+r.parts+' Parts')}tickGuide?.()};setTimeout(()=>$('dailyClaim').focus(),30);return true}const el=$('guideIntro'),n=P.DAILY.parts.length,done=(o.missed?o.day-1:o.day-1);
  const tiles=P.DAILY.parts.map((v,i)=>`<li class="${i<done?'got':i===o.day-1?'today':''}"><small>DAY ${i+1}</small><b>⚙ ${v}</b>${i<done?'<em>✓</em>':''}</li>`).join('');
  el.innerHTML=`<div class="overlay-card intro-card daily-card"><span class="eyebrow">DAILY REWARD${o.day>1?' · '+o.streak+'-DAY STREAK':''}</span><h2 id="guideTitle">Welcome back, Warden</h2><ol class="daily-days">${tiles}</ol><p class="daily-today">Today: <b>⚙ ${o.parts} Parts</b>${o.resonance?` and <b>✦ ${o.resonance} Resonance</b> (Friday bonus)`:''}</p>${o.missed?'<p class="muted">You missed a day, so your streak paused. Come back tomorrow to keep climbing.</p>':`<p class="muted">${o.day<n?'Tomorrow: ⚙ '+P.DAILY.parts[o.day]+' Parts.':'Every day from now: ⚙ '+P.DAILY.parts[n-1]+' Parts.'} Fridays add ✦ ${P.DAILY.fridayResonance} Resonance.</p>`}<div class="intro-actions"><button class="primary-btn" id="dailyClaim">Claim</button></div></div>`;
  el.hidden=false;$('dailyClaim').onclick=()=>{const r=P.claimDaily(profile);el.hidden=true;if(r.ok){persist();render();toast('Daily reward claimed','+'+r.parts+' Parts'+(r.resonance?' · +'+r.resonance+' Resonance':''))}tickGuide?.()};setTimeout(()=>$('dailyClaim').focus(),30);return true}
+if(seals().cleared&&!profile.firstDay){P.markFirstDay(profile);persist()}
 if(!(P.dailyOffer(profile).ok&&!campaignRevealDue()&&setTimeout(showDaily,450)))if(seals().cleared&&!profile.hubIntroSeen&&!guidedOn()&&!campaignRevealDue())setTimeout(showIntro,500);
 
 // ---------- area sound: a short cue when you open an area -----------------------------------------
@@ -315,7 +316,7 @@ async function guidedAlarm(a){const key=a.type==='outer'?'outer':a.sector;const 
 async function runDirector(){
  if(campaignRevealDue()){await momentDone();return campaignReveal()}
  if(!guidedOn()||directing)return;directing=true;document.body.classList.add('guided');closePanelQuiet();
- await gwait(700);await momentDone();
+ await gwait(700);await momentDone();while(!$('guideIntro').hidden)await gwait(250);/* a daily card speaks first; the guide waits for it */
  if(!profile.guidedWelcome){profile.guidedWelcome=true;persist();await guidedCaption('HOME BASE','Welcome home, Warden','This is the Containment Complex, your base. Every victory restores a piece of it and makes your towers stronger.',5200)}
  for(let i=0;i<24;i++){const a=GD.next(profile,P,C);
   if(a.type==='gate'){const r=P.openGate(profile);if(!r.ok)break;persist();closePanelQuiet();celebrate('gate',0,1,'The Outer Seal Gate rises',`The road into the complex is open · +${P.GATE.bonus[1]} starting Charge in every defense`);await gwait(300);await momentDone();await gwait(500);continue}
