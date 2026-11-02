@@ -14,7 +14,7 @@ const {chromium}=require('/opt/npm-tools/node_modules/playwright');const B=proce
  await waitWave(1);await shot('05-wave1-done');
  await pg.waitForTimeout(1200);await shot('05b-banner');
  const pads=await pg.evaluate(()=>WardenEngine.TUTORIAL_PADS);
- await think();await place('2',175,330);await shot('06a-water');await think();await place('3',305,330);await shot('06-water-ice');
+ await think();await place('2',255,240);await shot('06a-water');await think();await place('3',345,320);await shot('06-water-ice');
  await think();await pg.keyboard.press('Escape');await pg.keyboard.press('n');let frz=null;
  for(let s=0;s<240;s++){await pg.waitForTimeout(250);if(await pg.evaluate(()=>game.combos.freeze>0)){frz=T();await shot('07-first-freeze');break}}
  log.push(`first freeze at ${frz}s`);console.log(log.join('\n'));console.log('errors',errs);await b.close()})();
