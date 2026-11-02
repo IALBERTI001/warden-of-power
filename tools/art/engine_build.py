@@ -60,24 +60,16 @@ def main():
     sealdist = np.hypot(xx - sc[0], yy - sc[1])
     f = lay['frame']; t, b, l, r = [v * S for v in (f['top'], f['bottom'], f['left'], f['right'])]
 
-    # ---- layer 0: ground = plain flagstone, quilted from small patches of the painting's stone only (no brass inlay)
-    hsv = np.asarray(Image.fromarray(P.astype(np.uint8)).convert('HSV')).astype(np.float32)
-    lum0 = nd.gaussian_filter(P.mean(2), 1.2); edge = np.hypot(nd.sobel(lum0, 0), nd.sobel(lum0, 1))
-    brass = (edge > np.percentile(edge, 80)) | (P.mean(2) < 95) | (hsv[..., 1] > 200)
-    brass = nd.binary_dilation(brass, iterations=2)
-    clean = ~brass & (oldd > 40 * S) & (sealdist > sr + 30 * S) & (yy > t + 10) & (yy < H - b - 10) & (xx > l + 10) & (xx < W - r - 10)
-    win = 30; patches = []
-    for y in range(0, H - win, 8):
-        for x in range(0, W - win, 8):
-            if clean[y:y + win, x:x + win].mean() > 0.97:
-                patches.append(P[y:y + win, x:x + win])
+    # ---- layer 0: ground = an approved seamless floor tile, repeated (no painted structure under it)
     rng = np.random.default_rng(lay.get('seed', 3))
-    if not patches: raise SystemExit('no clean stone patches')
-    if len(patches) > 120: patches = [patches[i] for i in rng.choice(len(patches), 120, replace=False)]
-    ground = quilt(patches, W, H, patch=28, overlap=8, seed=lay.get('seed', 3))
-    ref = P[clean]; g2 = ground.reshape(-1, 3)
-    ground = ((g2 - g2.mean(0)) / (g2.std(0) + 1e-3) * ref.std(0) * 0.9 + ref.mean(0)).reshape(ground.shape)
-    glow = np.clip(1.10 - sealdist / (W * 1.0), 0.9, 1.10)
+    tile = Image.open(lay['floorTile']).convert('RGB')
+    tw = round(lay.get('tileWorld', 240) * S); tile = tile.resize((tw, tw), Image.LANCZOS)
+    T = np.asarray(tile).astype(np.float32)
+    reps = (H // tw + 2, W // tw + 2)
+    big = np.tile(T, (reps[0], reps[1], 1))
+    ox, oy = int(rng.integers(0, tw)), int(rng.integers(0, tw))
+    ground = big[oy:oy + H, ox:ox + W].copy()
+    glow = np.clip(1.08 - sealdist / (W * 1.1), 0.92, 1.08)
     ground = ground * glow[..., None]
     # ---- layer 1: decals = the painting's brass medallions, cut whole and placed where the layout says
     for (sx, sy), (dx, dy) in lay.get('medallions', []):
@@ -120,23 +112,35 @@ def main():
                 if 0 <= x0 and 0 <= y0 and x0 + wsz < W and y0 + wsz < H and inner[y0:y0 + wsz, x0:x0 + wsz].all():
                     rp.append(P[y0:y0 + wsz, x0:x0 + wsz])
     if len(rp) > 60: rp = [rp[i] for i in rng.choice(len(rp), 60, replace=False)]
-    stop = sealdist < sr * 0.92
+    stop = sealdist < lay['seal'].get('dais', 104) * S * 0.97
     img, _ = draw_roads(img, [d.tolist() for d in dense], lay['roadHalf'] * S, Image.open(lay['strips']), stop_mask=stop,
                         seed=lay.get('seed', 3), recolor=recolor, cob_patches=rp or None)
 
-    # ---- layer 4: the painted seal as one round piece with a soft rim and contact shadow
-    sa = np.clip((sr - sealdist) / 14, 0, 1)
-    ssh = np.clip((sr + 14 - np.hypot(xx - sc[0] - 7, yy - sc[1] - 9)) / 18, 0, 1) * (1 - sa)
-    img = img * (1 - 0.4 * ssh[..., None])
+    # ---- layer 4: the painted seal, cut along its own outline (heart, ring, gold arches and the painted road stubs between
+    # them, which line up with the new routes), never as a disc of floor. Untouched pixels from the approved painting.
+    hsv0 = np.asarray(Image.fromarray(P.astype(np.uint8)).convert('HSV')).astype(np.float32)
+    lum = P.mean(2); gold = ((hsv0[..., 1] > 150) & (lum > 120)) | (lum < 75)
+    near = sealdist < lay['seal'].get('outer', 135) * S
+    filled = nd.binary_fill_holes(nd.binary_closing(gold & near, iterations=3))
+    upper = (yy - sc[1]) < 35 * S / 1.62 * 1.0
+    m = (filled & upper) | (nd.binary_closing(gold, iterations=2) & ~upper) | ((oldd < 24 * S) & ~upper)
+    m &= sealdist < lay['seal'].get('outer', 135) * S
+    m |= sealdist < lay['seal'].get('dais', 104) * S          # the whole round dais out to its dark rim
+    m = nd.binary_opening(m, iterations=1)
+    lab_, n_ = nd.label(m)
+    if n_:
+        sizes = nd.sum(m, lab_, range(1, n_ + 1)); m = np.isin(lab_, [k + 1 for k, v in enumerate(sizes) if v > 300])
+    sa = nd.gaussian_filter(m.astype(np.float32), 1.6)
+    ssh = np.roll(np.roll(nd.gaussian_filter(m.astype(np.float32), 9), 7, 0), 7, 1)
+    img = img * (1 - 0.35 * np.clip(ssh - sa, 0, 1)[..., None])
     img = img * (1 - sa[..., None]) + P * sa[..., None]
-
     final = np.clip(img, 0, 255).astype(np.uint8)
     Image.fromarray(final).save(out)
     if len(sys.argv) > 3:
         dbg = Image.fromarray(final); d = ImageDraw.Draw(dbg)
         for q in dense: d.line([tuple(p) for p in q], fill=(255, 0, 255), width=2)
         dbg.save(sys.argv[3])
-    print('built', out, len(patches), 'floor patches', len(rp), 'road patches')
+    print('built', out, len(rp), 'road patches')
 
 
 if __name__ == '__main__':

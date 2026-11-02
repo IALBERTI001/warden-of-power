@@ -371,16 +371,16 @@
     440
    ],
    [
-    405,
+    432,
     440
    ],
    [
-    405,
-    345
+    432,
+    334
    ],
    [
-    455,
-    300
+    450,
+    306
    ]
   ],
   [
@@ -405,16 +405,16 @@
     440
    ],
    [
-    595,
+    568,
     440
    ],
    [
-    595,
-    345
+    568,
+    334
    ],
    [
-    545,
-    300
+    550,
+    306
    ]
   ]
  ],
@@ -451,5 +451,7 @@
    ]
   ]
  ],
- "note": "Chosen by the user Nov 2 2026 (Option E): 5,226 build spots in reach of the road, 234 out of reach; road 1,082 per side. Seal = the painted heart and its gold arches, carried over untouched."
+ "note": "Chosen by the user Nov 2 2026 (Option E): 5,226 build spots in reach of the road, 234 out of reach; road 1,082 per side. Seal = the painted heart and its gold arches, carried over untouched. Route ends follow the painted road stubs inside the seal piece, so the seal stays untouched (Nov 2).",
+ "floorTile": "art/ground/aetherheart/brass_floor_v1.png",
+ "tileWorld": 200
 }
