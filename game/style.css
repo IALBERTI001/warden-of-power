@@ -257,3 +257,6 @@ dialog.ascension-card.thousandth h2{font-size:38px;letter-spacing:1px}
 @keyframes eternal-fall{to{transform:translateY(560px) rotate(540deg);opacity:0}}
 dialog.ascension-card.thousandth{isolation:isolate}
 @media (max-height:560px){dialog.ascension-card.thousandth{padding:12px 18px}dialog.ascension-card.thousandth .asc-medal{transform:scale(.62);margin:-26px auto -22px}dialog.ascension-card.thousandth h2{font-size:28px;margin:2px 0}dialog.ascension-card.thousandth .asc-banner{font-size:13px;margin:0 0 6px}.eternal-rewards div{padding:6px 4px}.eternal-rewards strong{font-size:19px}.eternal-rewards i{font-size:18px}.eternal-foot{font-size:12px}}
+/* Nov 4 2026: sector element chip in the battle title plaque */
+.sector-chip{display:inline-block;margin-right:7px;padding:0 7px;border-radius:999px;font-style:normal;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1c1215;vertical-align:1px}
+.sector-chip.el-water{background:#5fd2ef}.sector-chip.el-fire{background:#ff9a3c}.sector-chip.el-ice{background:#a9e6ff}.sector-chip.el-lightning{background:#c79bff}
