@@ -39,7 +39,14 @@ def main():
         band &= np.hypot(xx - sx, yy - sy) > sr
         fx0, fy0, fx1, fy1 = [int(v * S) for v in cfg['field']]
         inside = np.zeros((H, W), bool); inside[fy0:fy1, fx0:fx1] = True
-        m = nd.binary_dilation(line & band & inside, iterations=1).astype(np.uint8) * 255
+        m0 = line & band & inside
+        # leftover fragments: short line pieces near a road after the trim are removed whole
+        rest = line & ~m0 & inside & (d < (cfg['roadHalf'] + 70) * S) & (np.hypot(xx - sx, yy - sy) > sr)
+        lab, n = nd.label(nd.binary_dilation(rest, iterations=1))
+        if n:
+            sizes = nd.sum(rest, lab, range(1, n + 1))
+            m0 |= np.isin(lab, [i + 1 for i, z in enumerate(sizes) if z < cfg.get('fragMax', 900)]) & rest
+        m = nd.binary_dilation(m0, iterations=1).astype(np.uint8) * 255
         base = cv2.inpaint(base.astype(np.uint8), m, 3, cv2.INPAINT_NS).astype(np.float32)
     img, surf = draw_network(base, dense, cfg['roadHalf'] * S, Image.open('art/kits/outer/road_strips.png'),
                              seed=11, cob_sat=0.6, cob_tint=(cfg['roadRGB'], cfg.get('roadTint', 0.3)), corner=30)
