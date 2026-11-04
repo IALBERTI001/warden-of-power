@@ -1,5 +1,5 @@
 {
- "note": "Nov 4 2026 campaign rebuild (one look, user-approved plan): shorter routes on the Outer Seal layout (field x76-739, channel and bridge, seal plaza at x932). World units; radius 60 like the Outer Seal. Every route crosses the channel bridge at y270 into the seal plaza (the sector painting keeps the seal there). Every entrance is on the left edge (Nov 4: a bottom entrance hid the spawn portal under the bottom bar).",
+ "note": "Nov 4 2026 campaign rebuild (one look, user-approved plan): shorter routes on the Outer Seal layout (field x76-739, channel and bridge, seal plaza at x932). World units; radius 60 like the Outer Seal. Every route crosses the channel bridge at y270 into the seal plaza (the sector painting keeps the seal there). Every entrance is on the left edge (Nov 4: a bottom entrance hid the spawn portal under the bottom bar). Nov 4: no two road legs run side by side closer than 160 (user: a dead strip on Furnace Heart where no tower fit).",
  "radius": 60,
  "maps": {
   "moonwell-1": [
@@ -172,14 +172,14 @@
    [
     [
      -40,
-     410
+     430
     ],
     [
-     320,
-     410
+     520,
+     430
     ],
     [
-     320,
+     520,
      270
     ],
     [
@@ -193,11 +193,11 @@
      150
     ],
     [
-     540,
+     520,
      150
     ],
     [
-     540,
+     520,
      270
     ],
     [
@@ -394,22 +394,14 @@
    [
     [
      -40,
-     430
+     460
     ],
     [
-     160,
-     430
+     220,
+     460
     ],
     [
-     160,
-     250
-    ],
-    [
-     300,
-     250
-    ],
-    [
-     300,
+     220,
      390
     ],
     [
