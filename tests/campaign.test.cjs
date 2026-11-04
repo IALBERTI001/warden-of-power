@@ -3,9 +3,9 @@
 require('../game/badges.js').pay=()=>null;
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),E=require('../game/engine.js'),C=require('../game/campaign.js'),P=require('../game/progression.js');
 assert.equal(C.MISSIONS.length,13);
-for(const m of C.MISSIONS){const map=E.MAPS[m.id];assert(map&&map.painted,`${m.id} painted`);assert(fs.existsSync(path.join(__dirname,'..','game',map.art)),map.art);assert(map.grid&&map.grid.length===30,'build grid');
+for(const m of C.MISSIONS){const map=E.MAPS[m.id];assert(map&&map.painted,`${m.id} painted`);assert(fs.existsSync(path.join(__dirname,'..','game',map.art)),map.art);assert((map.grid&&map.grid.length===30)||(map.play&&map.roadHalf),'build area: a grid (old painted maps) or the layer-build play area and road rule');
  const g=new E.Game({},{mission:m.id,seed:1});assert.equal(g.waves.length,m.waves);for(const w of g.waves)assert(w.attunes.length<=2,'at most two attunement kinds per wave');
- for(const R of g.routes)assert(R.total>600,`${m.id} route length`)}
+ for(const R of g.routes){assert(R.total>600,`${m.id} route length`);/* Nov 4 2026 user note: the campaign is easy, so routes stay short (less travel time) */if(!m.finale)assert(R.total<1450,`${m.id} route stays short (${Math.round(R.total)})`)}}
 assert.notDeepEqual(E.MAPS['moonwell-1'].path,E.MAPS['moonwell-2'].path,'every map has its own route');
 // unlock chain
 const p={gateOpen:true,restorations:{},missions:{}};assert(C.available(p,'moonwell-1').ok);assert(!C.available(p,'moonwell-2').ok);assert(!C.available(p,'emberheart-1').ok,'other sectors after the Moonwell');assert(!C.available(p,'aetherheart-1').ok);

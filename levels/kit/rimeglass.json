@@ -1,0 +1,44 @@
+{
+ "sector": "rimeglass",
+ "note": "Rimeglass arena: a repaint of the Outer Seal in the ice element (ChatGPT, Nov 4 2026, art/incoming/rimeglass-arena_v1_20261104.png; 1618x969 kept, resized to 1620x971). Seal, wall, channel and courtyard are the painting's own.",
+ "arena": "art/ground/rimeglass/arena_v1.png",
+ "channel": [
+  776,
+  861
+ ],
+ "seal": [
+  931,
+  268
+ ],
+ "sealRadius": 43,
+ "roadRGB": [
+  150,
+  165,
+  180
+ ],
+ "roadSat": 0.7,
+ "play": {
+  "left": 76,
+  "right": 739,
+  "top": 119,
+  "bottom": 480
+ },
+ "blocked": [
+  [
+   235,
+   0,
+   716,
+   142
+  ],
+  [
+   0,
+   0,
+   242,
+   150
+  ]
+ ],
+ "sharpen": [
+  2,
+  80
+ ]
+}
