@@ -19,39 +19,48 @@ def ribbon(text, top, mid, bot, edge, ink):
     d = ImageDraw.Draw(lay)
     y0, y1 = 158 * K, 214 * K
     x0, x1 = 42 * K, 214 * K
-    notch = 14 * K
-    # tails behind the band
+    ow = 5 * K                                   # outline weight close to the medal rim's dark line
+    dark = tuple(int(c * .55) for c in bot)
     for sx in (-1, 1):
         cx = W / 2 + sx * 84 * K
         tail = [(cx, y0 + 10 * K), (cx + sx * 22 * K, y0 + 10 * K), (cx + sx * 13 * K, (y0 + y1) / 2 + 5 * K),
                 (cx + sx * 22 * K, y1 + 8 * K), (cx, y1 + 8 * K)]
-        d.polygon(tail, fill=tuple(int(c * .62) for c in bot) + (255,), outline=edge + (255,), width=3 * K)
+        d.polygon(tail, fill=tuple(int(c * .78) for c in mid) + (255,))
+        # tail shading: darker toward the band, where it folds behind
+        fold = [(cx, y0 + 10 * K), (cx + sx * 9 * K, y0 + 10 * K), (cx + sx * 9 * K, y1 + 8 * K), (cx, y1 + 8 * K)]
+        d.polygon(fold, fill=dark + (255,))
+        d.line(tail + [tail[0]], fill=edge + (255,), width=ow, joint='curve')
+        # the fold: a small dark triangle tucked under the band's end
+        tri = [(cx - sx * 2 * K, y1), (cx + sx * 10 * K, y1), (cx - sx * 2 * K, y1 + 8 * K)]
+        d.polygon(tri, fill=edge + (255,))
     band = [(x0 + 12 * K, y0), (x1 - 12 * K, y0), (x1, (y0 + y1) / 2), (x1 - 12 * K, y1), (x0 + 12 * K, y1), (x0, (y0 + y1) / 2)]
-    # vertical gradient fill through a mask
     mask = Image.new('L', (W, W), 0); ImageDraw.Draw(mask).polygon(band, fill=255)
-    grad = np.zeros((W, W, 3), np.float32)
     t = np.clip((np.arange(W) - y0) / (y1 - y0), 0, 1)[:, None]
     c = np.where(t < .5, np.array(top) * (1 - t * 2) + np.array(mid) * t * 2, np.array(mid) * (2 - t * 2) + np.array(bot) * (t * 2 - 1))
-    grad[:] = c[:, None, :]
+    # soft top highlight and bottom shade baked into the gradient
+    c = c + 40 * np.exp(-((t - .12) / .07) ** 2) - 30 * np.exp(-((t - .92) / .08) ** 2)
+    grad = np.repeat(np.clip(c, 0, 255)[:, None, :], W, axis=1).reshape(W, W, 3)
     g = Image.fromarray(grad.astype(np.uint8)).convert('RGBA'); g.putalpha(mask)
     lay.alpha_composite(g)
-    d.line(band + [band[0]], fill=edge + (255,), width=4 * K, joint='curve')
-    # inner highlight line
-    d.line([(x0 + 22 * K, y0 + 6 * K), (x1 - 22 * K, y0 + 6 * K)], fill=(255, 250, 225, 150), width=2 * K)
-    size = 44 * K if len(text) <= 3 else 40 * K
+    d.line(band + [band[0]], fill=edge + (255,), width=ow, joint='curve')
+    size = 44 * K if len(text) <= 3 else 46 * K
     f = ImageFont.truetype(FONT, size)
     bb = d.textbbox((0, 0), text, font=f)
     tx = (W - (bb[2] - bb[0])) / 2 - bb[0]; ty = (y0 + y1) / 2 - (bb[3] - bb[1]) / 2 - bb[1]
-    d.text((tx + 2 * K, ty + 3 * K), text, font=f, fill=(40, 20, 10, 170))
-    d.text((tx, ty), text, font=f, fill=ink + (255,), stroke_width=4 * K, stroke_fill=(58, 30, 12, 255))
+    d.text((tx + 2 * K, ty + 3 * K), text, font=f, fill=(30, 15, 8, 170))
+    d.text((tx, ty), text, font=f, fill=ink + (255,), stroke_width=4 * K, stroke_fill=(40, 22, 10, 255))
     return lay
 
 
 def main():
     base = Image.open(SRC).convert('RGBA').resize((256 * K, 256 * K), Image.LANCZOS)
-    gold = dict(top=(255, 222, 120), mid=(232, 162, 46), bot=(160, 92, 24), edge=(92, 48, 14), ink=(255, 248, 228))
-    white = dict(top=(255, 255, 248), mid=(236, 224, 196), bot=(190, 160, 110), edge=(110, 78, 30), ink=(255, 214, 92))
-    for n, text, st in [(600, '600', gold), (700, '700', gold), (800, '800', gold), (900, '900', gold), (1000, '1K', white)]:
+    cream = (255, 248, 228)
+    tiers = [(600, '600', dict(top=(240, 190, 140), mid=(184, 112, 58), bot=(112, 62, 30), edge=(58, 30, 12), ink=cream)),      # bronze
+             (700, '700', dict(top=(250, 252, 255), mid=(178, 190, 204), bot=(104, 116, 134), edge=(40, 44, 58), ink=cream)),    # silver
+             (800, '800', dict(top=(255, 230, 130), mid=(232, 162, 46), bot=(150, 86, 22), edge=(80, 42, 12), ink=cream)),       # gold
+             (900, '900', dict(top=(130, 200, 255), mid=(42, 112, 206), bot=(18, 48, 120), edge=(10, 22, 60), ink=cream)),       # sapphire
+             (1000, '1K', dict(top=(196, 140, 255), mid=(110, 50, 190), bot=(52, 18, 104), edge=(26, 8, 54), ink=(255, 226, 120)))]  # prismatic violet
+    for n, text, st in tiers:
         im = base.copy()
         r = ribbon(text, **st)
         sh = r.getchannel('A').filter(ImageFilter.GaussianBlur(5 * K)).point(lambda v: v * .5)
