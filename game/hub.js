@@ -335,9 +335,12 @@ async function guidedAlarm(a){const S=missionStakes(a);const pin=document.queryS
   <p class="mc-sub">${elInfo?`<i class="mc-el" style="--el:${elInfo.color}">${elInfo.name}</i>`:''}<b>${escape(S.title)}</b> · ${S.sub}</p>
   <div class="mc-pics"><figure><img src="${S.now}" alt=""><figcaption><small>NOW</small>${escape(S.nowCap)}</figcaption></figure><span class="mc-arrow" aria-hidden="true">➜</span><figure class="win" style="--el:${elInfo?.color||'#ffd36b'}"><img src="${S.next}" alt=""><figcaption><small>IF YOU WIN</small>${escape(S.nextCap)}</figcaption></figure></div>
   <p class="mc-reward">${S.reward}</p>${news?`<p class="mc-news"><span>${escape(news.eyebrow)}</span>${escape(news.title)}</p>`:''}
-  <button class="primary-btn mc-go" id="mcGo">Defend! <span class="count">5</span></button>`,'alarm mission');
- let go=false;card.querySelector('#mcGo').onclick=()=>{go=true};setTimeout(()=>card.querySelector('#mcGo')?.focus(),60);
- for(let n=5;n>=1&&!go;n--){/* Nov 4 2026 (user): 5 seconds now that Defend starts at once */const c=card.querySelector('.count');c.textContent=n;c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');for(let k=0;k<10&&!go;k++)await gwait(100)}
+  <div class="mc-actions"><button class="mc-wait" id="mcWait">Not ready</button><button class="primary-btn mc-go" id="mcGo">Defend! <span class="count">5</span></button></div>`,'alarm mission');
+ let go=false,hold=false;card.querySelector('#mcGo').onclick=()=>{go=true};
+ /* Nov 4 2026 (user): "Not ready" stops the countdown; the card waits until Defend is pressed */
+ card.querySelector('#mcWait').onclick=e=>{hold=true;e.currentTarget.hidden=true;const c=card.querySelector('.count');c.textContent='';c.classList.remove('tick');card.classList.add('held');card.querySelector('.prep-held')||card.querySelector('.mc-actions').insertAdjacentHTML('beforebegin','<p class="prep-held">Take your time. Press Defend! when you are ready.</p>');card.querySelector('#mcGo').focus()};setTimeout(()=>card.querySelector('#mcGo')?.focus(),60);
+ for(let n=5;n>=1&&!go&&!hold;n--){/* Nov 4 2026 (user): 5 seconds now that Defend starts at once */const c=card.querySelector('.count');c.textContent=n;c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');for(let k=0;k<10&&!go&&!hold;k++)await gwait(100)}
+ while(!go)await new Promise(r=>setTimeout(r,100));
  card.querySelector('.count').textContent='';card.querySelector('#mcGo').firstChild.textContent='Defend!';await gwait(150)}
 async function runDirector(){
  if(campaignRevealDue()){await momentDone();return campaignReveal()}
