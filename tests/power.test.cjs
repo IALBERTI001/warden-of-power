@@ -22,7 +22,7 @@ assert(P.ETERNAL.cost(2)>P.ETERNAL.cost(1));
 {const w=E.engineWave(1000,()=>.3,1);assert(/The Thousandth/.test(w.name)&&w.trial);const g=new E.Game({...crown},{mission:'engine',seed:1});const b=g.spawn('boss',1000,null,false,0,true);assert(b.thousandth);
  g.completed=1000;g.engineMilestone();assert(g.profile.earned.eternal_thousand);assert(g.drain().some(e=>e.type==='thousandth'))}
 assert(B.HIDDEN.has('eternal_thousand')&&!B.visible('eternal_thousand',{earned:{}})&&B.visible('eternal_thousand',{earned:{eternal_thousand:'x'}}));
-assert.equal(B.publicTotal(E.ACHIEVEMENTS),E.ACHIEVEMENTS.length-5,'the secrets are not counted');
+assert.equal(B.publicTotal(E.ACHIEVEMENTS),E.ACHIEVEMENTS.length-6,'the secrets are not counted');
 // Tactician badges are awarded at run end
 {const g=new E.Game({...crown},{mission:'engine',seed:1});g.completed=700;g.finish(false);const r=g.drain().find(e=>e.type==='result');assert(r.tactician&&r.tactician.factor>4);assert(g.profile.earned.tactician_legend&&g.profile.earned.tactician_master)}
 console.log('PASS: Warden Power (measured, monotonic, projects simulator depth), Tactician, Eternal Mastery (cap, Engine only, post-500 pay), the hidden wave-1000 badge.');
