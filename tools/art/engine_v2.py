@@ -27,9 +27,39 @@ def main():
     base = np.asarray(Image.open(cfg['arena']).convert('RGB').resize((W, H), Image.LANCZOS)).astype(np.float32)
     R = cfg['radius']
     dense = [[(x * S, y * S) for x, y in fillet_path(r, R, 1.0)[0]] for r in cfg['routes']]
+    if cfg.get('trimInlay'):                        # brass floor lines end before each kerb instead of running under it
+        import cv2
+        from scipy.spatial import cKDTree
+        yy, xx = np.mgrid[0:H, 0:W]
+        d = cKDTree(np.vstack([np.array(l) for l in dense])).query(np.c_[xx.ravel(), yy.ravel()], distance_upper_bound=200)[0].reshape(H, W)
+        hsv = np.asarray(Image.fromarray(base.astype(np.uint8)).convert('HSV')).astype(np.float32)
+        line = (hsv[..., 1] > 165) & (hsv[..., 2] < 235) & (hsv[..., 0] < 30)
+        band = (d > cfg['roadHalf'] * S - 4) & (d < (cfg['roadHalf'] + cfg['trimInlay']) * S)
+        sx, sy, sr = cfg['seal']['at'][0] * S, cfg['seal']['at'][1] * S, 175
+        band &= np.hypot(xx - sx, yy - sy) > sr
+        fx0, fy0, fx1, fy1 = [int(v * S) for v in cfg['field']]
+        inside = np.zeros((H, W), bool); inside[fy0:fy1, fx0:fx1] = True
+        m = nd.binary_dilation(line & band & inside, iterations=1).astype(np.uint8) * 255
+        base = cv2.inpaint(base.astype(np.uint8), m, 3, cv2.INPAINT_NS).astype(np.float32)
     img, surf = draw_network(base, dense, cfg['roadHalf'] * S, Image.open('art/kits/outer/road_strips.png'),
                              seed=11, cob_sat=0.6, cob_tint=(cfg['roadRGB'], cfg.get('roadTint', 0.3)), corner=30)
     canvas = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).convert('RGBA')
+    # gateposts: the Outer Seal kit's orb post, one on each side of every entrance, standing on the machine border
+    gp = Image.open('art/kits/outer/gatepost.png').convert('RGBA'); gp = gp.crop(gp.getchannel('A').getbbox())
+    k = cfg['gate']['scale']; gp = gp.resize((round(gp.width * k), round(gp.height * k)), Image.LANCZOS)
+    stands = []
+    for gx, gy in cfg['gate']['posts']:
+        stands.append((gy, round(gx * S - gp.width / 2), round(gy * S - gp.height)))
+    for _, x, y in sorted(stands):
+        ga = np.asarray(gp)[..., 3].astype(np.float32) / 255
+        sh2 = nd.gaussian_filter(np.pad(ga, 12), 4) * 0.45
+        lay = np.zeros((H + 200, W + 200), np.float32)
+        lay[y + 100 - 12 + 8:y + 100 - 12 + 8 + sh2.shape[0], x + 100 - 12 + 10:x + 100 - 12 + 10 + sh2.shape[1]] = sh2
+        lay = lay[100:100 + H, 100:100 + W]
+        b0 = np.asarray(canvas.convert('RGB')).astype(np.float32)
+        b0 = b0 * (1 - lay[..., None]) + np.array([30, 24, 14], np.float32) * lay[..., None]
+        canvas = Image.fromarray(np.clip(b0, 0, 255).astype(np.uint8)).convert('RGBA')
+        canvas.alpha_composite(gp, (max(0, x), max(0, y)), (max(0, -x), max(0, -y)))
     seal = Image.open(cfg['seal']['src']).convert('RGBA')
     ax, ay = cfg['seal']['anchor']; cx, cy = cfg['seal']['at']
     x0, y0 = round(cx * S - ax), round(cy * S - ay)

@@ -313,14 +313,14 @@ let terrain;
 const SEAL_TINT={conduit:'#7fe3d4',outer:'#ffd27a',moonwell:'#7fdcff',emberheart:'#ffa04a',rimeglass:'#cfefff',stormcrown:'#c49bff',aetherheart:'#ffd96a'};
 let sealFlashAt=-9;
 function sealTint(){return SEAL_TINT[game.map.sector||game.map.id]||'#ffd27a'}
-function sealPoints(){const pts=[];for(const R of game.routes){const e=R.path[R.path.length-1],near=pts.find(p=>Math.hypot(p.x-e[0],p.y-e[1])<130);if(near){near.n++;near.x+=(e[0]-near.x)/near.n;near.y+=(e[1]-near.y)/near.n}else pts.push({x:e[0],y:e[1],n:1})}return pts}
+function sealPoints(){const pts=[];for(const R of game.routes){const e=R.path[R.path.length-1],near=pts.find(p=>Math.hypot(p.x-e[0],p.y-e[1])<150);if(near){near.n++;near.x+=(e[0]-near.x)/near.n;near.y+=(e[1]-near.y)/near.n}else pts.push({x:e[0],y:e[1],n:1})}return pts}
 function entryPoints(){const pts=[];for(const R of game.routes){let d=0;for(;d<R.total;d+=4){const q=R.position(d);if(q.x>=14&&q.x<=986&&q.y>=14&&q.y<=586)break}const q=R.position(d),n=R.position(Math.min(R.total,d+30));if(!pts.some(p=>Math.hypot(p.x-q.x,p.y-q.y)<40))pts.push({x:q.x,y:q.y,a:Math.atan2(n.y-q.y,n.x-q.x)})}return pts}
 function hexA(c,a){return c+Math.round(Math.max(0,Math.min(1,a))*255).toString(16).padStart(2,'0')}
 function drawSealGround(){const t=realTime,col=sealTint(),flash=Math.max(0,1-(t-sealFlashAt)/.7),calm=settings.reduced;
  for(const sp of sealPoints()){const p=G.project(sp.x,sp.y);ctx.save();
   const pulse=calm?1:1+.08*Math.sin(t*2.4),R=46*pulse,g=ctx.createRadialGradient?.(p.x,p.y,4,p.x,p.y,R*1.5);if(g?.addColorStop){g.addColorStop(0,hexA(flash?'#ff6b5e':col,.55+.3*flash));g.addColorStop(.45,hexA(flash?'#ff6b5e':col,.22));g.addColorStop(1,hexA(col,0));ctx.fillStyle=g}else ctx.fillStyle=hexA(col,.25);/* Oct 29 2026: a map with a painted seal keeps its own glow; the soft fill only shows as hit feedback */if(!game.map.paintedSeal||flash){if(game.map.paintedSeal)ctx.globalAlpha=flash;ctx.beginPath();ctx.arc(p.x,p.y,R*1.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}
-  ctx.lineWidth=2.4;ctx.strokeStyle=hexA(col,.9);ctx.setLineDash([9,7]);ctx.lineDashOffset=calm?0:-t*18;ctx.beginPath();ctx.ellipse(p.x,p.y,R*.72,R*.44,0,0,Math.PI*2);ctx.stroke();
-  ctx.setLineDash([3,6]);ctx.lineDashOffset=calm?0:t*24;ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(p.x,p.y,R*.48,R*.29,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+  if(!game.map.noSealRing){/* Nov 4 2026: the Engine's painted heart needs no rings over it */ctx.lineWidth=2.4;ctx.strokeStyle=hexA(col,.9);ctx.setLineDash([9,7]);ctx.lineDashOffset=calm?0:-t*18;ctx.beginPath();ctx.ellipse(p.x,p.y,R*.72,R*.44,0,0,Math.PI*2);ctx.stroke();
+  ctx.setLineDash([3,6]);ctx.lineDashOffset=calm?0:t*24;ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(p.x,p.y,R*.48,R*.29,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([])}
   if(!calm)for(let i=0;i<12;i++){const ph=(t*.45+i/12)%1,ang=i*2.399+t*.3,rx=Math.cos(ang)*R*.55,ry=Math.sin(ang)*R*.32;ctx.globalAlpha=(1-ph)*.9;ctx.fillStyle=i%3?col:'#ffffff';ctx.beginPath();ctx.arc(p.x+rx,p.y+ry-ph*58,1.6+(1-ph)*1.6,0,Math.PI*2);ctx.fill()}
   ctx.restore()}
  for(const ep of entryPoints()){const p=G.project(ep.x,ep.y);ctx.save();ctx.translate(p.x,p.y);const spin=calm?0:t*2.2;
