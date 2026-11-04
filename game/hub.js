@@ -38,7 +38,7 @@ addEventListener('storage',e=>{if(e.key===PROFILE_KEY){profile=load();render()}}
 // ---------- map painting (HubFX draws stages, living effects and restoration moments) ------------
 const canvas=$('hubMap');
 const img={};let ready=false;
-Promise.all([['ruined','assets/hub/hub-ruined.jpg'],['restored','assets/hub/hub-restored.jpg']].map(([k,src])=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>{img[k]=i;ok()};i.onerror=()=>bad(src);i.src=src}))).then(()=>HubFX.init(canvas,img.ruined,img.restored)).then(()=>{ready=true;paint();ascensionMoment();runDirector()}).catch(src=>{toast('Could not load the hub painting',String(src))});
+Promise.all([['ruined','assets/hub/hub-ruined.jpg'],['restored','assets/hub/hub-restored.jpg']].map(([k,src])=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>{img[k]=i;ok()};i.onerror=()=>bad(src);i.src=src+((document.querySelector('script[src*="hub.js?v="]')?.getAttribute('src')||'').match(/\?v=\w+/)||[''])[0]}))).then(()=>HubFX.init(canvas,img.ruined,img.restored)).then(()=>{ready=true;paint();ascensionMoment();runDirector()}).catch(src=>{toast('Could not load the hub painting',String(src))});
 function sceneState(){const s={gate:profile.gateOpen?1:0,aetherheart:profile.earned?.eternal_thousand&&profile.thousandthSeen?6:Math.max(0,Math.min(5,profile.ascensionSeen??(profile.ascension||0)))};for(const id of ['moonwell','emberheart','rimeglass','stormcrown','atelier'])s[id]=stage(id);return s}
 function paint(){if(ready&&!HubFX.isPlaying())HubFX.setState(sceneState())}
 // The restoration moment: pins step aside, the area is rebuilt on screen, a banner names what changed.
@@ -168,7 +168,9 @@ function closePanel(){$('panel').hidden=true;currentPanel=null;document.querySel
 function restore(id){const r=P.restore(profile,id);if(!r.ok){toast('Not yet',r.reason);return}const f=facility(id),p=PLACES.find(p=>p.id===id);
  if(r.stage===1&&f.branch&&!guidedOn())toast(`${ELEMENT[f.branch].name} skills unlocked`,f.name);
  if(r.stage===3){toast(`${f.name} reawakened`,'RESTORATION COMPLETE');if(p.badge)award(p.badge)}
- persist();closePanelQuiet();celebrate(id,r.stage-1,r.stage,`${f.stages[r.stage-1]}`,`${f.name} · stage ${r.stage} of 3 · ${bonusText(f)}`)}
+ persist();closePanelQuiet();/* Nov 4 2026: name the win that paid for it, so battle and base read as one loop */
+ const won=C&&f.branch?C.MISSIONS.find(m=>m.sector===id&&m.index===r.stage&&profile.missions?.[m.id]?.cleared):null;
+ celebrate(id,r.stage-1,r.stage,`${f.stages[r.stage-1]}`,`${won?`Your win at ${won.name} restored the ${f.name}`:f.name} · stage ${r.stage} of 3 · ${bonusText(f)}`,won?'YOUR VICTORY RESTORED':'RESTORED')}
 function closePanelQuiet(){$('panel').hidden=true;currentPanel=null}
 document.querySelector('[data-close-panel]').onclick=closePanel;
 
@@ -311,13 +313,35 @@ const menuOpen=()=>!!document.querySelector('.overlay:not([hidden])');
 const gwait=ms=>new Promise(r=>{let left=ms;const tick=()=>{if(!menuOpen())left-=100;if(left<=0)r();else setTimeout(tick,100)};setTimeout(tick,100)});
 const momentDone=()=>new Promise(r=>{const t=setInterval(()=>{if(!document.body.classList.contains('moment')){clearInterval(t);r()}},200)});
 async function guidedCaption(eyebrow,title,text,ms){guidedCard(`<span class="eyebrow">${eyebrow}</span><h2>${title}</h2><p>${text}</p>`,'caption');await gwait(ms);$('guidedCard').hidden=true}
-async function guidedAlarm(a){const key=a.type==='outer'?'outer':a.sector;const pin=document.querySelector(`[data-place="${key==='outer'?'outer':key}"]`);pin?.classList.add('under-attack');
- const m=a.id&&C?C.mission(a.id):null;const sub=a.type==='outer'?'Hold the gate to earn Parts.':m?`${m.finale?'The finale':'Mission '+m.index} · ${m.name}`:'';
- playAreaCue(key==='outer'?'emberheart':key==='aetherheart'?'atelier':key);
- const card=guidedCard(`<span class="eyebrow alarm-eyebrow">⚠ UNDER ATTACK</span><h2>${ALARM[key]||ALARM.outer}</h2><p>${sub}</p><strong class="prep">Prepare to defend!</strong><div class="count" aria-live="assertive">3</div>`,'alarm');
- /* Nov 4 2026 (user): 3 seconds between campaign trips (was 5 plus a pause) */
- for(let n=3;n>=1;n--){card.querySelector('.count').textContent=n;card.querySelector('.count').classList.remove('tick');void card.offsetWidth;card.querySelector('.count').classList.add('tick');await gwait(1000)}
- card.querySelector('.count').textContent='Defend!';await gwait(250)}
+/* Nov 4 2026 (user playthrough: "What am I defending? I didn't know what's happening"): the bare countdown became a
+   mission card. It names the sector and its element, shows that sector of the complex as it is NOW beside how it looks
+   once this win restores it, says what the win gives, and starts after 5 seconds (or at once on Defend). */
+function sectorPic(id,stg){const B=HubFX.BOXES[id];if(!B||!img.ruined)return'';const w=B[2]-B[0],h=B[3]-B[1],c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
+ x.drawImage(stg>=3&&id==='aetherheart'?img.restored:img.ruined,B[0],B[1],w,h,0,0,w,h);const L=id==='aetherheart'?null:HubFX.layerFor(id,stg);if(L)x.drawImage(L,0,0,w,h);return c.toDataURL('image/jpeg',.85)}
+function missionStakes(a){
+ if(a.type==='outer'){const need=['moonwell','emberheart','rimeglass','stormcrown'].map(facility).find(f=>{const o=P.restorationOffer(profile,f.id);return o&&!o.ok&&/Parts/.test(o.reason||'')})||facility('moonwell');const st=stage(need.id);
+  return{key:'outer',head:'Raiders at the Outer Seal!',sector:'The Outer Seal',el:null,title:'Hold the gate',sub:'Defend the south gate',now:sectorPic(need.id,st),next:sectorPic(need.id,Math.min(3,st+1)),nowCap:`${need.name} now`,nextCap:need.stages[Math.min(2,st)],
+   reward:`Win: <b>Restoration Parts</b> to restore the <b>${need.name}</b>`}}
+ const m=C.mission(a.id),key=a.sector;
+ if(m.finale)return{key:'aetherheart',head:'The Aetherheart Engine is under attack!',sector:'Aetherheart Engine',el:'engineering',title:m.name,sub:'The finale',now:sectorPic('aetherheart',0),next:sectorPic('aetherheart',3),nowCap:'Sealed and dark',nextCap:'The Engine awakens',
+  reward:'Win: <b>awaken the Engine</b> · endless <b>Engine Trials</b>, Skills and the Workshop open'};
+ const f=facility(key),st=stage(key),gives=st<m.index;const el=ELEMENT[f.branch];
+ return{key,head:ALARM[key],sector:f.name,el:f.branch,title:m.name,sub:`Mission ${m.index} of 3`,now:sectorPic(key,st),next:sectorPic(key,gives?m.index:st),nowCap:st?f.stages[st-1]:'In ruins',nextCap:gives?f.stages[m.index-1]:'Restored',
+  reward:gives?`Win: <b>+${m.firstParts} Parts</b> to restore it · <b class="el-${f.branch}">${el.name} towers +${Math.round(f.bonus[1]*100)}% damage</b>, everywhere${m.index===1?` · <b>${el.name} skills</b> unlocked`:''}`:`Win: <b>Parts</b> and a Seal for your record`}}
+async function guidedAlarm(a){const S=missionStakes(a);const pin=document.querySelector(`[data-place="${S.key}"]`);pin?.classList.add('under-attack');
+ playAreaCue(S.key==='outer'?'emberheart':S.key==='aetherheart'?'atelier':S.key);
+ const news=a.type==='mission'&&GD.missionNews?GD.missionNews(a.id,el=>E.TYPES[el]?.paths):null;const elInfo=S.el?ELEMENT[S.el]:null;
+ const card=guidedCard(`<span class="eyebrow alarm-eyebrow">⚠ UNDER ATTACK</span><h2>${S.head}</h2>
+  <p class="mc-sub">${elInfo?`<i class="mc-el" style="--el:${elInfo.color}">${elInfo.name}</i>`:''}<b>${escape(S.title)}</b> · ${S.sub}</p>
+  <div class="mc-pics"><figure><img src="${S.now}" alt=""><figcaption><small>NOW</small>${escape(S.nowCap)}</figcaption></figure><span class="mc-arrow" aria-hidden="true">➜</span><figure class="win" style="--el:${elInfo?.color||'#ffd36b'}"><img src="${S.next}" alt=""><figcaption><small>IF YOU WIN</small>${escape(S.nextCap)}</figcaption></figure></div>
+  <p class="mc-reward">${S.reward}</p>${news?`<p class="mc-news"><span>${escape(news.eyebrow)}</span>${escape(news.title)}</p>`:''}
+  <div class="mc-actions"><button class="mc-wait" id="mcWait">Not ready</button><button class="primary-btn mc-go" id="mcGo">Defend! <span class="count">5</span></button></div>`,'alarm mission');
+ let go=false,hold=false;card.querySelector('#mcGo').onclick=()=>{go=true};
+ /* Nov 4 2026 (user): "Not ready" stops the countdown; the card waits until Defend is pressed */
+ card.querySelector('#mcWait').onclick=e=>{hold=true;e.currentTarget.hidden=true;const c=card.querySelector('.count');c.textContent='';c.classList.remove('tick');card.classList.add('held');card.querySelector('.prep-held')||card.querySelector('.mc-actions').insertAdjacentHTML('beforebegin','<p class="prep-held">Take your time. Press Defend! when you are ready.</p>');card.querySelector('#mcGo').focus()};setTimeout(()=>card.querySelector('#mcGo')?.focus(),60);
+ for(let n=5;n>=1&&!go&&!hold;n--){/* Nov 4 2026 (user): 5 seconds now that Defend starts at once */const c=card.querySelector('.count');c.textContent=n;c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');for(let k=0;k<10&&!go&&!hold;k++)await gwait(100)}
+ while(!go)await new Promise(r=>setTimeout(r,100));
+ card.querySelector('.count').textContent='';card.querySelector('#mcGo').firstChild.textContent='Defend!';await gwait(150)}
 async function runDirector(){
  if(campaignRevealDue()){await momentDone();return campaignReveal()}
  if(!guidedOn()||directing)return;directing=true;document.body.classList.add('guided');closePanelQuiet();

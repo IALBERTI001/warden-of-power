@@ -1,0 +1,51 @@
+{
+ "sector": "moonwell",
+ "note": "Moonwell arena: a repaint of the Outer Seal in the water element (ChatGPT, Nov 4 2026, art/incoming/moonwell-arena_v1_20261104.png; top 951 rows kept, resized to 1620x971). Seal, wall, channel and courtyard are the painting's own.",
+ "arena": "art/ground/moonwell/arena_v1.png",
+ "channel": [
+  776,
+  861
+ ],
+ "seal": [
+  931,
+  268
+ ],
+ "sealRadius": 43,
+ "roadRGB": [
+  168,
+  160,
+  140
+ ],
+ "roadSat": 0.7,
+ "play": {
+  "left": 76,
+  "right": 739,
+  "top": 119,
+  "bottom": 480
+ },
+ "blocked": [
+  [
+   235,
+   0,
+   716,
+   142
+  ],
+  [
+   0,
+   0,
+   242,
+   150
+  ]
+ ],
+ "propThr": 32,
+ "roadTint": 0.3,
+ "groundGrade": [
+  [
+   150,
+   175,
+   50
+  ],
+  0.45,
+  1.0
+ ]
+}

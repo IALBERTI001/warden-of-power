@@ -18,7 +18,9 @@ const LOOPS={
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FX={canvas:null,ctx:null,base:null,restored:null,art:{},layers:{},state:{},moment:null,particles:[],last:0,running:false,onMoment:null};
 
-function load(src){return new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src=src})}
+/* Nov 4 2026: images carry the build version so a repaint never shows a cached old piece */
+const AV=(()=>{const m=(document.querySelector('script[src*="hubfx.js?v="]')?.getAttribute('src')||'').match(/v=(\w+)/);return m?'?v='+m[1]:''})();
+function load(src){return new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src=src+AV})}
 function feather(img,box,edge=36){const w=box[2]-box[0],h=box[3]-box[1],c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(img,0,0,w,h);
  // soft rectangular feather so painted crops melt into the base painting
  const m=document.createElement('canvas');m.width=w;m.height=h;const mx=m.getContext('2d');mx.fillStyle='#000';mx.filter=`blur(${edge/2}px)`;mx.fillRect(edge,edge,w-2*edge,h-2*edge);
@@ -26,7 +28,7 @@ function feather(img,box,edge=36){const w=box[2]-box[0],h=box[3]-box[1],c=docume
 function cropOf(img,box){const w=box[2]-box[0],h=box[3]-box[1],c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,box[0],box[1],w,h,0,0,w,h);return c}
 async function init(canvas,base,restored){FX.canvas=canvas;FX.ctx=canvas.getContext('2d');FX.base=base;FX.restored=restored;
  const jobs=[];for(const id of Object.keys(BOXES)){if(id==='aetherheart'){jobs.push(Promise.all([1,2,3,4,5,6].map(n=>load(`assets/hub/stages/aetherheart-asc${n}.png`))).then(list=>{FX.art.aetherheart={};list.forEach((im,i)=>{if(im)FX.art.aetherheart[i+1]=feather(im,BOXES.aetherheart,48)})}));continue}if(id==='gate'){jobs.push(load('assets/hub/stages/gate-sealed.png').then(i=>{FX.art.gate={sealed:i?feather(i,BOXES.gate):null,open:null}}));continue}
-  jobs.push(Promise.all([load(`assets/hub/stages/${id}-stage1.png`),load(`assets/hub/stages/${id}-stage2.png`)]).then(([a,b])=>{FX.art[id]={1:a&&feather(a,BOXES[id]),2:b&&feather(b,BOXES[id]),3:feather(cropOf(restored,BOXES[id]),BOXES[id])}}))}
+  jobs.push(Promise.all([load(`assets/hub/stages/${id}-stage1.png`),load(`assets/hub/stages/${id}-stage2.png`),load(`assets/hub/stages/${id}-stage3.png`)]).then(([a,b,c])=>{FX.art[id]={1:a&&feather(a,BOXES[id]),2:b&&feather(b,BOXES[id]),3:feather(c||cropOf(restored,BOXES[id]),BOXES[id])}}))/* Nov 4 2026: stage pieces carry an ownership alpha so overlapping boxes never repaint a neighbour */}
  await Promise.all(jobs)}
 // The best available picture for a facility stage (0 = ruined base, nothing drawn).
 function layerFor(id,s){if(id==='aetherheart'){const a=FX.art.aetherheart||{};for(let k=s;k>=1;k--)if(a[k])return a[k];return null}if(id==='gate')return s>=1?null:FX.art.gate?.sealed;if(!s)return null;const a=FX.art[id]||{};for(let k=s;k<=3;k++)if(a[k])return a[k];return null}

@@ -1,0 +1,134 @@
+{
+ "id": "aetherheart-1",
+ "note": "Aetherheart Engine, one-look rebuild (Nov 4 2026). Arena: repaint of the Outer Seal in brass (art/incoming/aetherheart-arena_v1_20261104.png). Routes: the user's Option E (Nov 2), entries moved to the painted side gateways (y130) and the last legs straight up into the seal's painted arches. Seal: the user's favourite heart seal, cut from the approved painting along its outline, untouched.",
+ "arena": "art/ground/aetherheart/arena_v1.png",
+ "radius": 50,
+ "roadHalf": 27,
+ "roadRGB": [
+  217,
+  165,
+  84
+ ],
+ "roadTint": 0.7,
+ "routes": [
+  [
+   [
+    -40,
+    138
+   ],
+   [
+    300,
+    138
+   ],
+   [
+    300,
+    270
+   ],
+   [
+    170,
+    270
+   ],
+   [
+    170,
+    440
+   ],
+   [
+    435,
+    440
+   ],
+   [
+    435,
+    330
+   ]
+  ],
+  [
+   [
+    1040,
+    138
+   ],
+   [
+    700,
+    138
+   ],
+   [
+    700,
+    270
+   ],
+   [
+    830,
+    270
+   ],
+   [
+    830,
+    440
+   ],
+   [
+    565,
+    440
+   ],
+   [
+    565,
+    330
+   ]
+  ]
+ ],
+ "seal": {
+  "src": "art/kits/aetherheart/heart_seal.png",
+  "anchor": [
+   237,
+   252
+  ],
+  "at": [
+   500,
+   300
+  ]
+ },
+ "play": {
+  "left": 58,
+  "right": 942,
+  "top": 119,
+  "bottom": 505
+ },
+ "blocked": [
+  [
+   400,
+   196,
+   600,
+   402
+  ],
+  [
+   445,
+   455,
+   555,
+   510
+  ]
+ ],
+ "gate": {
+  "scale": 0.3,
+  "posts": [
+   [
+    24,
+    104
+   ],
+   [
+    24,
+    232
+   ],
+   [
+    976,
+    104
+   ],
+   [
+    976,
+    232
+   ]
+  ]
+ },
+ "trimInlay": 22,
+ "field": [
+  40,
+  120,
+  960,
+  560
+ ]
+}
