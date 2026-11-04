@@ -18,7 +18,9 @@ const LOOPS={
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FX={canvas:null,ctx:null,base:null,restored:null,art:{},layers:{},state:{},moment:null,particles:[],last:0,running:false,onMoment:null};
 
-function load(src){return new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src=src})}
+/* Nov 4 2026: images carry the build version so a repaint never shows a cached old piece */
+const AV=(()=>{const m=(document.querySelector('script[src*="hubfx.js?v="]')?.getAttribute('src')||'').match(/v=(\w+)/);return m?'?v='+m[1]:''})();
+function load(src){return new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src=src+AV})}
 function feather(img,box,edge=36){const w=box[2]-box[0],h=box[3]-box[1],c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(img,0,0,w,h);
  // soft rectangular feather so painted crops melt into the base painting
  const m=document.createElement('canvas');m.width=w;m.height=h;const mx=m.getContext('2d');mx.fillStyle='#000';mx.filter=`blur(${edge/2}px)`;mx.fillRect(edge,edge,w-2*edge,h-2*edge);

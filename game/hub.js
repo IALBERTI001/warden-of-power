@@ -38,7 +38,7 @@ addEventListener('storage',e=>{if(e.key===PROFILE_KEY){profile=load();render()}}
 // ---------- map painting (HubFX draws stages, living effects and restoration moments) ------------
 const canvas=$('hubMap');
 const img={};let ready=false;
-Promise.all([['ruined','assets/hub/hub-ruined.jpg'],['restored','assets/hub/hub-restored.jpg']].map(([k,src])=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>{img[k]=i;ok()};i.onerror=()=>bad(src);i.src=src}))).then(()=>HubFX.init(canvas,img.ruined,img.restored)).then(()=>{ready=true;paint();ascensionMoment();runDirector()}).catch(src=>{toast('Could not load the hub painting',String(src))});
+Promise.all([['ruined','assets/hub/hub-ruined.jpg'],['restored','assets/hub/hub-restored.jpg']].map(([k,src])=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>{img[k]=i;ok()};i.onerror=()=>bad(src);i.src=src+((document.querySelector('script[src*="hub.js?v="]')?.getAttribute('src')||'').match(/\?v=\w+/)||[''])[0]}))).then(()=>HubFX.init(canvas,img.ruined,img.restored)).then(()=>{ready=true;paint();ascensionMoment();runDirector()}).catch(src=>{toast('Could not load the hub painting',String(src))});
 function sceneState(){const s={gate:profile.gateOpen?1:0,aetherheart:profile.earned?.eternal_thousand&&profile.thousandthSeen?6:Math.max(0,Math.min(5,profile.ascensionSeen??(profile.ascension||0)))};for(const id of ['moonwell','emberheart','rimeglass','stormcrown','atelier'])s[id]=stage(id);return s}
 function paint(){if(ready&&!HubFX.isPlaying())HubFX.setState(sceneState())}
 // The restoration moment: pins step aside, the area is rebuilt on screen, a banner names what changed.
