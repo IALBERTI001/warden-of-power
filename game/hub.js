@@ -315,7 +315,7 @@ const momentDone=()=>new Promise(r=>{const t=setInterval(()=>{if(!document.body.
 async function guidedCaption(eyebrow,title,text,ms){guidedCard(`<span class="eyebrow">${eyebrow}</span><h2>${title}</h2><p>${text}</p>`,'caption');await gwait(ms);$('guidedCard').hidden=true}
 /* Nov 4 2026 (user playthrough: "What am I defending? I didn't know what's happening"): the bare countdown became a
    mission card. It names the sector and its element, shows that sector of the complex as it is NOW beside how it looks
-   once this win restores it, says what the win gives, and starts after 3 seconds (or at once on Defend). */
+   once this win restores it, says what the win gives, and starts after 5 seconds (or at once on Defend). */
 function sectorPic(id,stg){const B=HubFX.BOXES[id];if(!B||!img.ruined)return'';const w=B[2]-B[0],h=B[3]-B[1],c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
  x.drawImage(stg>=3&&id==='aetherheart'?img.restored:img.ruined,B[0],B[1],w,h,0,0,w,h);const L=id==='aetherheart'?null:HubFX.layerFor(id,stg);if(L)x.drawImage(L,0,0,w,h);return c.toDataURL('image/jpeg',.85)}
 function missionStakes(a){
@@ -335,9 +335,9 @@ async function guidedAlarm(a){const S=missionStakes(a);const pin=document.queryS
   <p class="mc-sub">${elInfo?`<i class="mc-el" style="--el:${elInfo.color}">${elInfo.name}</i>`:''}<b>${escape(S.title)}</b> · ${S.sub}</p>
   <div class="mc-pics"><figure><img src="${S.now}" alt=""><figcaption><small>NOW</small>${escape(S.nowCap)}</figcaption></figure><span class="mc-arrow" aria-hidden="true">➜</span><figure class="win" style="--el:${elInfo?.color||'#ffd36b'}"><img src="${S.next}" alt=""><figcaption><small>IF YOU WIN</small>${escape(S.nextCap)}</figcaption></figure></div>
   <p class="mc-reward">${S.reward}</p>${news?`<p class="mc-news"><span>${escape(news.eyebrow)}</span>${escape(news.title)}</p>`:''}
-  <button class="primary-btn mc-go" id="mcGo">Defend! <span class="count">3</span></button>`,'alarm mission');
+  <button class="primary-btn mc-go" id="mcGo">Defend! <span class="count">5</span></button>`,'alarm mission');
  let go=false;card.querySelector('#mcGo').onclick=()=>{go=true};setTimeout(()=>card.querySelector('#mcGo')?.focus(),60);
- for(let n=3;n>=1&&!go;n--){const c=card.querySelector('.count');c.textContent=n;c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');for(let k=0;k<10&&!go;k++)await gwait(100)}
+ for(let n=5;n>=1&&!go;n--){/* Nov 4 2026 (user): 5 seconds now that Defend starts at once */const c=card.querySelector('.count');c.textContent=n;c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');for(let k=0;k<10&&!go;k++)await gwait(100)}
  card.querySelector('.count').textContent='';card.querySelector('#mcGo').firstChild.textContent='Defend!';await gwait(150)}
 async function runDirector(){
  if(campaignRevealDue()){await momentDone();return campaignReveal()}
