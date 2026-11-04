@@ -18,6 +18,8 @@ from PIL import Image, ImageDraw
 sys.path.insert(0, os.path.dirname(__file__))
 from layout import fillet_path, game_path
 from kit_road import draw_roads, quilt
+from road_network import draw_network
+from scipy import ndimage as nd
 from kit_build import load_piece, scaled, cast_shadow
 
 S = 1.62
@@ -47,12 +49,86 @@ def grade_to(target_rgb, strength=1.0, sat=1.0):
     return f
 
 
+FIELD = (50, 104, 766, 536)                        # world rect of the open field on every sector arena
+
+
+def prop_mask(img, thr):
+    """Small objects on the field (stepping stones, snow lumps, pebbles, cracks): pixels far from their local median."""
+    L = _labimg(img)
+    med = np.stack([nd.median_filter(L[..., c], size=31) for c in range(3)], -1)
+    d = np.linalg.norm(L - med, axis=2)
+    m = nd.binary_closing(d > thr, iterations=2)
+    m = nd.binary_opening(m, iterations=1)
+    return nd.binary_dilation(m, iterations=4)
+
+
+def _labimg(a):
+    from skimage import color
+    return color.rgb2lab(np.clip(a / 255.0, 0, 1))
+
+
+def field_for(mid, base, cfg, dense):
+    """The map's ground: the arena painting, with (maps 2 and 3) a field quilted anew so each map has its own ground,
+    and every small object that the road would cut removed whole (covered with clean quilted field)."""
+    fx0, fy0, fx1, fy1 = [int(v * S) for v in cfg.get('field', FIELD)]
+    idx = int(mid.split('-')[1])
+    pm = np.zeros((H, W), bool)
+    pm[fy0:fy1, fx0:fx1] = prop_mask(base[fy0:fy1, fx0:fx1], cfg.get('propThr', 18))
+    # clean source patches inside the field
+    win = 120; src = []
+    for y in range(fy0 + 20, fy1 - win - 20, 30):
+        for x in range(fx0 + 20, fx1 - win - 20, 30):
+            src.append((pm[y:y + win, x:x + win].mean(), y, x))
+    src.sort(key=lambda t: t[0])                   # the cleanest windows (fewest small objects) are the sources
+    src = [base[y:y + win, x:x + win] for f, y, x in src[:max(12, len(src) // 4)]]
+    rng = np.random.default_rng(idx)
+    if len(src) > 60:
+        src = [src[i] for i in rng.choice(len(src), 60, replace=False)]
+    flat = []
+    for c in src:
+        l = c.mean(2); b = nd.gaussian_filter(l, 30)
+        flat.append(c * (l.mean() / np.maximum(b, 1))[..., None])
+    clean = quilt(flat, W, H, patch=90, overlap=24, seed=40 + idx)
+    lp = nd.gaussian_filter(base.mean(2), 60); lf = nd.gaussian_filter(clean.mean(2), 60)
+    clean = clean * (lp / np.maximum(lf, 1))[..., None]
+    img = base.copy()
+    fm = np.zeros((H, W), np.float32); fm[fy0 + 12:fy1 - 12, fx0 + 12:fx1 - 12] = 1
+    fm = nd.gaussian_filter(fm, 8)
+    if idx > 1 and src:                            # maps 2 and 3: their own field, sprinkled with the painting's props
+        props = quilt([base[y:y + win, x:x + win] for y in range(fy0 + 20, fy1 - win - 20, 60)
+                       for x in range(fx0 + 20, fx1 - win - 20, 60)], W, H, patch=90, overlap=24, seed=70 + idx)
+        img = img * (1 - fm[..., None]) + props * fm[..., None]
+        pm = np.zeros((H, W), bool)
+        pm[fy0:fy1, fx0:fx1] = prop_mask(img[fy0:fy1, fx0:fx1], cfg.get('propThr', 18))
+    # remove whole objects within reach of the road
+    from scipy.spatial import cKDTree
+    yy, xx = np.mgrid[0:H, 0:W]
+    d = cKDTree(np.vstack([np.array(l) for l in dense])).query(np.c_[xx.ravel(), yy.ravel()],
+                                                                 distance_upper_bound=200)[0].reshape(H, W)
+    near = d < (cfg.get('roadHalf', 27) + 22) * S
+    lab, n = nd.label(pm)
+    hit = np.unique(lab[near & pm]); hit = hit[hit > 0]
+    rm = np.isin(lab, hit)
+    rm = nd.gaussian_filter(nd.binary_dilation(rm, iterations=5).astype(np.float32), 2.5) * fm
+    img = img * (1 - rm[..., None]) + clean * rm[..., None]
+    return img
+
+
 def main():
     cfg = json.load(open(sys.argv[1])); out = sys.argv[2]; os.makedirs(out, exist_ok=True)
     only = sys.argv[3:]
     routes_all = json.load(open('levels/kit/routes.json'))
     R = routes_all['radius']
     arena = Image.open(cfg['arena']).convert('RGB').resize((W, H), Image.LANCZOS)
+    if cfg.get('groundGrade'):                   # one-palette rule: nudge the arena's colour toward the Outer Seal
+        from road_network import tint
+        rgb_t, k, sat = cfg['groundGrade']
+        a = np.asarray(arena).astype(np.float32)
+        if k: a = tint(a, rgb_t, k)
+        if sat != 1.0:
+            from skimage import color
+            L = color.rgb2lab(a / 255.0); L[..., 1:] *= sat; a = np.clip(color.lab2rgb(L) * 255, 0, 255)
+        arena = Image.fromarray(a.astype(np.uint8))
     if cfg.get('sharpen'):                        # one-sharpness rule: lift a soft painting's detail toward the Outer Seal
         from PIL import ImageFilter
         r, pct = cfg['sharpen']; arena = arena.filter(ImageFilter.UnsharpMask(radius=r, percent=pct, threshold=2))
@@ -77,19 +153,11 @@ def main():
     for mid, rlist in routes_all['maps'].items():
         if not mid.startswith(cfg['sector']) or (only and mid not in only):
             continue
-        img = base.copy()
         dense = [[(x * S, y * S) for x, y in fillet_path(r, R, 1.0)[0]] for r in rlist]
-        # routes that merge share their last stretch: draw that stretch once (a later route stops a little past the
-        # point where it meets an earlier one, so its kerbs open into the junction and no doubled bed shows)
-        from scipy.spatial import cKDTree
-        for i in range(1, len(dense)):
-            prev = cKDTree(np.vstack([np.array(dense[j]) for j in range(i)]))
-            d, _ = prev.query(np.array(dense[i]))
-            on = np.flatnonzero(d < 2.0)
-            if len(on):
-                dense[i] = dense[i][:min(len(dense[i]), on[0] + 6)]
+        img = field_for(mid, base, cfg, dense)
         stop = xx > cx0 * S                       # the road ends at the channel bank; the bridge carries it on
-        img, dist = draw_roads(img, dense, cfg.get('roadHalf', 27) * S, strips, stop_mask=stop, seed=11, recolor=recolor)
+        img, surf = draw_network(img, dense, cfg.get('roadHalf', 27) * S, strips, stop_mask=stop, seed=11,
+                                 cob_sat=0.6, cob_tint=(cfg['roadRGB'], cfg.get('roadTint', 0.3)), corner=cfg.get('corner', 30))
         canvas = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).convert('RGBA')
         # bridge: deck middle repeated from just inside the bank to the seal's rim
         y = seal[1]
@@ -101,7 +169,7 @@ def main():
             deck.alpha_composite(midsec.crop((0, 0, min(midsec.width, need - cap - x), deck0.height)), (x, 0)); x += midsec.width
         deck.alpha_composite(deck0.crop((deck0.width - cap, 0, deck0.width, deck0.height)), (need - cap, 0))
         a = np.asarray(deck).astype(np.float32); m = a[..., 3] > 128
-        g = grade_to(cfg['roadRGB'], 0.85, cfg.get('roadSat', 0.75))
+        g = grade_to(cfg['roadRGB'], cfg.get('roadTint', 0.3), 1.0)
         a[..., :3][m] = g(a[..., :3][m].reshape(-1, 1, 3)).reshape(-1, 3)
         deck = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
         face = round(deck.height * 0.16)

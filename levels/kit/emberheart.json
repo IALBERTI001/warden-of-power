@@ -40,5 +40,16 @@
  "sharpen": [
   2,
   80
+ ],
+ "propThr": 25,
+ "roadTint": 0.3,
+ "groundGrade": [
+  [
+   165,
+   72,
+   33
+  ],
+  0,
+  0.82
  ]
 }

@@ -40,5 +40,7 @@
  "sharpen": [
   2,
   80
- ]
+ ],
+ "propThr": 18,
+ "roadTint": 0.3
 }
