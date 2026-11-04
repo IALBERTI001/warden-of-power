@@ -314,13 +314,14 @@ async function guidedCaption(eyebrow,title,text,ms){guidedCard(`<span class="eye
 async function guidedAlarm(a){const key=a.type==='outer'?'outer':a.sector;const pin=document.querySelector(`[data-place="${key==='outer'?'outer':key}"]`);pin?.classList.add('under-attack');
  const m=a.id&&C?C.mission(a.id):null;const sub=a.type==='outer'?'Hold the gate to earn Parts.':m?`${m.finale?'The finale':'Mission '+m.index} · ${m.name}`:'';
  playAreaCue(key==='outer'?'emberheart':key==='aetherheart'?'atelier':key);
- const card=guidedCard(`<span class="eyebrow alarm-eyebrow">⚠ UNDER ATTACK</span><h2>${ALARM[key]||ALARM.outer}</h2><p>${sub}</p><strong class="prep">Prepare to defend!</strong><div class="count" aria-live="assertive">5</div>`,'alarm');
- for(let n=5;n>=1;n--){card.querySelector('.count').textContent=n;card.querySelector('.count').classList.remove('tick');void card.offsetWidth;card.querySelector('.count').classList.add('tick');await gwait(1000)}
- card.querySelector('.count').textContent='Defend!';await gwait(500)}
+ const card=guidedCard(`<span class="eyebrow alarm-eyebrow">⚠ UNDER ATTACK</span><h2>${ALARM[key]||ALARM.outer}</h2><p>${sub}</p><strong class="prep">Prepare to defend!</strong><div class="count" aria-live="assertive">3</div>`,'alarm');
+ /* Nov 4 2026 (user): 3 seconds between campaign trips (was 5 plus a pause) */
+ for(let n=3;n>=1;n--){card.querySelector('.count').textContent=n;card.querySelector('.count').classList.remove('tick');void card.offsetWidth;card.querySelector('.count').classList.add('tick');await gwait(1000)}
+ card.querySelector('.count').textContent='Defend!';await gwait(250)}
 async function runDirector(){
  if(campaignRevealDue()){await momentDone();return campaignReveal()}
  if(!guidedOn()||directing)return;directing=true;document.body.classList.add('guided');closePanelQuiet();
- await gwait(700);await momentDone();while(!$('guideIntro').hidden)await gwait(250);/* a daily card speaks first; the guide waits for it */
+ await gwait(300);await momentDone();while(!$('guideIntro').hidden)await gwait(250);/* a daily card speaks first; the guide waits for it */
  if(!profile.guidedWelcome){profile.guidedWelcome=true;persist();await guidedCaption('HOME BASE','Welcome home, Warden','This is the Containment Complex, your base. Every victory restores a piece of it and makes your towers stronger.',5200)}
  for(let i=0;i<24;i++){const a=GD.next(profile,P,C);
   if(a.type==='gate'){const r=P.openGate(profile);if(!r.ok)break;persist();closePanelQuiet();celebrate('gate',0,1,'The Outer Seal Gate rises',`The road into the complex is open · +${P.GATE.bonus[1]} starting Charge in every defense`);await gwait(300);await momentDone();await gwait(500);continue}
