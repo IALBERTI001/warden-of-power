@@ -229,3 +229,5 @@ Gaps carried from before this log existed: the prompts for the tower, enemy and 
 | tower-layout.js | Written by Claude with Ivan (game code) | - | - |
 | tutorial.js | Written by Claude with Ivan (game code) | - | - |
 | ui-polish.css | Written by Claude with Ivan (game code) | - | - |
+
+| assets/hub/hub-restored.jpg, hub-ruined.jpg, stages/* (Nov 4 2026, one-look hub) | AI image generation (ChatGPT, run by Claude in the built-in browser): the restored complex repainted in the Outer Seal map style over the old layout, then ruined, stage 1, stage 2 and six Engine stages painted from it | art/incoming/hub-*_v2_20261104.png | Aligned to the restored painting (OpenCV ECC), cut to the hub boxes with ownership alpha (tools/art/hub_stages.py) |
