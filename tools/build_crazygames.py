@@ -62,6 +62,7 @@ for rel in WEBP:
 REPL=[("'../previews/audio-v3/'+name+variant+'.wav'","'assets/sfx/'+name+variant+'.mp3'",'game.js'),
       ("'../previews/audio-v3/tier_up.wav'","'assets/sfx/tier_up.mp3'",'hub.js'),
       ("'../previews/audio-v2/broken-conduit.wav'","'assets/music/broken-conduit.mp3'",'game.js'),
+      ("'../previews/audio-v2/broken-conduit.wav'","'assets/music/broken-conduit.mp3'",'music.js'),
       ("assets/hub/ambience/amb-${name}.wav","assets/hub/ambience/amb-${name}.mp3",'hub.js')]
 for rel,s in texts.items():
     s=s.replace('../art-reference/','assets/art/').replace("assets/audio/ascension.wav","assets/audio/ascension.mp3")

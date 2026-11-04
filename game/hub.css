@@ -322,3 +322,9 @@ body:has(.overlay:not([hidden])) .guided-card{display:none}
 .guided-card .mc-wait:hover,.guided-card .mc-wait:focus-visible{border-color:#d5b369;color:#fff}
 .guided-card.held{animation:gcIn .35s ease-out both}
 .guided-card .prep-held{margin:2px auto 4px;font-size:15px;color:#c9b48a}
+
+/* Nov 4 2026: Engine music picker */
+.music-pick{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:8px 0 10px}
+.music-pick label{font:15px var(--game-font);color:#ffe2a2}
+.music-pick select{padding:5px 8px;border-radius:8px;border:2px solid #8a7550;background:#2a1d27;color:#fff0d1;font:600 14px Nunito,sans-serif}
+.music-pick small{flex-basis:100%}
