@@ -172,7 +172,7 @@ function bestSpot(type){/* Oct 28 2026 (user): the starter tower guards the seal
  for(const near of [230,320,450,9999]){let best=null;for(let y=30;y<=570;y+=15)for(let x=30;x<=970;x+=15){if(Math.hypot(x-seal.x,y-seal.y)>near)continue;if(starts.some(st=>Math.hypot(x-st.x,y-st.y)<220))continue;if(!game.placement(x,y).ok)continue;let sc=0;for(const q of pts)if(Math.hypot(q.x-x,q.y-y)<=R)sc+=q.w;if(sc>0&&(!best||sc>best.s))best={x,y,s:sc}}if(best)return best}
  return null}
 function guidedTick(){if(!GUIDED_BATTLE||game.status!=='playing'||!ready)return;
- if(!game.__gs&&game.wave===0&&!game.towers.length){game.__gs=realTime+1.2;const s=bestSpot('fire');if(s){const r=game.build('fire',{x:s.x,y:s.y});if(r.ok){fx.push({kind:'tierup',x:s.x,y:s.y,color:E.TYPES.fire.color,at:game.time,life:1.1,small:true});events();refresh()}}feedback('Wave 1 incoming! Build more towers as they come.')}
+ if(!game.__gs&&game.wave===0&&!game.towers.length){game.__gs=realTime+1.2;const s=bestSpot('fire');if(s){const r=game.build('fire',{x:s.x,y:s.y});if(r.ok){/* Nov 5 2026 (user): the auto-built first tower must not leave Fire armed on the cursor */buildType=null;fx.push({kind:'tierup',x:s.x,y:s.y,color:E.TYPES.fire.color,at:game.time,life:1.1,small:true});events();refresh()}}feedback('Wave 1 incoming! Build more towers as they come.')}
  if(typeof game.__gs==='number'&&realTime>=game.__gs){game.__gs=true;if(game.wave===0){nextWave();autoArmed=true}}
  if(game.__gs===undefined&&game.wave>0){game.__gs=true;autoArmed=true}}
 let guidedTimer=null;
